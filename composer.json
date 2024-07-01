@@ -1,0 +1,21 @@
+{
+    "name": "controlink/laravel-winmax4",
+    "description": "This package is a Laravel 11 service provider for Winmax4 API",
+    "type": "library",
+    "require": {
+        "laravel/framework": "^11.13"
+    },
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Controlink\\LaravelWinmax4\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Inês Pereira",
+            "email": "ines.pereira@controlink.pt"
+        }
+    ],
+    "minimum-stability": "stable"
+}
