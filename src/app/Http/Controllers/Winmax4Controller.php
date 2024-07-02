@@ -30,7 +30,7 @@ class Winmax4Controller extends Controller
         $n_terminal = $request->n_terminal;
 
         $client = new \GuzzleHttp\Client();
-        $response = $client->request('POST', $url . '/api/authenticate', [
+        $response = $client->request('POST', $url . '/Account/Authenticate', [
             'json' => [
                 'company_code' => $company_code,
                 'username' => $username,
