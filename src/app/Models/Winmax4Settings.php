@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Winmax4 extends Model
+class Winmax4Settings extends Model
 {
     use HasFactory, SoftDeletes, HasUuids;
 

@@ -2,7 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
-use Controlink\LaravelWinmax4\app\Models\Winmax4;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Settings;
 use Illuminate\Http\Request;
 
 class Winmax4Controller extends Controller
@@ -47,7 +47,7 @@ class Winmax4Controller extends Controller
         $response = json_decode($response->getBody()->getContents());
 
         if($response->Results[0]->Code === 'OK'){
-            $winmax4 = new Winmax4();
+            $winmax4 = new Winmax4Settings();
             $winmax4->url = $url;
             $winmax4->company_code = $company_code;
             $winmax4->username = $username;
