@@ -20,7 +20,7 @@ class Winmax4ServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/database/migrations' => database_path('migrations'),
-            ], 'migrations');
+            ], 'winmax4-migrations');
         }
 
         // Load routes
