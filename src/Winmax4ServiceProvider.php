@@ -39,6 +39,7 @@ class Winmax4ServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        // Load config file
+        $this->mergeConfigFrom(__DIR__.'/../src/config/winmax4.php', 'winmax4');
     }
 }
