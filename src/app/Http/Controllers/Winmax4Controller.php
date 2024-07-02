@@ -22,7 +22,7 @@ class Winmax4Controller extends Controller
         if ($winmax4) {
             return response()->json([
                 'message' => 'Success',
-                'data' => $winmax4,
+                $winmax4,
             ], 200);
         }
     }
