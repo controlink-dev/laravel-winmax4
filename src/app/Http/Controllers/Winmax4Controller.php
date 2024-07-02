@@ -29,6 +29,16 @@ class Winmax4Controller extends Controller
         $password = $request->password;
         $n_terminal = $request->n_terminal;
 
+        dd([
+            'verify' => config('winmax4.verify_ssl_guzzle'),
+            'json' => [
+                'Company' => $company_code,
+                'UserLogin' => $username,
+                'Password' => $password,
+                'TerminalCode' => $n_terminal,
+            ],
+        ]);
+
         $client = new \GuzzleHttp\Client();
         $response = $client->post($url . '/Account/GenerateToken', [
             'verify' => config('winmax4.verify_ssl_guzzle'),
