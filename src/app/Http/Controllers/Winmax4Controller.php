@@ -16,15 +16,12 @@ class Winmax4Controller extends Controller
      */
     public function authenticate(Request $request)
     {
-        $request->use_license = config('winmax4.use_license');
-
         $request->validate([
             'url' => 'required',
             'company_code' => 'required',
             'username' => 'required',
             'password' => 'required',
             'n_terminal' => 'required',
-            'license_id' => 'required_if:use_license,true',
         ]);
 
         $url = $request->url;
@@ -55,7 +52,7 @@ class Winmax4Controller extends Controller
             $winmax4->n_terminal = $n_terminal;
 
             if(config('winmax4.use_license')){
-                $winmax4->{config('winmax4.license_column')} = $request->license_id;
+                $winmax4->{config('winmax4.license_column')} = session('licenseID');
             }
 
             $winmax4->save();
