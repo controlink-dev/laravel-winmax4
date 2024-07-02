@@ -53,8 +53,7 @@ class Winmax4Controller extends Controller
 
 
             if(config('winmax4.use_license')){
-                dd(config('winmax4.use_license'), config('winmax4.license_column'), session('licenseID'));
-                $winmax4->{config('winmax4.license_column')} = session('licenseID');
+                $winmax4->{config('winmax4.license_column')} = $request->sessionID;
             }
 
             $winmax4->save();
