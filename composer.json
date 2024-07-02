@@ -17,6 +17,16 @@
             "email": "ines.pereira@controlink.pt"
         }
     ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Controlink\\LaravelWinmax4\\Winmax4ServiceProvider"
+            ],
+            "aliases": {
+                "Winmax4": "Controlink\\LaravelWinmax4\\Facades\\YourFacade"
+            }
+        }
+    },
     "minimum-stability": "stable",
     "prefer-stable": true
 }
