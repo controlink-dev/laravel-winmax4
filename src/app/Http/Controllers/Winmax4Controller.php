@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
+use Controlink\LaravelWinmax4\app\Models\Winmax4;
 use Illuminate\Http\Request;
 
 class Winmax4Controller extends Controller
@@ -15,12 +16,15 @@ class Winmax4Controller extends Controller
      */
     public function authenticate(Request $request)
     {
+        $request->use_license = config('winmax4.use_license');
+
         $request->validate([
             'url' => 'required',
             'company_code' => 'required',
             'username' => 'required',
             'password' => 'required',
             'n_terminal' => 'required',
+            'license_id' => 'required_if:use_license,true',
         ]);
 
         $url = $request->url;
@@ -42,6 +46,31 @@ class Winmax4Controller extends Controller
 
         $response = json_decode($response->getBody()->getContents());
 
-        dd($response);
+        if($response->Results[0]->Code === 'OK'){
+            $winmax4 = new Winmax4();
+            $winmax4->url = $url;
+            $winmax4->company_code = $company_code;
+            $winmax4->username = $username;
+            $winmax4->password = $password;
+            $winmax4->n_terminal = $n_terminal;
+
+            if(config('winmax4.use_license')){
+                $winmax4->{config('winmax4.license_column')} = $request->license_id;
+            }
+
+            $winmax4->save();
+
+            return response()->json([
+                'message' => 'Success',
+                'data' => $response->Results[0]->Message,
+            ], 201);
+
+        }else{
+
+            return response()->json([
+                'message' => 'Error',
+                'error' => $response->Results[0]->Message,
+            ], 400);
+        }
     }
 }
