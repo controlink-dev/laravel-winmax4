@@ -40,6 +40,8 @@ class Winmax4Controller extends Controller
             ],
         ]);
 
-        return response()->json(json_decode($response->getBody()->getContents()));
+        $response = json_decode($response->getBody()->getContents());
+
+        dd($response);
     }
 }
