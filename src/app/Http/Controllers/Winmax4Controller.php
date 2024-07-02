@@ -51,7 +51,9 @@ class Winmax4Controller extends Controller
             $winmax4->password = $password;
             $winmax4->n_terminal = $n_terminal;
 
+
             if(config('winmax4.use_license')){
+                dd(config('winmax4.use_license'), config('winmax4.license_column'), session('licenseID'));
                 $winmax4->{config('winmax4.license_column')} = session('licenseID');
             }
 
