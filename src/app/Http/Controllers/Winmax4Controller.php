@@ -29,7 +29,7 @@ class Winmax4Controller extends Controller
         $password = $request->password;
         $n_terminal = $request->n_terminal;
 
-        $client = new \GuzzleHttp\Client();
+        $client = new \GuzzleHttp\Client(['verify' => config('winmax4.verify_ssl_guzzle')]);
         $response = $client->request('POST', $url . '/Account/Authenticate', [
             'json' => [
                 'company_code' => $company_code,
