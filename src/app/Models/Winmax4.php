@@ -2,7 +2,6 @@
 
 namespace Controlink\LaravelWinmax4\app\Models;
 
-use App\Models\Scopes\LicenseScope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
