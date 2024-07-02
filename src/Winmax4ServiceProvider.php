@@ -21,6 +21,11 @@ class Winmax4ServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../src/database/migrations' => database_path('migrations'),
             ], 'winmax4-migrations');
+
+            // Publish config file
+            $this->publishes([
+                __DIR__.'/../src/config/winmax4.php' => config_path('winmax4.php'),
+            ], 'winmax4-config');
         }
 
         // Load routes
