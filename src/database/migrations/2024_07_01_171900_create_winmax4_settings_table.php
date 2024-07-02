@@ -18,6 +18,17 @@ return new class extends Migration
             $table->string('username');
             $table->string('password');
             $table->string('n_terminal');
+
+            if(config('winmax4.use_license')){
+                if(config('winmax4.license_is_uuid')){
+                    $table->uuid(config('winmax4.license_column'));
+                }else{
+                    $table->foreignId(config('winmax4.license_column'));
+                }
+
+                $table->foreign(config('winmax4.license_column'))->references('id')->on(config('winmax4.licenses_table'));
+            }
+
             $table->timestamps();
         });
     }
