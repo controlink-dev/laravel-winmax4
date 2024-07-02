@@ -15,8 +15,20 @@ class Winmax4Controller extends Controller
         $this->winmax4Service = $winmax4Service;
     }
 
+    public function getWinmax4Settings()
+    {
+        $winmax4 = Winmax4Settings::where(config('winmax4.license_column'), session('licenseID'))->first();
+
+        if ($winmax4) {
+            return response()->json([
+                'message' => 'Success',
+                'data' => $winmax4,
+            ], 200);
+        }
+    }
+
     /**
-     * Authenticate to Winmax4 API
+     * Generate token for Winmax4 API
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -38,7 +50,7 @@ class Winmax4Controller extends Controller
         $password = $validatedData['password'];
         $n_terminal = $validatedData['n_terminal'];
 
-        $response = $this->winmax4Service->authenticate($url, $company_code, $username, $password, $n_terminal);
+        $response = $this->winmax4Service->generateToken($url, $company_code, $username, $password, $n_terminal);
 
         if ($response->Results[0]->Code === 'OK') {
             $winmax4 = new Winmax4Settings();

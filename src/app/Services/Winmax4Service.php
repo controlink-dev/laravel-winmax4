@@ -27,7 +27,7 @@ class Winmax4Service
      * @return object
      * @throws GuzzleException
      */
-    public function authenticate($url, $company_code, $username, $password, $n_terminal)
+    public function generateToken($url, $company_code, $username, $password, $n_terminal)
     {
         $response = $this->client->post($url . '/Account/GenerateToken', [
             'verify' => $this->settings['verify_ssl_guzzle'],
