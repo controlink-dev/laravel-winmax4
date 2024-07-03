@@ -14,6 +14,7 @@ class Winmax4Currency extends Model
     protected $table = 'winmax4_currencies';
 
     protected $fillable = [
+        'license_id',
         'code',
         'designation',
         'is_active',

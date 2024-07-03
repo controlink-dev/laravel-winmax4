@@ -51,6 +51,7 @@ class SyncCurrencies extends Command
                         'code' => $currency->Code
                     ],
                     [
+                        'license_id' => $winmax4Setting->license_id,
                         'designation' => $currency->Designation,
                         'is_active' => $currency->IsActive,
                         'article_decimals' => $currency->ArticleDecimals,
