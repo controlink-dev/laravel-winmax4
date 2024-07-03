@@ -105,13 +105,33 @@ class Winmax4Controller extends Controller
     public function getCurrencies(){
         $winmax4 = Winmax4Settings::where(config('winmax4.license_column'), session('licenseID'))->first();
 
-        if ($winmax4) {
-            $response = $this->winmax4Service->getCurrencies($winmax4->url);
+        if (!$winmax4) {
+            return response()->json([
+                'message' => 'Error',
+                'error' => 'Winmax4 not configured.',
+            ], 400);
+        }
 
+        $url = $winmax4->url;
+        $company_code = $winmax4->company_code;
+        $username = $winmax4->username;
+        $password = $winmax4->password;
+        $n_terminal = $winmax4->n_terminal;
+
+        $winmax4Service = new Winmax4Service(false, $url, $company_code, $username, $password, $n_terminal);
+
+        $response = $winmax4Service->getCurrencies($url);
+
+        if ($response->Results[0]->Code === 'OK') {
             return response()->json([
                 'message' => 'Success',
-                'data' => $response,
+                'data' => $response->Results[0]->Message,
             ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Error',
+                'error' => $response->Results[0]->Message,
+            ], 400);
         }
     }
 
