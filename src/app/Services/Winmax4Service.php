@@ -50,6 +50,12 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * Get currencies from Winmax4 API
+     *
+     * @return object
+     * @throws GuzzleException
+     */
     public function getCurrencies()
     {
         $response = $this->client->get($this->url . '/Files/Currencies', [
