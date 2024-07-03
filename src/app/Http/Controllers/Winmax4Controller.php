@@ -73,6 +73,11 @@ class Winmax4Controller extends Controller
         $password = $request->password;
         $n_terminal = $request->n_terminal;
 
+        $type_docs_invoice = $request->type_docs_invoice;
+        $type_docs_invoice_receipt = $request->type_docs_invoice_receipt;
+        $type_docs_credit_note = $request->type_docs_credit_note;
+        $type_docs_receipt = $request->type_docs_receipt;
+
         $response = $this->winmax4Service->generateToken($url, $company_code, $username, $password, $n_terminal);
 
         if ($response->Results[0]->Code === 'OK') {
@@ -82,6 +87,11 @@ class Winmax4Controller extends Controller
             $winmax4->username = $username;
             $winmax4->password = $password;
             $winmax4->n_terminal = $n_terminal;
+
+            $winmax4->type_docs_invoice = $type_docs_invoice;
+            $winmax4->type_docs_invoice_receipt = $type_docs_invoice_receipt;
+            $winmax4->type_docs_credit_note = $type_docs_credit_note;
+            $winmax4->type_docs_receipt = $type_docs_receipt;
 
             if (config('winmax4.use_license')) {
                 $winmax4->{config('winmax4.license_column')} = $request->sessionID;
