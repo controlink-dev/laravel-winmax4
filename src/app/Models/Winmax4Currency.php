@@ -11,6 +11,8 @@ class Winmax4Currency extends Model
 {
     use HasFactory;
 
+    protected $table = 'winmax4_currencies';
+
     protected $fillable = [
         'code',
         'designation',

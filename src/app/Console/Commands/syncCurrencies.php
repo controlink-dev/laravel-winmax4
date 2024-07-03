@@ -46,7 +46,7 @@ class SyncCurrencies extends Command
 
             foreach ($currencies as $currency) {
                 // Save currency to the database
-                $currency = Winmax4Currency::updateOrCreate(
+                 Winmax4Currency::updateOrCreate(
                     [
                         'code' => $currency->Code
                     ],
