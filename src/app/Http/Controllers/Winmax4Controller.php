@@ -107,4 +107,12 @@ class Winmax4Controller extends Controller
         return response()->json(Winmax4Currency::get(), 200);
     }
 
+    public function getDocumentTypes(){
+        $response = $this->winmax4Service->getDocumentTypes();
+
+        dd($response);
+
+        return response()->json($response->Data->DocumentTypes, 200);
+    }
+
 }

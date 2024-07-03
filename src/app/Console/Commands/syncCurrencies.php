@@ -8,7 +8,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Console\Command;
 
-class SyncCurrencies extends Command
+class syncCurrencies extends Command
 {
     /**
      * The name and signature of the console command.

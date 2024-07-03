@@ -2,7 +2,7 @@
 
 namespace Controlink\LaravelWinmax4;
 
-use Controlink\LaravelWinmax4\app\Console\Commands\SyncCurrencies;
+use Controlink\LaravelWinmax4\app\Console\Commands\syncCurrencies;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,7 +32,7 @@ class Winmax4ServiceProvider extends ServiceProvider
 
         // Register the command
         $this->commands([
-            SyncCurrencies::class,
+            syncCurrencies::class,
         ]);
 
         // Load routes
