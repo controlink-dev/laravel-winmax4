@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\GuzzleException;
 class Winmax4Service
 {
     protected $client;
+    protected $url;
     protected $settings;
     protected $token;
 
@@ -15,6 +16,7 @@ class Winmax4Service
     {
         $this->client = new Client();
         $this->settings = config('winmax4');
+        $this->url = $url;
 
         if (!$saveMode) {
             $this->token = $this->generateToken($url, $company_code, $username, $password, $n_terminal);
@@ -48,9 +50,9 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
-    public function getCurrencies($url)
+    public function getCurrencies()
     {
-        $response = $this->client->get($url . '/Files/Currencies', [
+        $response = $this->client->get($this->url . '/Files/Currencies', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
