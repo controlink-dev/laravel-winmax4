@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
+use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Http\Request;
@@ -103,19 +104,7 @@ class Winmax4Controller extends Controller
      * Get currencies from Winmax4 API
      */
     public function getCurrencies(){
-        $response = $this->winmax4Service->getCurrencies();
-
-        if ($response->Results[0]->Code === 'OK') {
-            return response()->json([
-                'message' => 'Success',
-                'data' => $response->Data->Currencies,
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'Error',
-                'error' => $response->Results[0]->Message,
-            ], 400);
-        }
+        return response()->json(Winmax4Currency::get(), 200);
     }
 
 }
