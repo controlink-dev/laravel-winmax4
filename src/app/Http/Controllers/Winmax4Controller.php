@@ -10,11 +10,32 @@ class Winmax4Controller extends Controller
 {
     protected $winmax4Service;
 
-    public function __construct(Winmax4Service $winmax4Service)
+    /**
+     * Winmax4Controller constructor.
+     *
+     */
+    public function __construct()
     {
-        $this->winmax4Service = $winmax4Service;
+        $winmaxSettings = Winmax4Settings::where(config('winmax4.license_column'), session('licenseID'))->first();
+
+        if(!$winmaxSettings) {
+            $this->winmax4Service = new Winmax4Service(true);
+        }else{
+            $this->winmax4Service = new Winmax4Service(
+                false,
+                $winmaxSettings->url,
+                $winmaxSettings->company_code,
+                $winmaxSettings->username,
+                $winmaxSettings->password,
+                $winmaxSettings->n_terminal
+            );
+        }
     }
 
+    /**
+     * Get Winmax4 settings
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getWinmax4Settings()
     {
         $winmax4 = Winmax4Settings::where(config('winmax4.license_column'), session('licenseID'))->first();
@@ -36,7 +57,7 @@ class Winmax4Controller extends Controller
      */
     public function generateToken(Request $request)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'url' => 'required',
             'company_code' => 'required',
             'username' => 'required',
@@ -44,11 +65,11 @@ class Winmax4Controller extends Controller
             'n_terminal' => 'required',
         ]);
 
-        $url = $validatedData['url'];
-        $company_code = $validatedData['company_code'];
-        $username = $validatedData['username'];
-        $password = $validatedData['password'];
-        $n_terminal = $validatedData['n_terminal'];
+        $url = $request->url;
+        $company_code = $request->company_code;
+        $username = $request->username;
+        $password = $request->password;
+        $n_terminal = $request->n_terminal;
 
         $response = $this->winmax4Service->generateToken($url, $company_code, $username, $password, $n_terminal);
 

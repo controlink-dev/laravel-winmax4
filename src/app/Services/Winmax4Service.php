@@ -9,11 +9,17 @@ class Winmax4Service
 {
     protected $client;
     protected $settings;
+    protected $token;
 
-    public function __construct()
+    public function __construct($saveMode = false, $url = '', $company_code = '', $username = '', $password = '', $n_terminal = '')
     {
         $this->client = new Client();
         $this->settings = config('winmax4');
+
+        if (!$saveMode) {
+            $this->token = $this->generateToken($url, $company_code, $username, $password, $n_terminal);
+        }
+
     }
 
     /**
