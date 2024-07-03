@@ -35,11 +35,11 @@ class SyncCurrencies extends Command
             $this->info('Syncing currencies for ' . $winmax4Setting->company_code . '...');
             $winmax4Service = new Winmax4Service(
                 false,
-                $winmax4Settings->url,
-                $winmax4Settings->company_code,
-                $winmax4Settings->username,
-                $winmax4Settings->password,
-                $winmax4Settings->n_terminal
+                $winmax4Setting->url,
+                $winmax4Setting->company_code,
+                $winmax4Setting->username,
+                $winmax4Setting->password,
+                $winmax4Setting->n_terminal
             );
 
             $currencies = $winmax4Service->getCurrencies()->Data->Currencies;
