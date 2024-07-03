@@ -44,6 +44,8 @@ class syncDocumentsTypes extends Command
 
             $documentTypes = $winmax4Service->getDocumentTypes()->Data->DocumentTypes;
 
+            $documentTypes = collect($documentTypes)->where('IsActive', 1)->where('TransactionType', 0)->where('EntityType', 0);
+
             foreach ($documentTypes as $documentType) {
                 // Save currency to the database
                  Winmax4Currency::updateOrCreate(
