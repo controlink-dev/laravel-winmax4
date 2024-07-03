@@ -53,7 +53,7 @@ class Winmax4Service
         $response = $this->client->get($url . '/Files/Currencies', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
-                'Authorization' => 'Bearer',
+                'Authorization' => 'Bearer' . $this->token->Token,
             ],
         ]);
 
