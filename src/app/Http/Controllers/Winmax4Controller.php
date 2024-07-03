@@ -3,6 +3,7 @@
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
+use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Http\Request;
@@ -108,11 +109,7 @@ class Winmax4Controller extends Controller
     }
 
     public function getDocumentTypes(){
-        $response = $this->winmax4Service->getDocumentTypes();
-
-        dd($response);
-
-        return response()->json($response->Data->DocumentTypes, 200);
+        return response()->json(Winmax4DocumentType::get(), 200);
     }
 
 }

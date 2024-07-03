@@ -53,6 +53,7 @@ class Winmax4ServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
             $schedule->command('winmax4:sync-currencies')->daily();
+            $schedule->command('winmax4:sync-document-types')->daily();
         });
     }
 }

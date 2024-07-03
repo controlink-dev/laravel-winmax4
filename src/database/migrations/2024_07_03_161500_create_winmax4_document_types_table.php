@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('winmax4_currencies', function (Blueprint $table) {
+        Schema::create('winmax4_document_types', function (Blueprint $table) {
             $table->id();
             $table->string('code');
             $table->string('designation');
             $table->boolean('is_active');
-            $table->string('article_decimals');
-            $table->string('document_decimals');
+            $table->bigInteger('transaction_type');
+            $table->bigInteger('entity_type');
 
             if(config('winmax4.use_license')){
                 if(config('winmax4.license_is_uuid')){
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('winmax4_currencies');
+        Schema::dropIfExists('winmax4_document_types');
     }
 };
