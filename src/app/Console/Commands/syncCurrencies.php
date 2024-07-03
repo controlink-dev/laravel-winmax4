@@ -31,8 +31,6 @@ class SyncCurrencies extends Command
     {
         $winmax4Settings = Winmax4Setting::get();
 
-        dd($winmax4Settings);
-
         foreach ($winmax4Settings as $winmax4Setting) {
             $this->info('Syncing currencies for ' . $winmax4Setting->company_code . '...');
             $winmax4Service = new Winmax4Service(
