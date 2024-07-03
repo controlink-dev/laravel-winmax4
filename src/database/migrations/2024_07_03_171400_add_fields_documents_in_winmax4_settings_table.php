@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('winmax4_settings', function (Blueprint $table) {
-            $table->bigInteger('type_docs_invoice');
-            $table->bigInteger('type_docs_invoice_receipt');
-            $table->bigInteger('type_docs_credit_note');
-            $table->bigInteger('type_docs_receipt');
+            $table->bigInteger('type_docs_invoice')->nullable();
+            $table->bigInteger('type_docs_invoice_receipt')->nullable();
+            $table->bigInteger('type_docs_credit_note')->nullable();
+            $table->bigInteger('type_docs_receipt')->nullable();
         });
     }
 
