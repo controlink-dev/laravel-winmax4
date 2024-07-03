@@ -105,6 +105,7 @@ class Winmax4Controller extends Controller
     public function getCurrencies(){
         $response = $this->winmax4Service->getCurrencies();
 
+        dd($response);
         if ($response->Results[0]->Code === 'OK') {
             return response()->json([
                 'message' => 'Success',
