@@ -4,6 +4,7 @@ namespace Controlink\LaravelWinmax4\app\Console\Commands;
 
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
+use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Console\Command;
@@ -48,7 +49,7 @@ class syncDocumentsTypes extends Command
 
             foreach ($documentTypes as $documentType) {
                 // Save currency to the database
-                 Winmax4Currency::updateOrCreate(
+                 Winmax4DocumentType::updateOrCreate(
                     [
                         'code' => $documentType->Code
                     ],
