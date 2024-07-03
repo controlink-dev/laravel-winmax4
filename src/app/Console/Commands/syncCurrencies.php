@@ -29,7 +29,7 @@ class SyncCurrencies extends Command
      */
     public function handle()
     {
-        $winmax4Settings = Winmax4Setting::all();
+        $winmax4Settings = Winmax4Setting::get();
 
         foreach ($winmax4Settings as $winmax4Setting) {
             $this->info('Syncing currencies for ' . $winmax4Setting->company_code . '...');
