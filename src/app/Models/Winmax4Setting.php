@@ -21,7 +21,7 @@ class Winmax4Setting extends Model
 
     protected static function booted()
     {
-        if(config('winmax4.use_license')){
+        if(config('winmax4.use_license') && !app()->runningInConsole()){
             static::addGlobalScope(new LicenseScope());
         }
     }
