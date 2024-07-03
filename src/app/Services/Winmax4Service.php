@@ -50,6 +50,7 @@ class Winmax4Service
 
     public function getCurrencies($url)
     {
+        dd($this->token->Data->AccessToken->Value);
         $response = $this->client->get($url . '/Files/Currencies', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
