@@ -2,7 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
-use Controlink\LaravelWinmax4\app\Models\Winmax4Settings;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Http\Request;
 
@@ -16,7 +16,7 @@ class Winmax4Controller extends Controller
      */
     public function __construct()
     {
-        $winmaxSettings = Winmax4Settings::where(config('winmax4.license_column'), session('licenseID'))->first();
+        $winmaxSettings = Winmax4Setting::where(config('winmax4.license_column'), session('licenseID'))->first();
 
         if(!$winmaxSettings) {
             $this->winmax4Service = new Winmax4Service(true);
@@ -38,7 +38,7 @@ class Winmax4Controller extends Controller
      */
     public function getWinmax4Settings()
     {
-        $winmax4 = Winmax4Settings::where(config('winmax4.license_column'), session('licenseID'))->first();
+        $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), session('licenseID'))->first();
 
         if ($winmax4) {
             return response()->json([
@@ -74,7 +74,7 @@ class Winmax4Controller extends Controller
         $response = $this->winmax4Service->generateToken($url, $company_code, $username, $password, $n_terminal);
 
         if ($response->Results[0]->Code === 'OK') {
-            $winmax4 = new Winmax4Settings();
+            $winmax4 = new Winmax4Setting();
             $winmax4->url = $url;
             $winmax4->company_code = $company_code;
             $winmax4->username = $username;

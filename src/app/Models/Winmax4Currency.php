@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Winmax4Settings extends Model
+class Winmax4Currency extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'url',
-        'company_code',
-        'username',
-        'password',
-        'n_terminal',
+        'code',
+        'designation',
+        'is_active',
+        'article_decimals',
+        'document_decimals',
     ];
 
     protected static function booted()
