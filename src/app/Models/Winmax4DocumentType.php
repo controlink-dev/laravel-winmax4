@@ -11,7 +11,7 @@ class Winmax4DocumentType extends Model
 {
     use HasFactory;
 
-    protected $table = 'winmax4_currencies';
+    protected $table = 'winmax4_document_types';
 
     protected $fillable = [
         'license_id',
