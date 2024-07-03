@@ -106,7 +106,7 @@ class Winmax4Controller extends Controller
         $winmax4 = Winmax4Settings::where(config('winmax4.license_column'), session('licenseID'))->first();
 
         if ($winmax4) {
-            $response = $this->winmax4Service->getCurrencies($winmax4->url, $this->generateToken($winmax4->url, $winmax4->company_code, $winmax4->username, $winmax4->password, $winmax4->n_terminal));
+            $response = $this->winmax4Service->getCurrencies($winmax4->url, );
 
             return response()->json([
                 'message' => 'Success',
