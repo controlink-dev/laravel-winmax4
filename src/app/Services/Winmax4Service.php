@@ -41,4 +41,16 @@ class Winmax4Service
 
         return json_decode($response->getBody()->getContents());
     }
+
+    public function getCurrencies($url, $token)
+    {
+        $response = $this->client->get($url . '/Currency/GetAll', [
+            'verify' => $this->settings['verify_ssl_guzzle'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents());
+    }
 }
