@@ -8,4 +8,5 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::post('/generateToken', [Winmax4Controller::class, 'generateToken'])->name('winmax4.generateToken');
     Route::get('/getCurrencies', [Winmax4Controller::class, 'getCurrencies'])->name('winmax4.getCurrencies');
     Route::get('/getDocumentTypes', [Winmax4Controller::class, 'getDocumentTypes'])->name('winmax4.getDocumentTypes');
+    Route::get('/getFamilies', [Winmax4Controller::class, 'getFamilies'])->name('winmax4.getFamilies');
 });

@@ -137,4 +137,12 @@ class Winmax4Controller extends Controller
         return response()->json(Winmax4DocumentType::get(), 200);
     }
 
+    public function getFamilies(){
+        //return response()->json(Winmax4Family::get(), 200);
+
+        $response = $this->winmax4Service->getFamilies();
+
+        dd($response);
+    }
+
 }
