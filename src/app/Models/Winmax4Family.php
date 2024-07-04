@@ -25,4 +25,9 @@ class Winmax4Family extends Model
             static::addGlobalScope(new LicenseScope());
         }
     }
+
+    public function subFamilies()
+    {
+        return $this->hasMany(Winmax4SubFamily::class, 'family_id');
+    }
 }

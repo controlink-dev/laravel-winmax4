@@ -3,6 +3,8 @@
 namespace Controlink\LaravelWinmax4\app\Jobs;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
+use Controlink\LaravelWinmax4\app\Models\Winmax4SubFamily;
+use Controlink\LaravelWinmax4\app\Models\Winmax4SubSubFamily;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,5 +43,39 @@ class SyncFamiliesJob implements ShouldQueue
                 'is_active' => $this->family->IsActive,
             ]
         );
+
+        if (isset($this->family->SubFamilies)) {
+            foreach ($this->family->SubFamilies as $subFamily) {
+                $newSubFamily = Winmax4SubFamily::updateOrCreate(
+                    [
+                        'family_id' => $this->family->id,
+                        'code' => $subFamily->Code,
+                        'designation' => $subFamily->Designation,
+                    ],
+                    [
+                        'family_id' => $this->family->id,
+                        'code' => $subFamily->Code,
+                        'designation' => $subFamily->Designation,
+                    ]
+                );
+
+                if (isset($subFamily->SubSubFamilies)) {
+                    foreach ($subFamily->SubSubFamilies as $subSubFamily) {
+                        $newSubSubFamily = Winmax4SubSubFamily::updateOrCreate(
+                            [
+                                'sub_family_id' => $newSubFamily->id,
+                                'code' => $subSubFamily->Code,
+                                'designation' => $subSubFamily->Designation,
+                            ],
+                            [
+                                'sub_family_id' => $newSubFamily->id,
+                                'code' => $subSubFamily->Code,
+                                'designation' => $subSubFamily->Designation,
+                            ]
+                        );
+                    }
+                }
+            }
+        }
     }
 }
