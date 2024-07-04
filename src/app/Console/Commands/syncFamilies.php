@@ -2,12 +2,12 @@
 
 namespace Controlink\LaravelWinmax4\app\Console\Commands;
 
-use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
-use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
-use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
+use Controlink\LaravelWinmax4\app\Jobs\SyncFamiliesJob;
+use Illuminate\Bus\Batch;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Bus;
 
 class syncFamilies extends Command
 {
@@ -43,22 +43,23 @@ class syncFamilies extends Command
                 $winmax4Setting->n_terminal
             );
 
-            $currencies = $winmax4Service->getFamilies()->Data->Families;
+            $families = $winmax4Service->getFamilies()->Data->Families;
 
-            foreach ($currencies as $currency) {
-                // Save currency to the database
-                 Winmax4Family::updateOrCreate(
-                    [
-                        'code' => $currency->Code
-                    ],
-                    [
-                        'license_id' => $winmax4Setting->license_id,
-                        'designation' => $currency->Designation,
-                        'is_active' => $currency->IsActive,
-                    ]
-                );
+            $job = [];
+            foreach ($families as $family) {
+                $job[] = new SyncFamiliesJob($family, $winmax4Setting->license_id);
             }
-        }
 
+            $batch = Bus::batch([])->finally(function (Batch $batch){
+                $batch->delete();
+            })->name('winmax4_families')->onQueue(config('winmax4.queue'))->dispatch();
+
+            $chunks = array_chunk($job, 100);
+
+            foreach ($chunks as $chunk){
+                $batch->add($chunk);
+            }
+
+        }
     }
 }

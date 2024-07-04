@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('winmax4_families', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->string('description');
+            $table->string('designation');
             $table->boolean('is_active');
 
             if(config('winmax4.use_license')){

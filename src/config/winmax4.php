@@ -32,4 +32,18 @@ return [
     |
     */
     'verify_ssl_guzzle' => env('WINMAX4_VERIFY_SSL_GUZZLE', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Jobs Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the queue that should be used for the Winmax4
+    | jobs. If set to null, the jobs will be dispatched to the default
+    | queue. If set to a string, the jobs will be dispatched to
+    | the specified queue.
+    |
+    */
+
+    'queue' => env('WINMAX4_QUEUE', 'winmax4'),
 ];
