@@ -44,7 +44,7 @@ class SyncFamiliesJob implements ShouldQueue
             ]
         );
 
-        dd($newFamily);
+        dump($newFamily);
 
         if (isset($this->family->SubFamilies)) {
             foreach ($this->family->SubFamilies as $subFamily) {
