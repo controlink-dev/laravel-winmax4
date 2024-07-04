@@ -58,16 +58,18 @@ class syncTaxes extends Command
                     ]
                 );
 
-                foreach ($tax->Rates as $rate) {
-                    $tax->taxRates()->updateOrCreate(
-                        [
-                            'tax_id' => $tax->id,
-                        ],
-                        [
-                            'fixedAmount' => $rate->FixedAmount,
-                            'percentage' => $rate->Percentage,
-                        ]
-                    );
+                if (!empty($tax->Rates)) {
+                    foreach ($tax->Rates as $rate) {
+                        $tax->taxRates()->updateOrCreate(
+                            [
+                                'tax_id' => $tax->id,
+                            ],
+                            [
+                                'fixedAmount' => $rate->FixedAmount,
+                                'percentage' => $rate->Percentage,
+                            ]
+                        );
+                    }
                 }
             }
 
