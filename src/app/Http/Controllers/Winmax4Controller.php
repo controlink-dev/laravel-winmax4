@@ -140,7 +140,9 @@ class Winmax4Controller extends Controller
     }
 
     public function getFamilies(){
-        return response()->json(Winmax4Family::get(), 200);
+        //return response()->json(Winmax4Family::get(), 200);
+
+        return $this->winmax4Service->getFamilies();
     }
 
     public function getTaxes(){
