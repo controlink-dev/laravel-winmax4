@@ -47,7 +47,7 @@ class syncTaxes extends Command
             $taxes = $winmax4Service->getTaxes()->Data->Taxes;
 
             foreach ($taxes as $tax) {
-                Winmax4Tax::updateOrCreate(
+                $newTax = Winmax4Tax::updateOrCreate(
                     [
                         'code' => $tax->Code,
                     ],
@@ -58,11 +58,9 @@ class syncTaxes extends Command
                     ]
                 );
 
-                dump($tax->Rates);
-
                 if ($tax->Rates) {
                     foreach ($tax->Rates as $rate) {
-                        $tax->taxRates()->updateOrCreate(
+                        $newTax->taxRates()->updateOrCreate(
                             [
                                 'tax_id' => $tax->id,
                             ],
