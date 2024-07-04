@@ -84,15 +84,13 @@ class Winmax4Service
 
     public function getFamilies()
     {
-        $response = $this->client->get($this->url . '/Files/Families', [
+        $response = $this->client->get($this->url . '/Files/Families?IncludeSubFamilies=true', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 'Content-Type' => 'application/json',
             ],
         ]);
-
-        dd(json_decode($response->getBody()->getContents()));
 
         return json_decode($response->getBody()->getContents());
     }
