@@ -63,6 +63,8 @@ class syncTaxes extends Command
                         $newTax->taxRates()->updateOrCreate(
                             [
                                 'tax_id' => $newTax->id,
+                                'fixedAmount' => $rate->FixedAmount,
+                                'percentage' => $rate->Percentage,
                             ],
                             [
                                 'fixedAmount' => $rate->FixedAmount,
