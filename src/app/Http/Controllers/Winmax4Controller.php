@@ -81,20 +81,38 @@ class Winmax4Controller extends Controller
         $response = $this->winmax4Service->generateToken($url, $company_code, $username, $password, $n_terminal);
 
         if ($response->Results[0]->Code === 'OK') {
-            $winmax4 = new Winmax4Setting();
-            $winmax4->url = $url;
-            $winmax4->company_code = $company_code;
-            $winmax4->username = $username;
-            $winmax4->password = $password;
-            $winmax4->n_terminal = $n_terminal;
+           //check if exists
+            $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), $request->sessionID)->first();
 
-            $winmax4->type_docs_invoice = $type_docs_invoice;
-            $winmax4->type_docs_invoice_receipt = $type_docs_invoice_receipt;
-            $winmax4->type_docs_credit_note = $type_docs_credit_note;
-            $winmax4->type_docs_receipt = $type_docs_receipt;
+            if($winmax4) {
+                $winmax4->url = $url;
+                $winmax4->company_code = $company_code;
+                $winmax4->url = $url;
+                $winmax4->company_code = $company_code;
+                $winmax4->username = $username;
+                $winmax4->password = $password;
+                $winmax4->n_terminal = $n_terminal;
 
-            if (config('winmax4.use_license')) {
-                $winmax4->{config('winmax4.license_column')} = $request->sessionID;
+                $winmax4->type_docs_invoice = $type_docs_invoice;
+                $winmax4->type_docs_invoice_receipt = $type_docs_invoice_receipt;
+                $winmax4->type_docs_credit_note = $type_docs_credit_note;
+                $winmax4->type_docs_receipt = $type_docs_receipt;
+            }else{
+                $winmax4 = new Winmax4Setting();
+                $winmax4->url = $url;
+                $winmax4->company_code = $company_code;
+                $winmax4->username = $username;
+                $winmax4->password = $password;
+                $winmax4->n_terminal = $n_terminal;
+
+                $winmax4->type_docs_invoice = $type_docs_invoice;
+                $winmax4->type_docs_invoice_receipt = $type_docs_invoice_receipt;
+                $winmax4->type_docs_credit_note = $type_docs_credit_note;
+                $winmax4->type_docs_receipt = $type_docs_receipt;
+
+                if (config('winmax4.use_license')) {
+                    $winmax4->{config('winmax4.license_column')} = $request->sessionID;
+                }
             }
 
             $winmax4->save();
