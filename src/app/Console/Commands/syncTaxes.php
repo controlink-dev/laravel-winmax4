@@ -58,8 +58,7 @@ class syncTaxes extends Command
                     ]
                 );
 
-                dd($tax->Rates);
-                if (!empty($tax->Rates)) {
+                if ($tax->Rates) {
                     foreach ($tax->Rates as $rate) {
                         $tax->taxRates()->updateOrCreate(
                             [
