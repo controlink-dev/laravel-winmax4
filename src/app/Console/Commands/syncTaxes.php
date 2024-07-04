@@ -62,7 +62,7 @@ class syncTaxes extends Command
                     foreach ($tax->Rates as $rate) {
                         $newTax->taxRates()->updateOrCreate(
                             [
-                                'tax_id' => $tax->id,
+                                'tax_id' => $newTax->id,
                             ],
                             [
                                 'fixedAmount' => $rate->FixedAmount,
