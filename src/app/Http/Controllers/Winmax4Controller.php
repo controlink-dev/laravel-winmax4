@@ -67,8 +67,6 @@ class Winmax4Controller extends Controller
             'n_terminal' => 'required',
         ]);
 
-        dd($request->all());
-
         $url = $request->url;
         $company_code = $request->company_code;
         $username = $request->username;
@@ -83,12 +81,9 @@ class Winmax4Controller extends Controller
         $response = $this->winmax4Service->generateToken($url, $company_code, $username, $password, $n_terminal);
 
         if ($response->Results[0]->Code === 'OK') {
-           //check if exists
             $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), $request->sessionID)->first();
 
             if($winmax4) {
-                $winmax4->url = $url;
-                $winmax4->company_code = $company_code;
                 $winmax4->url = $url;
                 $winmax4->company_code = $company_code;
                 $winmax4->username = $username;
