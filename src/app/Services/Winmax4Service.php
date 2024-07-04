@@ -92,8 +92,6 @@ class Winmax4Service
             ],
         ]);
 
-        dd($response->getBody()->getContents());
-
         return json_decode($response->getBody()->getContents());
     }
 
