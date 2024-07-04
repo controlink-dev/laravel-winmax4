@@ -6,6 +6,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Tax;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Http\Request;
 
@@ -143,7 +144,7 @@ class Winmax4Controller extends Controller
     }
 
     public function getTaxes(){
-        return $this->winmax4Service->getTaxes();
+        return response()->json(Winmax4Tax::get(), 200);
     }
 
 }

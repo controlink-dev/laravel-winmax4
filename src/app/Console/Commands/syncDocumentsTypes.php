@@ -48,7 +48,6 @@ class syncDocumentsTypes extends Command
             $documentTypes = collect($documentTypes)->where('TransactionType', 0)->where('EntityType', 0);
 
             foreach ($documentTypes as $documentType) {
-                // Save document types to the database
                  Winmax4DocumentType::updateOrCreate(
                     [
                         'code' => $documentType->Code
