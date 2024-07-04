@@ -67,6 +67,8 @@ class Winmax4Controller extends Controller
             'n_terminal' => 'required',
         ]);
 
+        dd($request->all());
+
         $url = $request->url;
         $company_code = $request->company_code;
         $username = $request->username;
