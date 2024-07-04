@@ -144,7 +144,7 @@ class Winmax4Controller extends Controller
     }
 
     public function getTaxes(){
-        return response()->json(Winmax4Tax::get(), 200);
+        return response()->json(Winmax4Tax::with('taxRates')->get(), 200);
     }
 
 }
