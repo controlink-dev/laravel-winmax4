@@ -4,6 +4,7 @@ namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Http\Request;
@@ -138,11 +139,7 @@ class Winmax4Controller extends Controller
     }
 
     public function getFamilies(){
-        //return response()->json(Winmax4Family::get(), 200);
-
-        $response = $this->winmax4Service->getFamilies();
-
-        dd($response);
+        return response()->json(Winmax4Family::get(), 200);
     }
 
 }
