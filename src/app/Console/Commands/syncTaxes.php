@@ -47,7 +47,7 @@ class syncTaxes extends Command
             $taxes = $winmax4Service->getTaxes()->Data->Taxes;
 
             foreach ($taxes as $tax) {
-                $tax = Winmax4Tax::updateOrCreate(
+                Winmax4Tax::updateOrCreate(
                     [
                         'code' => $tax->Code,
                     ],
