@@ -33,7 +33,7 @@ class SyncFamiliesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Winmax4Family::updateOrCreate(
+        $newFamily = Winmax4Family::updateOrCreate(
             [
                 'code' => $this->family->Code
             ],
@@ -48,7 +48,7 @@ class SyncFamiliesJob implements ShouldQueue
             foreach ($this->family->SubFamilies as $subFamily) {
                 $newSubFamily = Winmax4SubFamily::updateOrCreate(
                     [
-                        'family_id' => $this->family->id,
+                        'family_id' => $newFamily->id,
                         'code' => $subFamily->Code,
                         'designation' => $subFamily->Designation,
                     ],
