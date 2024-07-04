@@ -45,8 +45,6 @@ class SyncFamiliesJob implements ShouldQueue
         );
 
         if (isset($this->family->SubFamilies)) {
-            dump($newFamily->id);
-
             foreach ($this->family->SubFamilies as $subFamily) {
                 $newSubFamily = Winmax4SubFamily::updateOrCreate(
                     [
