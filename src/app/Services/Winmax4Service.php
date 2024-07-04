@@ -95,4 +95,17 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    public function getTaxes()
+    {
+        $response = $this->client->get($this->url . '/Files/Taxes', [
+            'verify' => $this->settings['verify_ssl_guzzle'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents());
+    }
+
 }
