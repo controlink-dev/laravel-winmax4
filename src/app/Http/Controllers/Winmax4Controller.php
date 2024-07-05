@@ -159,7 +159,7 @@ class Winmax4Controller extends Controller
     public function getArticles(){
         //return response()->json(Winmax4Article::get(), 200);
 
-        $response = $this->winmax4Service->getArticles();
+        return $this->winmax4Service->getArticles();
     }
 
 }
