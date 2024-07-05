@@ -10,8 +10,8 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::get('/getDocumentTypes', [Winmax4Controller::class, 'getDocumentTypes'])->name('winmax4.getDocumentTypes');
 
     Route::get('/getFamilies', [Winmax4Controller::class, 'getFamilies'])->name('winmax4.getFamilies');
-    Route::get('/getSubFamilies', [Winmax4Controller::class, 'getSubFamilies'])->name('winmax4.getSubFamilies');
-    Route::get('/getSubSubFamilies', [Winmax4Controller::class, 'getSubSubFamilies'])->name('winmax4.getSubSubFamilies');
+    Route::get('/getSubFamilies/{family_id}', [Winmax4Controller::class, 'getSubFamilies'])->name('winmax4.getSubFamilies');
+    Route::get('/getSubSubFamilies/{sub_family_id}', [Winmax4Controller::class, 'getSubSubFamilies'])->name('winmax4.getSubSubFamilies');
 
     Route::get('/getTaxes', [Winmax4Controller::class, 'getTaxes'])->name('winmax4.getTaxes');
 
