@@ -14,5 +14,6 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::get('/getSubSubFamilies/{sub_family_id}', [Winmax4Controller::class, 'getSubSubFamilies'])->name('winmax4.getSubSubFamilies');
 
     Route::get('/getTaxes', [Winmax4Controller::class, 'getTaxes'])->name('winmax4.getTaxes');
+    Route::get('/getArticles', [Winmax4Controller::class, 'getArticles'])->name('winmax4.getArticles');
 
 });
