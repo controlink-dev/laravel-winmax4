@@ -35,7 +35,10 @@ class SyncEntitiesJob implements ShouldQueue
     public function handle(): void
     {
         Winmax4Entity::updateOrCreate(
-            ['code' => $this->entity->Code],
+            [
+                'code' => $this->entity->Code,
+                'tax_payer_id' => $this->entity->TaxPayerID,
+            ],
             [
                 'license_id' => $this->license_id,
                 'name' => $this->entity->Name,
