@@ -110,7 +110,7 @@ class Winmax4Service
 
     public function getArticles()
     {
-        $response = $this->client->get($this->url . '/Files/Articles?IncludeCategories=true', [
+        $response = $this->client->get($this->url . '/Files/Articles?IncludeCategories=true?IncludeExtras=true?IncludeHolds=true?IncludeDescriptives=true?IncludeQuestions=true', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
