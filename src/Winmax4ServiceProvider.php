@@ -64,7 +64,7 @@ class Winmax4ServiceProvider extends ServiceProvider
             $schedule->command('winmax4:sync-document-types')->daily();
             $schedule->command('winmax4:sync-families')->everyFifteenMinutes();
             $schedule->command('winmax4:sync-taxes')->daily();
-            $schedule->command('winmax4:sync-entities')->everyFifteenMinutes();
+            $schedule->command('winmax4:sync-entities')->everyMinute();
         });
     }
 }

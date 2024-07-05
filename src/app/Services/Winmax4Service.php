@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Services;
 
+use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
@@ -145,10 +146,10 @@ class Winmax4Service
             ],
             'json' => [
                 'Code' => $values['code'],
-                'Name' => 'Inês Pereira',
+                'Name' => $values['name'],
                 'IsActive' => 1,
                 'EntityType' => 0,
-                'TaxPayerID	' => $values['nif'],
+                'TaxPayerID' => $values['nif'],
                 'Address' => $values['address'],
                 'ZipCode' => $values['zipCode'],
                 'Phone' => $values['phone'],
