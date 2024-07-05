@@ -137,12 +137,26 @@ class Winmax4Service
 
     public function postEntities($values)
     {
-        dd($values);
         $response = $this->client->post($this->url . '/Files/Entities', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'Code' => $values->code,
+                'Name' => $values->name,
+                'IsActive' => 1,
+                'EntityType' => 0,
+                'TaxPayerID	' => $values->nif,
+                'Address' => $values->address,
+                'ZipCode' => $values->zipCode,
+                'Phone' => $values->phone,
+                'Fax' => null,
+                'MobilePhone' => null,
+                'Email' => $values->email,
+                'Location' => $values->locality,
+                'Country' => 'PT',
             ],
         ]);
 
