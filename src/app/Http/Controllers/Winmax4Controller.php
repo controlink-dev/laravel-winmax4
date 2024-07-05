@@ -187,26 +187,7 @@ class Winmax4Controller extends Controller
     }
 
     public function getEntities(){
-        $entities = Winmax4Entity::get();
-
-        return DataTables::of($entities)
-            ->editColumn('name_style', function($entity){
-                return $entity->Name;
-            })
-            ->editColumn('type_style', function($entity){
-                return $entity->EntityType;
-            })
-            ->editColumn('nif_style', function($entity){
-                return $entity->TaxPayerID;
-            })
-            ->editColumn('newsletter_style', function($entity){
-                return $entity->newsletter ? 'Yes' : 'No';
-            })
-            ->addColumn('action', function($entity){
-                return '<button class="btn btn-primary btn-sm" onclick="editEntity('.$entity->ID.')">Edit</button>';
-            })
-            ->rawColumns(['name_style', 'type_style', 'nif_style', 'newsletter_style', 'action'])
-            ->make(true);
+        return response()->json(Winmax4Entity::get(), 200);
     }
 
 }
