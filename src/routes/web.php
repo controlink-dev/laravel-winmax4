@@ -15,5 +15,6 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
 
     Route::get('/getTaxes', [Winmax4Controller::class, 'getTaxes'])->name('winmax4.getTaxes');
     Route::get('/getArticles', [Winmax4Controller::class, 'getArticles'])->name('winmax4.getArticles');
+    Route::get('/getEntities', [Winmax4Controller::class, 'getEntities'])->name('winmax4.getEntities');
 
 });
