@@ -13,6 +13,7 @@ class Winmax4Entity extends Model
     protected $table = 'winmax4_entities';
 
     protected $fillable = [
+        'license_id',
         'name',
         'address',
         'code',
@@ -30,8 +31,8 @@ class Winmax4Entity extends Model
 
     protected static function booted()
     {
-        static::addGlobalScope(new LicenseScope);
+        if(config('winmax4.use_license') && !app()->runningInConsole()){
+            static::addGlobalScope(new LicenseScope());
+        }
     }
-
-
 }
