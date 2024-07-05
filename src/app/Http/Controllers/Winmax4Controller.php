@@ -185,8 +185,20 @@ class Winmax4Controller extends Controller
         return $this->winmax4Service->getArticles();
     }
 
+    /**
+     * Get entities from Winmax4 API
+     */
     public function getEntities(){
         return response()->json(Winmax4Entity::get(), 200);
+    }
+
+    /**
+     * Post entities to Winmax4 API
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function postEntities()
+    {
+        return response()->json($this->winmax4Service->postEntities(), 200);
     }
 
 }

@@ -4,6 +4,7 @@ namespace Controlink\LaravelWinmax4\app\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Request;
 
 class Winmax4Service
 {
@@ -124,6 +125,20 @@ class Winmax4Service
     public function getEntities()
     {
         $response = $this->client->get($this->url . '/Files/Entities', [
+            'verify' => $this->settings['verify_ssl_guzzle'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents());
+    }
+
+    public function postEntities(Request $request)
+    {
+        dd($request->all());
+        $response = $this->client->post($this->url . '/Files/Entities', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
