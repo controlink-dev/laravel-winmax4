@@ -135,9 +135,9 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
-    public function postEntities(Request $request)
+    public function postEntities($values)
     {
-        dd($request->all());
+        dd($values);
         $response = $this->client->post($this->url . '/Files/Entities', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
