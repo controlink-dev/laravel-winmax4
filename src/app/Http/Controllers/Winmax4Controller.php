@@ -143,6 +143,14 @@ class Winmax4Controller extends Controller
         return response()->json(Winmax4Family::with('subFamilies.subSubFamilies')->get(), 200);
     }
 
+    public function getSubFamilies($family_id){
+        return response()->json(Winmax4Family::find($family_id)->subFamilies, 200);
+    }
+
+    public function getSubSubFamilies($sub_family_id){
+        return response()->json(Winmax4SubFamily::find($sub_family_id)->subSubFamilies, 200);
+    }
+
     public function getTaxes(){
         return response()->json(Winmax4Tax::with('taxRates')->get(), 200);
     }
