@@ -4,6 +4,7 @@ namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4SubFamily;
@@ -185,7 +186,7 @@ class Winmax4Controller extends Controller
     }
 
     public function getEntities(){
-        return $this->winmax4Service->getEntities();
+        return response()->json(Winmax4Entity::get(), 200);
     }
 
 }

@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('winmax4_families');
+        Schema::dropIfExists('winmax4_taxes_rates');
     }
 };
