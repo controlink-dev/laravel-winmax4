@@ -136,30 +136,56 @@ class Winmax4Controller extends Controller
         return response()->json(Winmax4Currency::get(), 200);
     }
 
+    /**
+     * Get document types from Winmax4 API
+     */
     public function getDocumentTypes(){
         return response()->json(Winmax4DocumentType::get(), 200);
     }
 
+    /**
+     * Get families from Winmax4 API
+     */
     public function getFamilies(){
         return response()->json(Winmax4Family::with('subFamilies.subSubFamilies')->get(), 200);
     }
 
+    /**
+     * Get sub families from Winmax4 API
+     * @param $family_id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getSubFamilies($family_id){
         return response()->json(Winmax4Family::find($family_id)->subFamilies, 200);
     }
 
+    /**
+     * Get sub sub families from Winmax4 API
+     * @param $sub_family_id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getSubSubFamilies($sub_family_id){
         return response()->json(Winmax4SubFamily::find($sub_family_id)->subSubFamilies, 200);
     }
 
+    /**
+     * Get taxes from Winmax4 API
+     */
     public function getTaxes(){
         return response()->json(Winmax4Tax::with('taxRates')->get(), 200);
     }
 
+    /**
+     * Get articles from Winmax4 API
+     */
     public function getArticles(){
         //return response()->json(Winmax4Article::get(), 200);
 
         return $this->winmax4Service->getArticles();
+    }
+
+    public function getEntities(){
+        return $this->winmax4Service->getEntities();
     }
 
 }
