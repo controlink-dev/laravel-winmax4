@@ -145,7 +145,7 @@ class Winmax4Service
             ],
             'json' => [
                 'Code' => $values['code'],
-                'Name' => $values['name'],
+                'Name' => 'Inês Pereira',
                 'IsActive' => 1,
                 'EntityType' => 0,
                 'TaxPayerID	' => $values['nif'],
