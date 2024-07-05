@@ -191,21 +191,21 @@ class Winmax4Controller extends Controller
 
         return DataTables::of($entities)
             ->editColumn('name_style', function($entity){
-                return $entity->Name;
+                return $entity->name;
             })
             ->editColumn('type_style', function($entity){
-                return $entity->EntityType;
+                return $entity->entity_type == 0 ? 'Client' : 'Supplier';
             })
             ->editColumn('nif_style', function($entity){
-                return $entity->TaxPayerID;
+                return $entity->tax_payer_id;
             })
             ->editColumn('newsletter_style', function($entity){
                 return $entity->newsletter ? 'Yes' : 'No';
             })
-            ->addColumn('action', function($entity){
+            ->addColumn('actions', function($entity){
                 return '<button class="btn btn-primary btn-sm" onclick="editEntity('.$entity->ID.')">Edit</button>';
             })
-            ->rawColumns(['name_style', 'type_style', 'nif_style', 'newsletter_style', 'action'])
+            ->rawColumns(['name_style', 'type_style', 'nif_style', 'newsletter_style', 'actions'])
             ->make(true);
     }
 
