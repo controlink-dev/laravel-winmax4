@@ -37,6 +37,7 @@ class SyncEntitiesJob implements ShouldQueue
         Winmax4Entity::updateOrCreate(
             ['code' => $this->entity->Code],
             [
+                'license_id' => $this->license_id,
                 'name' => $this->entity->Name,
                 'address' => $this->entity->Address,
                 'country_code' => $this->entity->CountryCode,
