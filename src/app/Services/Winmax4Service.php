@@ -272,6 +272,6 @@ class Winmax4Service
             'zip_code' => $entity->Data->Entity->ZipCode,
         ]);
 
-        return $entity;
+        return $entity->Data->Entity;
     }
 }
