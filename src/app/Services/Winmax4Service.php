@@ -161,6 +161,25 @@ class Winmax4Service
             ],
         ]);
 
-        return json_decode($response->getBody()->getContents());
+        $entity = $response->getBody()->getContents();
+
+        dd($entity);
+
+        /*Winmax4Entity::create([
+            'license_id' => session('licenseID'),
+            'name' => $entity
+            'address',
+            'code',
+            'country_code',
+            'email',
+            'entity_type',
+            'fax',
+            'is_active',
+            'location',
+            'mobile_phone',
+            'phone',
+            'tax_payer_id',
+            'zip_code',
+        ]);*/
     }
 }
