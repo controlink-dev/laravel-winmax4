@@ -255,6 +255,8 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
+        dd($entity);
+
         Winmax4Entity::where('code', $values['code'])->update([
             'license_id' => session('licenseID'),
             'name' => $entity->Data->Entity->Name,
