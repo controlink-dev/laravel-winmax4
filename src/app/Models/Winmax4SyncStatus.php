@@ -11,6 +11,8 @@ class Winmax4SyncStatus extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'model',
         'last_synced_at',
