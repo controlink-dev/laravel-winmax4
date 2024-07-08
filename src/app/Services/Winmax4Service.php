@@ -180,6 +180,6 @@ class Winmax4Service
             'zip_code' => $entity->Data->Entity->ZipCode,
         ]);
 
-        return json_decode($entity);
+        return $entity;
     }
 }
