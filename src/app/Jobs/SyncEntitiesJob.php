@@ -41,6 +41,7 @@ class SyncEntitiesJob implements ShouldQueue
             ],
             [
                 'license_id' => $this->license_id,
+                'id_winmax4' => $this->entity->ID,
                 'name' => $this->entity->Name,
                 'address' => $this->entity->Address,
                 'country_code' => $this->entity->CountryCode,
