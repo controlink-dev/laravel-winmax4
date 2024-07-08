@@ -16,6 +16,7 @@ class Winmax4SyncStatus extends Model
     protected $fillable = [
         'model',
         'last_synced_at',
+        'license_id',
     ];
 
     protected static function booted()
