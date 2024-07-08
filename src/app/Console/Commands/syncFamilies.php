@@ -57,7 +57,7 @@ class syncFamilies extends Command
 
             }
 
-            $batch = Bus::batch([])->finally(function (Batch $batch) use ($winmax4Setting) {
+            $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
                 if(config('winmax4.use_license')){
                     (new Winmax4Controller())->updateLastSyncedAt(Winmax4Family::class, $winmax4Setting->license_id);
                 }else{
