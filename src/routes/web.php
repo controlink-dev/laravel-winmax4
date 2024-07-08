@@ -21,5 +21,5 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
 
     Route::get('/getEntities', [Winmax4Controller::class, 'getEntities'])->name('winmax4.getEntities');
     Route::post('/postEntities', [Winmax4Controller::class, 'postEntities'])->name('winmax4.postEntities');
-    Route::post('/putEntities', [Winmax4Controller::class, 'putEntities'])->name('winmax4.putEntities');
+    Route::put('/putEntities', [Winmax4Controller::class, 'putEntities'])->name('winmax4.putEntities');
 });
