@@ -231,7 +231,7 @@ class Winmax4Service
      */
     public function putEntities($values)
     {
-        $response = $this->client->put($this->url . '/Files/Entities/' . $values['id_winmax4'], [
+        $response = $this->client->post($this->url . '/Files/Entities/?id='.$values['id_winmax4'], [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
@@ -255,8 +255,6 @@ class Winmax4Service
         ]);
 
         $entity = json_decode($response->getBody()->getContents());
-
-        dd($entity);
 
         Winmax4Entity::where('code', $values['code'])->update([
             'license_id' => session('licenseID'),
