@@ -201,8 +201,6 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        dd($entity->Data->Entity);
-
         Winmax4Entity::create([
             'license_id' => session('licenseID'),
             'id_winmax4' => $entity->Data->Entity->ID,
@@ -233,7 +231,7 @@ class Winmax4Service
      */
     public function putEntities($values)
     {
-        $response = $this->client->post($this->url . '/Files/Entities/' . $values['code'], [
+        $response = $this->client->post($this->url . '/Files/Entities/' . $values['id_winmax4'], [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
@@ -262,10 +260,8 @@ class Winmax4Service
 
         Winmax4Entity::where('code', $values['code'])->update([
             'license_id' => session('licenseID'),
-            'id_winmax4' => $entity->Data->Entity->ID,
             'name' => $entity->Data->Entity->Name,
             'address' => $entity->Data->Entity->Address,
-            'code' => $entity->Data->Entity->Code,
             'country_code' => $entity->Data->Entity->CountryCode,
             'email' => $entity->Data->Entity->Email,
             'entity_type' => $entity->Data->Entity->EntityType,
