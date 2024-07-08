@@ -203,6 +203,7 @@ class Winmax4Service
 
         Winmax4Entity::create([
             'license_id' => session('licenseID'),
+            'id_winmax4' => $entity->Data->Entity->ID,
             'name' => $entity->Data->Entity->Name,
             'address' => $entity->Data->Entity->Address,
             'code' => $entity->Data->Entity->Code,
