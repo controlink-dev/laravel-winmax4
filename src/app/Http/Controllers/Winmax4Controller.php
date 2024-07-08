@@ -223,7 +223,7 @@ class Winmax4Controller extends Controller
     {
 
         if (config('winmax4.use_license')) {
-            Winmax4SyncStatus::createOrUpdate([
+            Winmax4SyncStatus::updateOrCreate([
                 'model' => class_basename($model),
                 config('winmax4.license_column') => $licence_id,
             ],
