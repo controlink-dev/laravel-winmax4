@@ -14,6 +14,7 @@ class Winmax4Entity extends Model
 
     protected $fillable = [
         'license_id',
+        'id_winmax4',
         'name',
         'address',
         'code',
