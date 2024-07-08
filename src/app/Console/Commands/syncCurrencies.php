@@ -45,18 +45,38 @@ class syncCurrencies extends Command
             $currencies = $winmax4Service->getCurrencies()->Data->Currencies;
 
             foreach ($currencies as $currency) {
-                 Winmax4Currency::updateOrCreate(
-                    [
-                        'code' => $currency->Code
-                    ],
-                    [
-                        'license_id' => $winmax4Setting->license_id,
-                        'designation' => $currency->Designation,
-                        'is_active' => $currency->IsActive,
-                        'article_decimals' => $currency->ArticleDecimals,
-                        'document_decimals' => $currency->DocumentDecimals,
-                    ]
-                );
+                if(config('winmax4.use_license')){
+                    Winmax4Currency::updateOrCreate(
+                        [
+                            'code' => $currency->Code,
+                            'license_id' => $winmax4Setting->license_id,
+                        ],
+                        [
+                            'designation' => $currency->Designation,
+                            'is_active' => $currency->IsActive,
+                            'article_decimals' => $currency->ArticleDecimals,
+                            'document_decimals' => $currency->DocumentDecimals,
+                        ]
+                    );
+                }else{
+                    Winmax4Currency::updateOrCreate(
+                        [
+                            'code' => $currency->Code,
+                        ],
+                        [
+                            'designation' => $currency->Designation,
+                            'is_active' => $currency->IsActive,
+                            'article_decimals' => $currency->ArticleDecimals,
+                            'document_decimals' => $currency->DocumentDecimals,
+                        ]
+                    );
+                }
+            }
+
+            if(config('winmax4.use_license')){
+                (new Winmax4Controller())->updateLastSyncedAt(Winmax4Currency::class, $winmax4Setting->license_id);
+            }else{
+                (new Winmax4Controller())->updateLastSyncedAt(Winmax4Currency::class);
             }
         }
 
