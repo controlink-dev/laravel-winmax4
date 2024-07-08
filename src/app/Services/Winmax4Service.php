@@ -230,7 +230,7 @@ class Winmax4Service
      */
     public function putEntities($values)
     {
-        $response = $this->client->put($this->url . '/Files/Entities/' . $values['code'], [
+        $response = $this->client->post($this->url . '/Files/Entities/' . $values['code'], [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
