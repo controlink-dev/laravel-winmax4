@@ -163,6 +163,8 @@ class Winmax4Service
 
         $entity = $response->getBody()->getContents();
 
+        dd($entity->Data);
+
         Winmax4Entity::create([
             'license_id' => session('licenseID'),
             'name' => $entity->Data->Entity->Name,
