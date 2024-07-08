@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('address');
             $table->integer('code');
             $table->string('country_code', 2);
-            $table->string('email')->unique();
+            $table->string('email');
             $table->bigInteger('entity_type');
             $table->string('fax')->nullable();
             $table->boolean('is_active');
