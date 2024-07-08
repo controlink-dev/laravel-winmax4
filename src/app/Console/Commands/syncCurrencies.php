@@ -49,7 +49,7 @@ class syncCurrencies extends Command
                     Winmax4Currency::updateOrCreate(
                         [
                             'code' => $currency->Code,
-                            'license_id' => $winmax4Setting->license_id,
+                            config('winmax4.license_column') => $winmax4Setting->license_id,
                         ],
                         [
                             'designation' => $currency->Designation,

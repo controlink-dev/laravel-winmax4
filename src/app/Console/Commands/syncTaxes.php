@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Console\Commands;
 
+use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Tax;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
@@ -47,16 +48,28 @@ class syncTaxes extends Command
             $taxes = $winmax4Service->getTaxes()->Data->Taxes;
 
             foreach ($taxes as $tax) {
-                $newTax = Winmax4Tax::updateOrCreate(
-                    [
-                        'code' => $tax->Code,
-                    ],
-                    [
-                        'license_id' => $winmax4Setting->license_id,
-                        'designation' => $tax->Designation,
-                        'is_active' => $tax->IsActive,
-                    ]
-                );
+                if(config('winmax4.use_license')){
+                    $newTax = Winmax4Tax::updateOrCreate(
+                        [
+                            'code' => $tax->Code,
+                            config('winmax4.license_column') => $winmax4Setting->license_id,
+                        ],
+                        [
+                            'designation' => $tax->Designation,
+                            'is_active' => $tax->IsActive,
+                        ]
+                    );
+                }else{
+                    $newTax = Winmax4Tax::updateOrCreate(
+                        [
+                            'code' => $tax->Code,
+                        ],
+                        [
+                            'designation' => $tax->Designation,
+                            'is_active' => $tax->IsActive,
+                        ]
+                    );
+                }
 
                 if ($tax->Rates) {
                     foreach ($tax->Rates as $rate) {
@@ -73,6 +86,12 @@ class syncTaxes extends Command
                         );
                     }
                 }
+            }
+
+            if(config('winmax4.use_license')){
+                (new Winmax4Controller())->updateLastSyncedAt(Winmax4Tax::class, $winmax4Setting->license_id);
+            }else{
+                (new Winmax4Controller())->updateLastSyncedAt(Winmax4Tax::class);
             }
 
         }

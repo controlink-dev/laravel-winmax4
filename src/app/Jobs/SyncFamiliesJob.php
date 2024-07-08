@@ -22,7 +22,7 @@ class SyncFamiliesJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($family, $license_id)
+    public function __construct($family, $license_id = null)
     {
         $this->family = $family;
         $this->license_id = $license_id;
@@ -33,16 +33,28 @@ class SyncFamiliesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $newFamily = Winmax4Family::updateOrCreate(
-            [
-                'code' => $this->family->Code
-            ],
-            [
-                'license_id' => $this->license_id,
-                'designation' => $this->family->Designation,
-                'is_active' => $this->family->IsActive,
-            ]
-        );
+        if(config('winmax4.use_license')){
+            $newFamily = Winmax4Family::updateOrCreate(
+                [
+                    'code' => $this->family->Code,
+                    config('winmax4.license_column') => $this->license_id,
+                ],
+                [
+                    'designation' => $this->family->Designation,
+                    'is_active' => $this->family->IsActive,
+                ]
+            );
+        }else{
+            $newFamily = Winmax4Family::updateOrCreate(
+                [
+                    'code' => $this->family->Code,
+                ],
+                [
+                    'designation' => $this->family->Designation,
+                    'is_active' => $this->family->IsActive,
+                ]
+            );
+        }
 
         if (isset($this->family->SubFamilies)) {
             foreach ($this->family->SubFamilies as $subFamily) {
