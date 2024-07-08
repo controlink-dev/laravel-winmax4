@@ -163,23 +163,23 @@ class Winmax4Service
 
         $entity = $response->getBody()->getContents();
 
-        dd($entity);
-
-        /*Winmax4Entity::create([
+        Winmax4Entity::create([
             'license_id' => session('licenseID'),
-            'name' => $entity
-            'address',
-            'code',
-            'country_code',
-            'email',
-            'entity_type',
-            'fax',
-            'is_active',
-            'location',
-            'mobile_phone',
-            'phone',
-            'tax_payer_id',
-            'zip_code',
-        ]);*/
+            'name' => $entity->Data->Entity->Name,
+            'address' => $entity->Data->Entity->Address,
+            'code' => $entity->Data->Entity->Code,
+            'country_code' => $entity->Data->Entity->CountryCode,
+            'email' => $entity->Data->Entity->Email,
+            'entity_type' => $entity->Data->Entity->EntityType,
+            'fax' => $entity->Data->Entity->Fax,
+            'is_active' => $entity->Data->Entity->IsActive,
+            'location' => $entity->Data->Entity->Location,
+            'mobile_phone' => $entity->Data->Entity->MobilePhone,
+            'phone' => $entity->Data->Entity->Phone,
+            'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
+            'zip_code' => $entity->Data->Entity->ZipCode,
+        ]);
+
+        return json_decode($entity);
     }
 }
