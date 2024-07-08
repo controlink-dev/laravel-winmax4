@@ -260,6 +260,7 @@ class Winmax4Service
 
         Winmax4Entity::where('code', $values['code'])->update([
             'license_id' => session('licenseID'),
+            'id_winmax4' => $entity->Data->Entity->ID,
             'name' => $entity->Data->Entity->Name,
             'address' => $entity->Data->Entity->Address,
             'code' => $entity->Data->Entity->Code,
