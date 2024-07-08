@@ -231,7 +231,7 @@ class Winmax4Controller extends Controller
                 'last_synced_at' => now(),
             ]);
         } else {
-            Winmax4SyncStatus::createOrUpdate([
+            Winmax4SyncStatus::updateOrCreate([
                 'model' => class_basename($model),
             ],
             [
