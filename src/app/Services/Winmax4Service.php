@@ -201,8 +201,6 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        dd($entity);
-
         Winmax4Entity::create([
             'license_id' => session('licenseID'),
             'name' => $entity->Data->Entity->Name,
@@ -220,7 +218,7 @@ class Winmax4Service
             'zip_code' => $entity->Data->Entity->ZipCode,
         ]);
 
-        return $entity;
+        return $entity->Data->Entity;
     }
 
     /**
