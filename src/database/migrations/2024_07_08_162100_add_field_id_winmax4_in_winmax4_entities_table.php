@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('winmax4_entities', function (Blueprint $table) {
-            $table->integer('id_winmax4')->unique();
+            $table->integer('id_winmax4');
         });
     }
 
