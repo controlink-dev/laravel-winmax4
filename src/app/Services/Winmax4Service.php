@@ -228,7 +228,7 @@ class Winmax4Service
      * @return object
      * @throws GuzzleException
      */
-    public function updateEntities($values)
+    public function putEntities($values)
     {
         $response = $this->client->put($this->url . '/Files/Entities', [
             'verify' => $this->settings['verify_ssl_guzzle'],
