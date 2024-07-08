@@ -71,6 +71,12 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * Get document types from Winmax4 API
+     *
+     * @return object
+     * @throws GuzzleException
+     */
     public function getDocumentTypes()
     {
         $response = $this->client->get($this->url . '/Files/DocumentTypes', [
@@ -84,6 +90,12 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * Get families from Winmax4 API
+     *
+     * @return object
+     * @throws GuzzleException
+     */
     public function getFamilies()
     {
         $response = $this->client->get($this->url . '/Files/Families?IncludeSubFamilies=true', [
@@ -97,6 +109,13 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * Get sub families from Winmax4 API
+     *
+     * @param $family_id
+     * @return object
+     * @throws GuzzleException
+     */
     public function getTaxes()
     {
         $response = $this->client->get($this->url . '/Files/Taxes', [
@@ -110,6 +129,12 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * Get articles from Winmax4 API
+     *
+     * @return object
+     * @throws GuzzleException
+     */
     public function getArticles()
     {
         $response = $this->client->get($this->url . '/Files/Articles?IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true', [
@@ -123,6 +148,12 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * Get entities from Winmax4 API
+     *
+     * @return object
+     * @throws GuzzleException
+     */
     public function getEntities()
     {
         $response = $this->client->get($this->url . '/Files/Entities', [
@@ -136,6 +167,13 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * Post entities to Winmax4 API
+     *
+     * @param $values
+     * @return object
+     * @throws GuzzleException
+     */
     public function postEntities($values)
     {
         $response = $this->client->post($this->url . '/Files/Entities', [
@@ -163,7 +201,63 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
+        dd($entity);
+
         Winmax4Entity::create([
+            'license_id' => session('licenseID'),
+            'name' => $entity->Data->Entity->Name,
+            'address' => $entity->Data->Entity->Address,
+            'code' => $entity->Data->Entity->Code,
+            'country_code' => $entity->Data->Entity->CountryCode,
+            'email' => $entity->Data->Entity->Email,
+            'entity_type' => $entity->Data->Entity->EntityType,
+            'fax' => $entity->Data->Entity->Fax,
+            'is_active' => $entity->Data->Entity->IsActive,
+            'location' => $entity->Data->Entity->Location,
+            'mobile_phone' => $entity->Data->Entity->MobilePhone,
+            'phone' => $entity->Data->Entity->Phone,
+            'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
+            'zip_code' => $entity->Data->Entity->ZipCode,
+        ]);
+
+        return $entity;
+    }
+
+    /**
+     * Update entities to Winmax4 API
+     *
+     * @param $values
+     * @return object
+     * @throws GuzzleException
+     */
+    public function updateEntities($values)
+    {
+        $response = $this->client->put($this->url . '/Files/Entities', [
+            'verify' => $this->settings['verify_ssl_guzzle'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'Code' => $values['code'],
+                'Name' => $values['name'],
+                'IsActive' => 1,
+                'EntityType' => 0,
+                'TaxPayerID' => $values['nif'],
+                'Address' => $values['address'],
+                'ZipCode' => $values['zipCode'],
+                'Phone' => $values['phone'],
+                'Fax' => null,
+                'MobilePhone' => null,
+                'Email' => $values['email'],
+                'Location' => $values['locality'],
+                'Country' => 'PT',
+            ],
+        ]);
+
+        $entity = json_decode($response->getBody()->getContents());
+
+        Winmax4Entity::where('code', $values['code'])->update([
             'license_id' => session('licenseID'),
             'name' => $entity->Data->Entity->Name,
             'address' => $entity->Data->Entity->Address,
