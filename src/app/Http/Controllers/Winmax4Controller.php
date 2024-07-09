@@ -46,12 +46,17 @@ class Winmax4Controller extends Controller
     {
         $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), session('licenseID'))->first();
 
-        if ($winmax4) {
+        if (!$winmax4) {
             return response()->json([
-                'message' => 'Success',
-                'winmax4' => $winmax4,
-            ], 200);
+                'message' => 'Error',
+                'error' => 'No settings found',
+            ], 404);
         }
+
+        return response()->json([
+            'message' => 'Success',
+            'winmax4' => $winmax4,
+        ], 200);
     }
 
     /**
