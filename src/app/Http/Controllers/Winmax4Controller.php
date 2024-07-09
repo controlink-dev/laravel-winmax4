@@ -157,4 +157,25 @@ class Winmax4Controller extends Controller
         }
     }
 
+    /**
+     * Get Winmax4 sync status
+     * @param string $model
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getWinmax4SyncStatus($model){
+        $winmax4SyncStatus = Winmax4SyncStatus::where('model', $model)->first();
+
+        if (!$winmax4SyncStatus) {
+            return response()->json([
+                'message' => 'Error',
+                'error' => 'No settings found',
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Success',
+            'winmax4SyncStatus' => $winmax4SyncStatus,
+        ], 200);
+    }
+
 }
