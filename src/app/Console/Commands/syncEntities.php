@@ -2,7 +2,10 @@
 
 namespace Controlink\LaravelWinmax4\app\Console\Commands;
 
+use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Jobs\SyncEntitiesJob;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Bus\Batch;
@@ -47,10 +50,20 @@ class syncEntities extends Command
 
             $job = [];
             foreach ($entities as $entity) {
-                $job[] = new SyncEntitiesJob($entity, $winmax4Setting->license_id);
+                if(config('winmax4.use_license')){
+                    $job[] = new SyncEntitiesJob($entity, $winmax4Setting->license_id);
+                }else{
+                    $job[] = new SyncEntitiesJob($entity);
+                }
             }
 
-            $batch = Bus::batch([])->finally(function (Batch $batch){
+            $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
+                if(config('winmax4.use_license')){
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class, $winmax4Setting->license_id);
+                }else{
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class);
+                }
+
                 $batch->delete();
             })->name('winmax4_entities')->onQueue(config('winmax4.queue'))->dispatch();
 

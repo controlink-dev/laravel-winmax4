@@ -11,21 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('winmax4_entities', function (Blueprint $table) {
+        Schema::create('winmax4_sync_statuses', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('address');
-            $table->integer('code');
-            $table->string('country_code', 2);
-            $table->string('email');
-            $table->bigInteger('entity_type');
-            $table->string('fax')->nullable();
-            $table->boolean('is_active');
-            $table->string('location');
-            $table->string('mobile_phone')->nullable();
-            $table->string('phone');
-            $table->integer('tax_payer_id');
-            $table->string('zip_code');
+            $table->string('model');
+            $table->timestamp('last_synced_at')->nullable();
 
             if(config('winmax4.use_license')){
                 if(config('winmax4.license_is_uuid')){
@@ -36,8 +25,6 @@ return new class extends Migration
 
                 $table->foreign(config('winmax4.license_column'))->references('id')->on(config('winmax4.licenses_table'));
             }
-
-            $table->timestamps();
         });
     }
 
@@ -46,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('winmax4_entities');
+        Schema::dropIfExists('winmax4_taxes_rates');
     }
 };

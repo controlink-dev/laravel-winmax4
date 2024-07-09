@@ -48,18 +48,38 @@ class syncDocumentsTypes extends Command
             $documentTypes = collect($documentTypes)->where('TransactionType', 0)->where('EntityType', 0);
 
             foreach ($documentTypes as $documentType) {
-                 Winmax4DocumentType::updateOrCreate(
-                    [
-                        'code' => $documentType->Code
-                    ],
-                    [
-                        'license_id' => $winmax4Setting->license_id,
-                        'designation' => $documentType->Designation,
-                        'is_active' => $documentType->IsActive,
-                        'transaction_type' => $documentType->TransactionType,
-                        'entity_type' => $documentType->EntityType,
-                    ]
-                );
+                 if(config('winmax4.use_license')){
+                     Winmax4DocumentType::updateOrCreate(
+                         [
+                             'code' => $documentType->Code,
+                             config('winmax4.license_column') => $winmax4Setting->license_id,
+                         ],
+                         [
+                             'designation' => $documentType->Designation,
+                             'is_active' => $documentType->IsActive,
+                             'transaction_type' => $documentType->TransactionType,
+                             'entity_type' => $documentType->EntityType,
+                         ]
+                     );
+                 }else{
+                     Winmax4DocumentType::updateOrCreate(
+                         [
+                             'code' => $documentType->Code,
+                         ],
+                         [
+                             'designation' => $documentType->Designation,
+                             'is_active' => $documentType->IsActive,
+                             'transaction_type' => $documentType->TransactionType,
+                             'entity_type' => $documentType->EntityType,
+                         ]
+                     );
+                 }
+            }
+
+            if(config('winmax4.use_license')){
+                (new Winmax4Controller())->updateLastSyncedAt(Winmax4DocumentType::class, $winmax4Setting->license_id);
+            }else{
+                (new Winmax4Controller())->updateLastSyncedAt(Winmax4DocumentType::class);
             }
         }
 

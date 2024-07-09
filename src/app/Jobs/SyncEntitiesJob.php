@@ -23,7 +23,7 @@ class SyncEntitiesJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($entity, $license_id)
+    public function __construct($entity, $license_id = null)
     {
         $this->entity = $entity;
         $this->license_id = $license_id;
@@ -34,27 +34,52 @@ class SyncEntitiesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Winmax4Entity::updateOrCreate(
-            [
-                'code' => $this->entity->Code,
-                'tax_payer_id' => $this->entity->TaxPayerID,
-            ],
-            [
-                'license_id' => $this->license_id,
-                'id_winmax4' => $this->entity->ID,
-                'name' => $this->entity->Name,
-                'address' => $this->entity->Address,
-                'country_code' => $this->entity->CountryCode,
-                'email' => $this->entity->Email,
-                'entity_type' => $this->entity->EntityType,
-                'fax' => $this->entity->Fax,
-                'is_active' => $this->entity->IsActive,
-                'location' => $this->entity->Location,
-                'mobile_phone' => $this->entity->MobilePhone,
-                'phone' => $this->entity->Phone,
-                'tax_payer_id' => $this->entity->TaxPayerID,
-                'zip_code' => $this->entity->ZipCode,
-            ]
-        );
+        if(config('winmax4.use_license')){
+            Winmax4Entity::updateOrCreate(
+                [
+                    'code' => $this->entity->Code,
+                    'tax_payer_id' => $this->entity->TaxPayerID,
+                    config('winmax4.license_column') => $this->license_id,
+                ],
+                [
+                    'id_winmax4' => $this->entity->ID,
+                    'name' => $this->entity->Name,
+                    'address' => $this->entity->Address,
+                    'country_code' => $this->entity->CountryCode,
+                    'email' => $this->entity->Email,
+                    'entity_type' => $this->entity->EntityType,
+                    'fax' => $this->entity->Fax,
+                    'is_active' => $this->entity->IsActive,
+                    'location' => $this->entity->Location,
+                    'mobile_phone' => $this->entity->MobilePhone,
+                    'phone' => $this->entity->Phone,
+                    'tax_payer_id' => $this->entity->TaxPayerID,
+                    'zip_code' => $this->entity->ZipCode,
+                ]
+            );
+        }else{
+            Winmax4Entity::updateOrCreate(
+                [
+                    'code' => $this->entity->Code,
+                    'tax_payer_id' => $this->entity->TaxPayerID,
+                ],
+                [
+                    'id_winmax4' => $this->entity->ID,
+                    'name' => $this->entity->Name,
+                    'address' => $this->entity->Address,
+                    'country_code' => $this->entity->CountryCode,
+                    'email' => $this->entity->Email,
+                    'entity_type' => $this->entity->EntityType,
+                    'fax' => $this->entity->Fax,
+                    'is_active' => $this->entity->IsActive,
+                    'location' => $this->entity->Location,
+                    'mobile_phone' => $this->entity->MobilePhone,
+                    'phone' => $this->entity->Phone,
+                    'tax_payer_id' => $this->entity->TaxPayerID,
+                    'zip_code' => $this->entity->ZipCode,
+                ]
+            );
+        }
+
     }
 }

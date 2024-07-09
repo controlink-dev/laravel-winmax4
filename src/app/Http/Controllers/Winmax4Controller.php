@@ -8,6 +8,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4SubFamily;
+use Controlink\LaravelWinmax4\app\Models\Winmax4SyncStatus;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Tax;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Http\Request;
@@ -215,6 +216,33 @@ class Winmax4Controller extends Controller
     public function putEntities(Request $request)
     {
         return response()->json($this->winmax4Service->putEntities($request->all()), 200);
+    }
+
+    /**
+     * Update the last synced at timestamp for the given model.
+     *
+     * @param string $model The model to update the last synced at timestamp for.
+     * @param int $licence_id The licence id to update the last synced at timestamp for.
+     */
+    public function updateLastSyncedAt($model, $licence_id = null)
+    {
+
+        if (config('winmax4.use_license')) {
+            Winmax4SyncStatus::updateOrCreate([
+                'model' => class_basename($model),
+                config('winmax4.license_column') => $licence_id,
+            ],
+            [
+                'last_synced_at' => now(),
+            ]);
+        } else {
+            Winmax4SyncStatus::updateOrCreate([
+                'model' => class_basename($model),
+            ],
+            [
+                'last_synced_at' => now(),
+            ]);
+        }
     }
 
 }
