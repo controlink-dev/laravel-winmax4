@@ -6,7 +6,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 
-abstract class Winmax4DocumentTypesController
+abstract class Winmax4DocumentTypesController extends Controller
 {
     protected $winmax4Service;
 

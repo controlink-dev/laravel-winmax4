@@ -66,13 +66,5 @@ class Winmax4ServiceProvider extends ServiceProvider
             $schedule->command('winmax4:sync-taxes')->daily();
             $schedule->command('winmax4:sync-entities')->everyMinute();
         });
-
-        /*$this->app->bind([
-            \Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4CurrenciesController::class,
-            \Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4DocumentTypesController::class,
-            \Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4FamiliesController::class,
-            \Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4TaxesController::class,
-            \Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4EntitiesController::class,
-        ]);*/
     }
 }

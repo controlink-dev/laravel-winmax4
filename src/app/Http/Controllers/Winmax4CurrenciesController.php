@@ -6,7 +6,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 
-abstract class Winmax4CurrenciesController
+abstract class Winmax4CurrenciesController extends Controller
 {
     protected $winmax4Service;
 
@@ -14,7 +14,7 @@ abstract class Winmax4CurrenciesController
      * Winmax4Controller constructor.
      *
      */
-    /*public function __construct()
+    public function __construct()
     {
         $winmaxSettings = Winmax4Setting::where(config('winmax4.license_column'), session('licenseID'))->first();
 
@@ -30,14 +30,12 @@ abstract class Winmax4CurrenciesController
                 $winmaxSettings->n_terminal
             );
         }
-    }*/
+    }
 
     /**
      * Get currencies from Winmax4 API
      */
     public function getCurrencies(){
-
-        dd('getCurrencies');
         return response()->json(Winmax4Currency::get(), 200);
     }
 }
