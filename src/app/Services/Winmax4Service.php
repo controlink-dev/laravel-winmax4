@@ -294,7 +294,7 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        Winmax4Entity::where('code', $values['code'])->delete();
+        Winmax4Entity::where('id_winmax4', $valueID)->delete();
 
         return $entity->Data->Entity;
     }
