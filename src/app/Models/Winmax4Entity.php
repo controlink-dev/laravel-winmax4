@@ -33,23 +33,16 @@ class Winmax4Entity extends Model
 
     protected static function booted()
     {
-        parent::boot();
+        parent::booted();
 
         if (config('winmax4.use_soft_deletes')) {
-            static::addTraitIfNotExists(SoftDeletes::class);
+            static::addGlobalScope('softDeletes', function (Builder $builder) {
+                $builder->withTrashed();
+            });
         }
 
-        if(config('winmax4.use_license') && !app()->runningInConsole()){
+        if (config('winmax4.use_license') && !app()->runningInConsole()) {
             static::addGlobalScope(new LicenseScope());
-        }
-    }
-
-    protected static function addTraitIfNotExists($trait)
-    {
-        $usedTraits = class_uses(static::class);
-
-        if (!in_array($trait, $usedTraits)) {
-            eval('namespace ' . __NAMESPACE__ . '; class ' . static::class . ' extends \\' . static::class . ' { use \\' . $trait . '; }');
         }
     }
 }
