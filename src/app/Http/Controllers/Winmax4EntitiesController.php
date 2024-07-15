@@ -7,7 +7,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Http\Request;
 
-abstract class Winmax4EntitiesController extends Controller
+class Winmax4EntitiesController extends Controller
 {
     protected $winmax4Service;
 

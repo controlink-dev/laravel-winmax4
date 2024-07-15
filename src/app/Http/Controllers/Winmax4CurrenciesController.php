@@ -6,7 +6,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 
-abstract class Winmax4CurrenciesController extends Controller
+class Winmax4CurrenciesController extends Controller
 {
     protected $winmax4Service;
 
