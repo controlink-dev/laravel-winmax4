@@ -232,7 +232,7 @@ class Winmax4Service
      */
     public function putEntities($values)
     {
-        dd($values);
+        dd($values['id_winmax4']);
         $response = $this->client->post($this->url . '/Files/Entities/?id='.$values['id_winmax4'], [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
