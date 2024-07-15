@@ -275,4 +275,27 @@ class Winmax4Service
 
         return $entity->Data->Entity;
     }
+
+    /**
+     * Delete entities from Winmax4 API
+     *
+     * @param $values
+     * @return object
+     * @throws GuzzleException
+     */
+    public function deleteEntities($values){
+        $response = $this->client->delete($this->url . '/Files/Entities/?id='.$values['id_winmax4'], [
+            'verify' => $this->settings['verify_ssl_guzzle'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        $entity = json_decode($response->getBody()->getContents());
+
+        Winmax4Entity::where('code', $values['code'])->delete();
+
+        return $entity->Data->Entity;
+    }
 }
