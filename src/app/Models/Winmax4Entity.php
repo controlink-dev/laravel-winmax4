@@ -3,6 +3,7 @@
 namespace Controlink\LaravelWinmax4\app\Models;
 
 use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
