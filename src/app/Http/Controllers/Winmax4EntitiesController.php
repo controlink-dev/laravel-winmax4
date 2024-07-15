@@ -65,9 +65,8 @@ class Winmax4EntitiesController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteEntities(Request $request)
+    public function deleteEntities($id)
     {
-        dd($request->all());
-        return response()->json($this->winmax4Service->deleteEntities($request->all()), 200);
+        return response()->json($this->winmax4Service->deleteEntities($id), 200);
     }
 }

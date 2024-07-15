@@ -283,8 +283,8 @@ class Winmax4Service
      * @return object
      * @throws GuzzleException
      */
-    public function deleteEntities($values){
-        $response = $this->client->delete($this->url . '/Files/Entities/?id='.$values['id_winmax4'], [
+    public function deleteEntities($valueID){
+        $response = $this->client->delete($this->url . '/Files/Entities/?id='.$valueID, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
