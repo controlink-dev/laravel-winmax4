@@ -294,7 +294,7 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        dd($entity->Response->Code, $response->getStatusCode());
+        dd($entity->Results->Code, $response->getStatusCode());
         if($response->getStatusCode() != 200){
             return $entity;
         }
