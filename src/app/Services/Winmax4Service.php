@@ -15,6 +15,9 @@ class Winmax4Service
     protected $settings;
     protected $token;
 
+    const WINMAX4_RESPONSE_OK = 'OK';
+    const WINMAX4_RESPONSE_EXCEPTION = 'EXCEPTION';
+
     public function __construct($saveMode = false, $url = '', $company_code = '', $username = '', $password = '', $n_terminal = '')
     {
         $this->client = new Client();
@@ -294,8 +297,7 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        dd($entity->Results[0]->Code, $response->getStatusCode());
-        if($response->getStatusCode() != 200){
+        if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             return $entity;
         }
 
