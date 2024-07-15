@@ -3,6 +3,7 @@
 namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use Dflydev\DotAccessData\Data;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
@@ -256,6 +257,7 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
+        dd($entity);
         Winmax4Entity::where('code', $values['code'])->update([
             'license_id' => session('licenseID'),
             'name' => $entity->Data->Entity->Name,
