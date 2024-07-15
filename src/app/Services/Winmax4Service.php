@@ -294,6 +294,10 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
+        if($response->getStatusCode() != 200){
+            return $entity;
+        }
+
         Winmax4Entity::where('id_winmax4', $valueID)->delete();
 
         return $entity->Data->Entity;
