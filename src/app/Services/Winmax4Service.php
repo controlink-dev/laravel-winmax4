@@ -298,6 +298,10 @@ class Winmax4Service
         $entity = json_decode($response->getBody()->getContents());
 
         if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
+            if(config('winmax4.use_soft_deletes')){
+                Winmax4Entity::where('id_winmax4', $valueID)->delete();
+            }
+
             return $entity;
         }
 
