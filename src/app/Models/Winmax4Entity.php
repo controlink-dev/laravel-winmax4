@@ -2,7 +2,6 @@
 
 namespace Controlink\LaravelWinmax4\app\Models;
 
-use Closure;
 use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,33 +39,17 @@ class Winmax4Entity extends Model
             static::addTraitIfNotExists(SoftDeletes::class);
         }
 
-        if (config('winmax4.use_license') && !app()->runningInConsole()) {
+        if(config('winmax4.use_license') && !app()->runningInConsole()){
             static::addGlobalScope(new LicenseScope());
         }
     }
 
     protected static function addTraitIfNotExists($trait)
     {
-        if (!in_array($trait, class_uses(static::class))) {
-            static::addDynamicTrait($trait);
-        }
-    }
+        $usedTraits = class_uses(static::class);
 
-    protected static function addDynamicTrait($trait)
-    {
-        // Create a new class extending the current class with the added trait
-        $currentClass = static::class;
-        $newClass = eval('return new class extends ' . $currentClass . ' { use ' . $trait . '; };');
-
-        // Copy the new class properties and methods to the current class
-        foreach (get_class_vars(get_class($newClass)) as $name => $value) {
-            static::${$name} = $value;
-        }
-
-        foreach (get_class_methods(get_class($newClass)) as $name) {
-            if ($name !== '__construct') {
-                static::${$name} = Closure::fromCallable([$newClass, $name]);
-            }
+        if (!in_array($trait, $usedTraits)) {
+            eval('namespace ' . __NAMESPACE__ . '; class ' . static::class . ' extends \\' . static::class . ' { use \\' . $trait . '; }');
         }
     }
 }
