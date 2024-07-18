@@ -301,6 +301,7 @@ class Winmax4Service
         $entity = json_decode($response->getBody()->getContents());
 
         if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
+            dd($entity->Results[0]);
             return response()->json([
                 'message' => $entity->Results[0]->Message,
             ], 400);
