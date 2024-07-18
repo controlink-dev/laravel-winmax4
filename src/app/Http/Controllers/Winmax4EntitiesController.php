@@ -47,7 +47,6 @@ class Winmax4EntitiesController extends Controller
      */
     public function postEntities(Request $request)
     {
-        dd($request->all());
         return response()->json($this->winmax4Service->postEntities($request->all()), 200);
     }
 
