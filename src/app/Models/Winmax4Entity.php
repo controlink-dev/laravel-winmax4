@@ -46,20 +46,21 @@ class Winmax4Entity extends Model
 
     protected static function addTraitIfNotExists($trait)
     {
-        $usedTraits = class_uses(static::class);
+        $usedTraits = class_uses_recursive(static::class);
 
         if (!in_array($trait, $usedTraits)) {
-            // Add the trait
             $usedTraits[] = $trait;
 
-            // Update the model
             $reflection = new \ReflectionClass(static::class);
-            $namespace = $reflection->getNamespaceName();
-            $model = $reflection->getShortName();
             $modelPath = $reflection->getFileName();
             $modelContent = file_get_contents($modelPath);
-            $modelContent = str_replace("use Illuminate\Database\Eloquent\Model;", "use Illuminate\Database\Eloquent\Model;\nuse $trait;", $modelContent);
-            file_put_contents($modelPath, $modelContent);
+
+            $traitShortName = (new \ReflectionClass($trait))->getShortName();
+            if (strpos($modelContent, "use $trait;") === false && strpos($modelContent, "use $traitShortName;") === false) {
+                $modelContent = str_replace("use Illuminate\Database\Eloquent\Model;", "use Illuminate\Database\Eloquent\Model;\nuse $trait;", $modelContent);
+                file_put_contents($modelPath, $modelContent);
+            }
         }
     }
+
 }
