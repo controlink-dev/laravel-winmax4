@@ -67,7 +67,6 @@ class Winmax4EntitiesController extends Controller
      */
     public function deleteEntities($id)
     {
-        dd($id);
         return response()->json($this->winmax4Service->deleteEntities($id), 200);
     }
 }
