@@ -301,9 +301,10 @@ class Winmax4Service
         $entity = json_decode($response->getBody()->getContents());
 
         if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
+            $error = $entity->Results[0]->Message;
             return response()->json([
-                'message' => $entity->Results[0]->Message,
-            ], 500);
+                'message' => $error,
+            ], 400);
         }
 
         if(config('winmax4.use_soft_deletes')){
