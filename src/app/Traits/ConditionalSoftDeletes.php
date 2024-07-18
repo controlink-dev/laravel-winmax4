@@ -3,6 +3,7 @@
 namespace Controlink\LaravelWinmax4\app\Traits;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 trait ConditionalSoftDeletes
 {
@@ -16,10 +17,14 @@ trait ConditionalSoftDeletes
                 }
             });
 
-            static::restored(function ($model) {
+            static::restoring(function ($model) {
                 $model->{$model->getDeletedAtColumn()} = null;
                 $model->exists = true;
                 $model->save();
+            });
+
+            static::restored(function ($model) {
+                // Custom logic after restoring if necessary
             });
         }
     }
@@ -37,10 +42,18 @@ trait ConditionalSoftDeletes
 
     public function restore()
     {
+        if ($this->fireModelEvent('restoring') === false) {
+            return false;
+        }
+
         $this->{$this->getDeletedAtColumn()} = null;
         $this->exists = true;
 
-        return $this->save();
+        $result = $this->save();
+
+        $this->fireModelEvent('restored', false);
+
+        return $result;
     }
 
     public function trashed()
@@ -57,5 +70,10 @@ trait ConditionalSoftDeletes
         $this->forceDeleting = false;
 
         return $result;
+    }
+
+    protected static function bootSoftDeletes()
+    {
+        static::addGlobalScope(new SoftDeletingScope);
     }
 }
