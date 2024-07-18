@@ -19,11 +19,6 @@ trait ConditionalSoftDeletes
                     return false;
                 }
             });
-
-            // Define o evento restored para restaurar corretamente o modelo após a restauração
-            static::restored(function ($model) {
-                // Implemente qualquer lógica adicional necessária após a restauração
-            });
         }
     }
 
@@ -55,22 +50,6 @@ trait ConditionalSoftDeletes
         ]);
 
         $this->syncOriginal();
-    }
-
-    public function restore()
-    {
-        if ($this->fireModelEvent('restoring') === false) {
-            return false;
-        }
-
-        $this->{$this->getDeletedAtColumn()} = null;
-        $this->exists = true;
-
-        $result = $this->save();
-
-        $this->fireModelEvent('restored', false);
-
-        return $result;
     }
 
     public function trashed()
