@@ -1,6 +1,6 @@
 <?php
 
-namespace Controlink\LaravelWinmax4\app\Traits;
+namespace App\Traits;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -16,7 +16,7 @@ trait ConditionalSoftDeletes
                 }
             });
 
-            static::restoring(function ($model) {
+            static::restored(function ($model) {
                 $model->{$model->getDeletedAtColumn()} = null;
                 $model->exists = true;
                 $model->save();
