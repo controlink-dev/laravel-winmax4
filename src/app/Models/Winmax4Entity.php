@@ -37,9 +37,10 @@ class Winmax4Entity extends Model
 
         if (config('winmax4.use_soft_deletes')) {
             static::addTraitIfNotExists(SoftDeletes::class);
+            static::initSoftDeletes();
         }
 
-        if(config('winmax4.use_license') && !app()->runningInConsole()){
+        if (config('winmax4.use_license') && !app()->runningInConsole()) {
             static::addGlobalScope(new LicenseScope());
         }
     }
@@ -73,5 +74,18 @@ class Winmax4Entity extends Model
         }
     }
 
+    // A protected static function that initializes the behavior of SoftDeletes without adding the trait directly in the class definition
+    protected static function initSoftDeletes()
+    {
+        // Define a deleting event for the model
+        static::deleting(function ($model) {
+            // If the model has a method runSoftDelete (from SoftDeletes trait), call it
+            if (method_exists($model, 'runSoftDelete')) {
+                $model->runSoftDelete();
+                // Prevent the actual delete by returning false
+                return false;
+            }
+        });
+    }
 
 }
