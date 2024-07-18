@@ -46,7 +46,24 @@ class syncEntities extends Command
                 $winmax4Setting->n_terminal
             );
 
+            $localEntities = Winmax4Entity::where('license_id', $winmax4Setting->license_id)->get();
+
             $entities = $winmax4Service->getEntities()->Data->Entities;
+
+            //Delete all local entities that don't exist in Winmax4
+            foreach ($localEntities as $localEntity) {
+                $found = false;
+                foreach ($entities as $entity) {
+                    if ($localEntity->id_winmax4 == $entity->Id) {
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    $localEntity->delete();
+                }
+            }
 
             $job = [];
             foreach ($entities as $entity) {
