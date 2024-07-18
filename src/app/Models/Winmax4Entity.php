@@ -6,7 +6,6 @@ use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
 use Controlink\LaravelWinmax4\app\Traits\ConditionalSoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Winmax4Entity extends Model
 {
@@ -43,5 +42,4 @@ class Winmax4Entity extends Model
             static::addGlobalScope(new LicenseScope());
         }
     }
-
 }

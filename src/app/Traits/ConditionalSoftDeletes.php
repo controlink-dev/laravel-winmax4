@@ -9,7 +9,7 @@ trait ConditionalSoftDeletes
     public static function bootConditionalSoftDeletes()
     {
         if (config('winmax4.use_soft_deletes')) {
-            // Adiciona a funcionalidade de SoftDeletes
+            // Adiciona o trait SoftDeletes se ainda não estiver sendo usado
             static::addTraitIfNotExists(SoftDeletes::class);
 
             // Define o evento deleting para personalizar o comportamento de soft delete
@@ -18,6 +18,11 @@ trait ConditionalSoftDeletes
                     $model->runSoftDelete();
                     return false;
                 }
+            });
+
+            // Define o evento restored para restaurar corretamente o modelo após a restauração
+            static::restored(function ($model) {
+                // Implemente qualquer lógica adicional necessária após a restauração
             });
         }
     }
