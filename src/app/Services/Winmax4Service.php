@@ -205,7 +205,6 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        dd($entity);
         Winmax4Entity::create([
             'license_id' => session('licenseID'),
             'id_winmax4' => $entity->Data->Entity->ID,
@@ -291,8 +290,6 @@ class Winmax4Service
      * @throws GuzzleException
      */
     public function deleteEntities($valueID){
-        dd($valueID);
-
         $response = $this->client->delete($this->url . '/Files/Entities/?id='.$valueID, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -301,14 +298,13 @@ class Winmax4Service
             ],
         ]);
 
+        dd($response->getBody()->getContents());
         $entity = json_decode($response->getBody()->getContents());
 
         if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
-            if(config('winmax4.use_soft_deletes')){
-                Winmax4Entity::where('id_winmax4', $valueID)->delete();
-            }
-
-            return $entity;
+            return response()->json([
+                'message' => $entity->Results[0]->Message,
+            ], 404);
         }
 
         Winmax4Entity::where('id_winmax4', $valueID)->delete();
