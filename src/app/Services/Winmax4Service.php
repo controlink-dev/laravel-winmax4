@@ -180,7 +180,6 @@ class Winmax4Service
      */
     public function postEntities($values)
     {
-        dd($values);
         $response = $this->client->post($this->url . '/Files/Entities', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -206,6 +205,7 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
+        dd($entity);
         Winmax4Entity::create([
             'license_id' => session('licenseID'),
             'id_winmax4' => $entity->Data->Entity->ID,
@@ -222,6 +222,9 @@ class Winmax4Service
             'phone' => $entity->Data->Entity->Phone,
             'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
             'zip_code' => $entity->Data->Entity->ZipCode,
+            'birthdate' => $values['birthdate'],
+            'newsletter' => $values['sendNotificationToEmail'] === 'on' ? 1 : 0,
+            'observations' => $values['observations'],
         ]);
 
         return $entity->Data->Entity;
