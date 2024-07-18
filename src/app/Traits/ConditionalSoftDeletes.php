@@ -3,29 +3,41 @@
 namespace Controlink\LaravelWinmax4\app\Traits;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 trait ConditionalSoftDeletes
 {
     public static function bootConditionalSoftDeletes()
     {
         if (config('winmax4.use_soft_deletes')) {
+            // Adiciona a funcionalidade de SoftDeletes
+            static::addTraitIfNotExists(SoftDeletes::class);
+
+            // Define o evento deleting para personalizar o comportamento de soft delete
             static::deleting(function ($model) {
                 if (! $model->forceDeleting) {
                     $model->runSoftDelete();
                     return false;
                 }
             });
+        }
+    }
 
-            static::restoring(function ($model) {
-                $model->{$model->getDeletedAtColumn()} = null;
-                $model->exists = true;
-                $model->save();
-            });
+    protected static function addTraitIfNotExists($trait)
+    {
+        $usedTraits = class_uses_recursive(static::class);
 
-            static::restored(function ($model) {
-                // Custom logic after restoring if necessary
-            });
+        if (!in_array($trait, $usedTraits)) {
+            $usedTraits[] = $trait;
+
+            $reflection = new \ReflectionClass(static::class);
+            $modelPath = $reflection->getFileName();
+            $modelContent = file_get_contents($modelPath);
+
+            $traitShortName = (new \ReflectionClass($trait))->getShortName();
+            if (strpos($modelContent, "use $trait;") === false && strpos($modelContent, "use $traitShortName;") === false) {
+                $modelContent = str_replace("use Illuminate\\Database\\Eloquent\\Model;", "use Illuminate\\Database\\Eloquent\\Model;\nuse $trait;", $modelContent);
+                file_put_contents($modelPath, $modelContent);
+            }
         }
     }
 
@@ -70,10 +82,5 @@ trait ConditionalSoftDeletes
         $this->forceDeleting = false;
 
         return $result;
-    }
-
-    protected static function bootSoftDeletes()
-    {
-        static::addGlobalScope(new SoftDeletingScope);
     }
 }
