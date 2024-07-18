@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace Controlink\LaravelWinmax4\app\Traits;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
