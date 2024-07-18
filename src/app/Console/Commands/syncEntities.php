@@ -61,7 +61,11 @@ class syncEntities extends Command
                 }
 
                 if (!$found) {
-                    $localEntity->delete();
+                    if(config('winmax4.use_soft_deletes')){
+                        $localEntity->delete();
+                    }else{
+                        $localEntity->forceDelete();
+                    }
                 }
             }
 

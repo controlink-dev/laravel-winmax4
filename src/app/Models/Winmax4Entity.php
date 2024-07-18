@@ -3,7 +3,6 @@
 namespace Controlink\LaravelWinmax4\app\Models;
 
 use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
-use Controlink\LaravelWinmax4\app\Traits\ConditionalSoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -34,9 +33,7 @@ class Winmax4Entity extends Model
 
     protected static function booted()
     {
-        parent::boot();
-
-        if (config('winmax4.use_license') && !app()->runningInConsole()) {
+        if(config('winmax4.use_license') && !app()->runningInConsole()){
             static::addGlobalScope(new LicenseScope());
         }
     }
