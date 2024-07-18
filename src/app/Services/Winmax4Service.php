@@ -205,29 +205,32 @@ class Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        Winmax4Entity::updatedOrcreate([
-            'license_id' => session('licenseID'),
-            'code' => $entity->Data->Entity->Code,
-            ],[
-            'license_id' => session('licenseID'),
-            'id_winmax4' => $entity->Data->Entity->ID,
-            'name' => $entity->Data->Entity->Name,
-            'address' => $entity->Data->Entity->Address,
-            'code' => $entity->Data->Entity->Code,
-            'country_code' => $entity->Data->Entity->CountryCode,
-            'email' => $entity->Data->Entity->Email,
-            'entity_type' => $entity->Data->Entity->EntityType,
-            'fax' => $entity->Data->Entity->Fax,
-            'is_active' => $entity->Data->Entity->IsActive,
-            'location' => $entity->Data->Entity->Location,
-            'mobile_phone' => $entity->Data->Entity->MobilePhone,
-            'phone' => $entity->Data->Entity->Phone,
-            'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
-            'zip_code' => $entity->Data->Entity->ZipCode,
-            'birthdate' => $values['birthdate'],
-            'newsletter' => $values['sendNotificationToEmail'] === 'on' ? 1 : 0,
-            'observations' => $values['observations'],
-        ]);
+        Winmax4Entity::updateOrCreate(
+            [
+                'license_id' => session('licenseID'),
+                'code' => $entity->Data->Entity->Code,
+            ],
+            [
+                'license_id' => session('licenseID'),
+                'id_winmax4' => $entity->Data->Entity->ID,
+                'name' => $entity->Data->Entity->Name,
+                'address' => $entity->Data->Entity->Address,
+                'code' => $entity->Data->Entity->Code,
+                'country_code' => $entity->Data->Entity->CountryCode,
+                'email' => $entity->Data->Entity->Email,
+                'entity_type' => $entity->Data->Entity->EntityType,
+                'fax' => $entity->Data->Entity->Fax,
+                'is_active' => $entity->Data->Entity->IsActive,
+                'location' => $entity->Data->Entity->Location,
+                'mobile_phone' => $entity->Data->Entity->MobilePhone,
+                'phone' => $entity->Data->Entity->Phone,
+                'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
+                'zip_code' => $entity->Data->Entity->ZipCode,
+                'birthdate' => $values['birthdate'],
+                'newsletter' => isset($values['sendNotificationToEmail']) && $values['sendNotificationToEmail'] === 'on' ? 1 : 0,
+                'observations' => $values['observations'],
+            ]
+        );
 
         return $entity->Data->Entity;
     }
