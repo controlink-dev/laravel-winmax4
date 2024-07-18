@@ -309,6 +309,7 @@ class Winmax4Service
             return $entity;
         }
 
+        dd(Winmax4Entity::where('id_winmax4', $valueID)->first());
         Winmax4Entity::where('id_winmax4', $valueID)->delete();
 
         return $entity->Data->Entity;

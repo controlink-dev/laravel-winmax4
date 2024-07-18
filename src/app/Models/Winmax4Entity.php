@@ -44,23 +44,34 @@ class Winmax4Entity extends Model
         }
     }
 
+    // A protected static function that adds a trait to a class if it doesn't already exist
     protected static function addTraitIfNotExists($trait)
     {
+        // Get an array of all traits used by the current class and its parents
         $usedTraits = class_uses_recursive(static::class);
 
+        // Check if the trait is not already in the list of used traits
         if (!in_array($trait, $usedTraits)) {
+            // If not, add it to the list
             $usedTraits[] = $trait;
 
+            // Create a reflection of the current class to get its file path
             $reflection = new \ReflectionClass(static::class);
             $modelPath = $reflection->getFileName();
+            // Read the content of the class file
             $modelContent = file_get_contents($modelPath);
 
+            // Get the short name of the trait (without namespace)
             $traitShortName = (new \ReflectionClass($trait))->getShortName();
+            // Check if the trait is not already being used in the class file
             if (strpos($modelContent, "use $trait;") === false && strpos($modelContent, "use $traitShortName;") === false) {
+                // If not, add the trait use statement after the Eloquent Model use statement
                 $modelContent = str_replace("use Illuminate\Database\Eloquent\Model;", "use Illuminate\Database\Eloquent\Model;\nuse $trait;", $modelContent);
+                // Write the updated content back to the class file
                 file_put_contents($modelPath, $modelContent);
             }
         }
     }
+
 
 }
