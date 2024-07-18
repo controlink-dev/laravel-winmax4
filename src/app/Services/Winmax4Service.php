@@ -286,7 +286,7 @@ class Winmax4Service
      * Delete entities from Winmax4 API
      *
      * @param $values
-     * @return object
+     * @return array
      * @throws GuzzleException
      */
     public function deleteEntities($valueID){
