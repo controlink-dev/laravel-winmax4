@@ -180,6 +180,7 @@ class Winmax4Service
      */
     public function postEntities($values)
     {
+        dd($values);
         $response = $this->client->post($this->url . '/Files/Entities', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
