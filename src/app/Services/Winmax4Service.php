@@ -306,7 +306,11 @@ class Winmax4Service
             ], 404);
         }
 
-        Winmax4Entity::where('id_winmax4', $valueID)->delete();
+        if(config('winmax4.use_soft_deletes')){
+            Winmax4Entity::where('id_winmax4', $valueID)->delete();
+        }else{
+            Winmax4Entity::where('id_winmax4', $valueID)->forceDelete();
+        }
 
         return $entity->Data->Entity;
     }
