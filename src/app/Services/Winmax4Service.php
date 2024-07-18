@@ -291,7 +291,7 @@ class Winmax4Service
      * @throws GuzzleException
      */
     public function deleteEntities($valueID){
-        dd(Winmax4Entity::where('id_winmax4', $valueID)->first());
+        dd($valueID);
 
         $response = $this->client->delete($this->url . '/Files/Entities/?id='.$valueID, [
             'verify' => $this->settings['verify_ssl_guzzle'],
