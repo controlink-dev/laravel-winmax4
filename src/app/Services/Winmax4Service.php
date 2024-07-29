@@ -318,7 +318,7 @@ class Winmax4Service
                 'is_active' => false,
             ]);
 
-            return $entity->Results[0]->Message;
+            return $entity->Data->Entity;
         }
 
         // If the result is OK, we will delete the entity or force delete it
