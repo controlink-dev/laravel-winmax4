@@ -11,6 +11,9 @@ class Winmax4Article extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const TYPE_PRODUCT = 0;
+    const TYPE_SERVICE = 1;
+
     protected $table = 'winmax4_articles';
 
     protected $fillable = [
