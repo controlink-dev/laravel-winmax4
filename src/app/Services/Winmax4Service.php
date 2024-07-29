@@ -297,7 +297,7 @@ class Winmax4Service
      * Delete entities from Winmax4 API
      *
      * @param $values
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      * @throws GuzzleException
      */
     public function deleteEntities($valueID){
@@ -314,16 +314,21 @@ class Winmax4Service
         if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
 
             // If the result is not OK, we will disable the entity
-            $entity = Winmax4Entity::where('id_winmax4', $valueID)->update([
+            $e = Winmax4Entity::where('id_winmax4', $valueID)->update([
                 'is_active' => false,
             ]);
 
-            return $entity->Data->Entity;
+            return response()->json(['message' => 'Entity disabled successfully!'], 200);
         }
 
         // If the result is OK, we will delete the entity or force delete it
         if(config('winmax4.use_soft_deletes')){
-            Winmax4Entity::where('id_winmax4', $valueID)->delete();
+            $e = Winmax4Entity::where('id_winmax4', $valueID)->delete();
+
+            $e->update([
+                'is_active' => false,
+            ]);
+            
         }else{
             Winmax4Entity::where('id_winmax4', $valueID)->forceDelete();
         }
