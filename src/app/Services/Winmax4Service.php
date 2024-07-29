@@ -56,6 +56,7 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**---- Currencies ----*/
     /**
      * Get currencies from Winmax4 API
      *
@@ -75,6 +76,7 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**---- Document Types ----*/
     /**
      * Get document types from Winmax4 API
      *
@@ -94,6 +96,7 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**---- Families and SubFamilies ----*/
     /**
      * Get families from Winmax4 API
      *
@@ -133,6 +136,7 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**---- Articles ----*/
     /**
      * Get articles from Winmax4 API
      *
@@ -152,6 +156,7 @@ class Winmax4Service
         return json_decode($response->getBody()->getContents());
     }
 
+    /**---- Entities ----*/
     /**
      * Get entities from Winmax4 API
      *
