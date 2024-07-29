@@ -312,17 +312,16 @@ class Winmax4Service
         $entity = json_decode($response->getBody()->getContents());
 
         if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
-            $entity = Winmax4Entity::where('id_winmax4', $valueID)->update([
-                'is_active' => 0,
-            ]);
 
-            if(config('winmax4.use_soft_deletes')){
-                Winmax4Entity::where('id_winmax4', $valueID)->delete();
-            }
+            // If the result is not OK, we will disable the entity
+            $entity = Winmax4Entity::where('id_winmax4', $valueID)->update([
+                'is_active' => false,
+            ]);
 
             return $entity->Results[0]->Message;
         }
 
+        // If the result is OK, we will delete the entity or force delete it
         if(config('winmax4.use_soft_deletes')){
             Winmax4Entity::where('id_winmax4', $valueID)->delete();
         }else{
