@@ -312,12 +312,11 @@ class Winmax4Service
         $entity = json_decode($response->getBody()->getContents());
 
         if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
-            $responseJson = [
-                'message' => $entity->Results[0]->Message,
-                'status' => $entity->Results[0]->Code,
-            ];
+            Winmax4Entity::where('id_winmax4', $valueID)->update([
+                'is_active' => 0,
+            ]);
 
-            return $responseJson;
+            return $entity->Results[0]->Message;
         }
 
         if(config('winmax4.use_soft_deletes')){
