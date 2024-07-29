@@ -25,6 +25,9 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::get('/getTaxes', [Winmax4TaxesController::class, 'getTaxes'])->name('winmax4.getTaxes');
 
     Route::get('/getArticles', [Winmax4ArticlesController::class, 'getArticles'])->name('winmax4.getArticles');
+    Route::post('/postArticles', [Winmax4ArticlesController::class, 'postArticles'])->name('winmax4.postArticles');
+    Route::post('/putArticles/{id}', [Winmax4ArticlesController::class, 'putArticles'])->name('winmax4.putArticles');
+    Route::delete('/deleteArticles/{id}', [Winmax4ArticlesController::class, 'deleteArticles'])->name('winmax4.deleteArticles');
 
     Route::get('/getEntities', [Winmax4EntitiesController::class, 'getEntities'])->name('winmax4.getEntities');
     Route::post('/postEntities', [Winmax4EntitiesController::class, 'postEntities'])->name('winmax4.postEntities');
