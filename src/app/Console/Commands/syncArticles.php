@@ -52,7 +52,7 @@ class syncArticles extends Command
 
             $articles = $winmax4Service->getArticles()->Data->Articles;
 
-            //Delete all local entities that don't exist in Winmax4
+            //Delete all local articles that don't exist in Winmax4
             foreach ($localArticles as $localArticle) {
                 $found = false;
                 foreach ($articles as $article) {
