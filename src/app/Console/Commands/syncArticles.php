@@ -50,10 +50,10 @@ class syncArticles extends Command
         }
 
         if ($license_id != null) {
-            $this->info('Syncing families for license id ' . $license_id . '...');
+            $this->info('Syncing articles for license id ' . $license_id . '...');
             $winmax4Settings = Winmax4Setting::where(config('winmax4.license_column'), $license_id)->get();
         } else {
-            $this->info('Syncing families for all licenses...');
+            $this->info('Syncing articles for all licenses...');
             $winmax4Settings = Winmax4Setting::get();
         }
 
