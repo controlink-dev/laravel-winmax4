@@ -8,6 +8,7 @@ use Controlink\LaravelWinmax4\app\Console\Commands\syncDocumentsTypes;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncEntities;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncFamilies;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncTaxes;
+use Controlink\LaravelWinmax4\app\Console\Commands\syncWarehouses;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
@@ -42,7 +43,8 @@ class Winmax4ServiceProvider extends ServiceProvider
             syncFamilies::class,
             syncTaxes::class,
             syncEntities::class,
-            syncArticles::class
+            syncArticles::class,
+            syncWarehouses::class,
         ]);
 
         // Load routes
@@ -68,6 +70,7 @@ class Winmax4ServiceProvider extends ServiceProvider
             $schedule->command('winmax4:sync-taxes')->daily();
             $schedule->command('winmax4:sync-entities')->everyMinute();
             $schedule->command('winmax4:sync-articles')->everyMinute();
+            $schedule->command('winmax4:sync-warehouses')->daily();
         });
     }
 }

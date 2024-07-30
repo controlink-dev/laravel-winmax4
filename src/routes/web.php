@@ -7,6 +7,7 @@ use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4DocumentTypesControlle
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4EntitiesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4FamiliesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4TaxesController;
+use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4WarehousesController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->prefix('winmax4')->group(function () {
@@ -33,4 +34,7 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::post('/postEntities', [Winmax4EntitiesController::class, 'postEntities'])->name('winmax4.postEntities');
     Route::post('/putEntities/{id}', [Winmax4EntitiesController::class, 'putEntities'])->name('winmax4.putEntities');
     Route::delete('/deleteEntities/{id}', [Winmax4EntitiesController::class, 'deleteEntities'])->name('winmax4.deleteEntities');
+
+    Route::get('/getWarehouses', [Winmax4WarehousesController::class, 'getWarehouses'])->name('winmax4.getWarehouses');
+
 });
