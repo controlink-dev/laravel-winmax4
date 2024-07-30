@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Services;
 
+use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Dflydev\DotAccessData\Data;
 use GuzzleHttp\Client;
@@ -145,7 +146,13 @@ class Winmax4Service
      */
     public function getArticles()
     {
-        $response = $this->client->get($this->url . '/Files/Articles?IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true', [
+        $url = $this->url . '/Files/Articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
+
+        foreach (Winmax4Currency::all() as $currency) {
+            $url .= "&PriceCurrencyCode=". $currency->code;
+        }
+
+        $response = $this->client->get($url, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,

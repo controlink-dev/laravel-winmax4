@@ -32,7 +32,7 @@ class SyncArticlesJob implements ShouldQueue
     public function handle(): void
     {
         if(config('winmax4.use_license')){
-            Winmax4Article::updateOrCreate(
+            $article = Winmax4Article::updateOrCreate(
                 [
                     'code' => $this->article->Code,
                     config('winmax4.license_column') => $this->license_id,
@@ -51,9 +51,10 @@ class SyncArticlesJob implements ShouldQueue
                     'extras' => $this->article->Extras ?? null,
                     'holds' => $this->article->Holds ?? null,
                     'descriptives' => $this->article->Descriptives ?? null,
-
                 ]
             );
+
+            dd($article);
         }else{
             Winmax4Article::updateOrCreate(
                 [
