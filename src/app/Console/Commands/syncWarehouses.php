@@ -68,7 +68,7 @@ class syncWarehouses extends Command
 
             foreach ($warehouses as $warehouse) {
                  if(config('winmax4.use_license')){
-                     Winmax4DocumentType::updateOrCreate(
+                     Winmax4Warehouse::updateOrCreate(
                          [
                              'code' => $warehouse->Code,
                              config('winmax4.license_column') => $winmax4Setting->license_id,
@@ -80,7 +80,7 @@ class syncWarehouses extends Command
                          ]
                      );
                  }else{
-                     Winmax4DocumentType::updateOrCreate(
+                     Winmax4Warehouse::updateOrCreate(
                          [
                              'code' => $warehouse->Code,
                          ],
