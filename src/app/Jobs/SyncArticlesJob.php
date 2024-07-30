@@ -87,8 +87,8 @@ class SyncArticlesJob implements ShouldQueue
                         'tax_fee_code' => $saleTax->TaxFeeCode,
                     ],
                     [
-                        'percentage' => $saleTax->Percentage,
-                        'fixedAmount' => $saleTax->FixedAmount,
+                        'percentage' => $saleTax->Percentage ?? 0,
+                        'fixedAmount' => $saleTax->FixedAmount ?? 0,
                     ]
                 );
             }
@@ -102,8 +102,8 @@ class SyncArticlesJob implements ShouldQueue
                         'tax_fee_code' => $purchaseTax->TaxFeeCode,
                     ],
                     [
-                        'percentage' => $purchaseTax->Percentage,
-                        'fixedAmount' => $purchaseTax->FixedAmount,
+                        'percentage' => $purchaseTax->Percentage ?? 0,
+                        'fixedAmount' => $purchaseTax->FixedAmount ?? 0,
                     ]
                 );
             }
@@ -152,7 +152,7 @@ class SyncArticlesJob implements ShouldQueue
                         'warehouse_code' => $stock->WarehouseCode,
                     ],
                     [
-                        'current' => $stock->Current,
+                        'current' => $stock->Current ?? 0,
                     ]
                 );
             }
