@@ -36,6 +36,38 @@ class Winmax4TaxesController extends Controller
      * Get taxes from Winmax4 API
      */
     public function getTaxes(){
-        return response()->json(Winmax4Tax::with('taxRates')->get(), 200);
+
+        $taxes = Winmax4Tax::with('taxRates')->map(function ($tax){
+            $value = 0;
+            $is_percentage = true;
+            $rates = [];
+
+            foreach($tax->taxRate as $rate){
+                $is_percentage = true;
+                if($rate->percentage == 0){
+                    if($rate->fixed_amount != 0){
+                        $value = $rate->fixed_amount;
+                        $is_percentage = false;
+                    }else{
+                        $value = 0;
+                    }
+                }else{
+                    $value = $rate->percentage;
+                }
+
+
+                $rates[] = [
+                    'is_percentage' => $is_percentage,
+                    'tax_rate' => $value,
+                ];
+            }
+
+            return [
+                'tax_name' => $tax->designation,
+                'tax_rates' => $rates,
+            ];
+        });
+
+        return response()->json($taxes, 200);
     }
 }
