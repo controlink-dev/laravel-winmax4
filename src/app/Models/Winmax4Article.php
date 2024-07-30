@@ -31,6 +31,7 @@ class Winmax4Article extends Model
         'holds',
         'descriptives',
         'license_id',
+        'id_winmax4',
     ];
 
     protected static function boot()
