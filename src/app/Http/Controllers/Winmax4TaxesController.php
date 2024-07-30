@@ -64,6 +64,7 @@ class Winmax4TaxesController extends Controller
 
             return [
                 'tax_name' => $tax->designation,
+                'is_active' => $tax->is_active,
                 'tax_rates' => $rates,
             ];
         });
