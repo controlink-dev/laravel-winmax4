@@ -79,7 +79,7 @@ class SyncArticlesJob implements ShouldQueue
             );
         }
 
-        if($this->article->SaleTaxes){
+        if(isset($this->article->SaleTaxes)){
             foreach ($this->article->SaleTaxes as $saleTax) {
                 Winmax4ArticleSaleTaxes::updateOrCreate(
                     [
@@ -94,7 +94,7 @@ class SyncArticlesJob implements ShouldQueue
             }
         }
 
-        if($this->article->PurchaseTaxes){
+        if(isset($this->article->PurchaseTaxes)){
             foreach ($this->article->PurchaseTaxes as $purchaseTax) {
                 Winmax4ArticlePurchaseTaxes::updateOrCreate(
                     [
@@ -109,7 +109,7 @@ class SyncArticlesJob implements ShouldQueue
             }
         }
 
-        if($this->article->Prices){
+        if(isset($this->article->Prices)){
             foreach ($this->article->Prices as $price) {
                 Winmax4ArticlePrices::updateOrCreate(
                     [
@@ -144,7 +144,7 @@ class SyncArticlesJob implements ShouldQueue
             }
         }
 
-        if($this->article->Stocks){
+        if(isset($this->article->Stocks)){
             foreach ($this->article->Stocks as $stock) {
                 Winmax4ArticleStocks::updateOrCreate(
                     [
