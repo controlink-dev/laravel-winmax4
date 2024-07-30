@@ -19,13 +19,6 @@ class Winmax4ArticlePurchaseTaxes extends Model
         'fixedAmount',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope(new LicenseScope);
-    }
-
     public function article()
     {
         return $this->belongsTo(Winmax4Article::class, 'article_id', 'id');

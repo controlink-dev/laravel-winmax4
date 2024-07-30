@@ -39,12 +39,6 @@ class Winmax4ArticlePrices extends Model
         'sales_price_hold_with_taxes',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope(new LicenseScope);
-    }
 
     public function article()
     {
