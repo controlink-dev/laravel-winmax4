@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('winmax4_articles_sale_taxes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('article_id');
+            $table->foreignIdFor(Controlink\LaravelWinmax4\app\Models\Winmax4Article::class, 'article_id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('tax_fee_code');
             $table->integer('percentage');
             $table->decimal('fixedAmount');

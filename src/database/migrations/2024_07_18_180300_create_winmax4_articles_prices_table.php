@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('winmax4_articles_prices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('article_id');
+            $table->foreignIdFor(Controlink\LaravelWinmax4\app\Models\Winmax4Article::class, 'article_id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('currency_code', 10);
             $table->decimal('sales_price1_without_taxes', 10, 2);
             $table->decimal('sales_price1_with_taxes', 10, 2);

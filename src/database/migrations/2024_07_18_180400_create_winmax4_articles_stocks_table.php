@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('winmax4_articles_stocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('article_id');
+            $table->foreignIdFor(Controlink\LaravelWinmax4\app\Models\Winmax4Article::class, 'article_id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer('warehouse_code');
             $table->double('current');
             $table->timestamps();
