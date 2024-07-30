@@ -19,7 +19,9 @@ class syncEntities extends Command
      *
      * @var string
      */
-    protected $signature = 'winmax4:sync-entities';
+    protected $signature = 'winmax4:sync-entities
+                            {--license_id= : If you want to sync entities for a specific license, specify the license id.}';
+
 
     /**
      * The console command description.
@@ -33,7 +35,26 @@ class syncEntities extends Command
      */
     public function handle()
     {
-        $winmax4Settings = Winmax4Setting::get();
+        $license_id = null;
+        if(config('winmax4.use_license')){
+            if($this->option('license_id') != null){
+                // If the license_id option is set, use it
+                $license_id = $this->option('license_id');
+            }
+        }
+
+        if (!config('winmax4.use_license') && $this->option('license_id') != null) {
+            $this->error('You cannot specify a license id if you are not using the use_license configuration.');
+            return;
+        }
+
+        if ($license_id != null) {
+            $this->info('Syncing families for license id ' . $license_id . '...');
+            $winmax4Settings = Winmax4Setting::where(config('winmax4.license_column'), $license_id)->get();
+        } else {
+            $this->info('Syncing families for all licenses...');
+            $winmax4Settings = Winmax4Setting::get();
+        }
 
         foreach ($winmax4Settings as $winmax4Setting) {
             $this->info('Syncing entities  for ' . $winmax4Setting->company_code . '...');
