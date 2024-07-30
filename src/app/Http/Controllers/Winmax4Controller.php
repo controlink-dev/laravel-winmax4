@@ -87,6 +87,8 @@ class Winmax4Controller extends Controller
         if ($response->Results[0]->Code === 'OK') {
             $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), $request->sessionID)->first();
 
+            $exists = $winmax4 ? true : false;
+
             if($winmax4) {
                 $winmax4->url = $url;
                 $winmax4->company_code = $company_code;
@@ -121,6 +123,7 @@ class Winmax4Controller extends Controller
             return response()->json([
                 'message' => 'Success',
                 'data' => $response->Results[0]->Message,
+                'first_time' => !$exists,
             ], 201);
         } else {
             return response()->json([

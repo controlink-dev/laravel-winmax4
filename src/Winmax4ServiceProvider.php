@@ -40,11 +40,11 @@ class Winmax4ServiceProvider extends ServiceProvider
         $this->commands([
             syncCurrencies::class,
             syncDocumentsTypes::class,
-            syncFamilies::class,
             syncTaxes::class,
-            syncEntities::class,
-            syncArticles::class,
             syncWarehouses::class,
+            syncFamilies::class,
+            syncArticles::class,
+            syncEntities::class,
         ]);
 
         // Load routes
@@ -66,11 +66,11 @@ class Winmax4ServiceProvider extends ServiceProvider
             $schedule = $this->app->make(Schedule::class);
             $schedule->command('winmax4:sync-currencies')->daily();
             $schedule->command('winmax4:sync-document-types')->daily();
-            $schedule->command('winmax4:sync-families')->everyFifteenMinutes();
             $schedule->command('winmax4:sync-taxes')->daily();
-            $schedule->command('winmax4:sync-entities')->everyMinute();
-            $schedule->command('winmax4:sync-articles')->everyMinute();
             $schedule->command('winmax4:sync-warehouses')->daily();
+            $schedule->command('winmax4:sync-families')->everyFifteenMinutes();
+            $schedule->command('winmax4:sync-articles')->everyMinute();
+            $schedule->command('winmax4:sync-entities')->everyMinute();
         });
     }
 }
