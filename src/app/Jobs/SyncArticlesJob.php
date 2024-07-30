@@ -36,7 +36,6 @@ class SyncArticlesJob implements ShouldQueue
     public function handle(): void
     {
         if(config('winmax4.use_license')){
-            dump($this->article->Code, $this->license_id);
             $article = Winmax4Article::updateOrCreate(
                 [
                     'code' => $this->article->Code,

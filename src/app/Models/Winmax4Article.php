@@ -34,11 +34,11 @@ class Winmax4Article extends Model
         'id_winmax4',
     ];
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
-
-        static::addGlobalScope(new LicenseScope);
+        if(config('winmax4.use_license') && !app()->runningInConsole()){
+            static::addGlobalScope(new LicenseScope());
+        }
     }
 
     public function family()
