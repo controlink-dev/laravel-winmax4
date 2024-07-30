@@ -12,16 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('winmax4_articles', function (Blueprint $table) {
-            $table->string('designation')->nullable();
-            $table->string('short_description')->nullable();
-            $table->foreignId('sub_family_code')->nullable();
-            $table->foreignId('sub_sub_family_code')->nullable();
-            $table->foreignId('sub_sub_sub_family_code')->nullable();
-            $table->foreignId('stock_unit_code')->nullable();
-            $table->longText('image_url')->nullable();
-            $table->longText('extras')->nullable();
-            $table->longText('holds')->nullable();
-            $table->integer('descriptives')->nullable();
+            //I want add property nullable to all fields
+            $table->string('designation')->nullable()->change();
+            $table->string('short_description')->nullable()->change();
+            $table->string('sub_family_code')->nullable()->change();
+            $table->string('sub_sub_family_code')->nullable()->change();
+            $table->string('sub_sub_sub_family_code')->nullable()->change();
+            $table->string('stock_unit_code')->nullable()->change();
+            $table->string('image_url')->nullable()->change();
+            $table->json('extras')->nullable()->change();
+            $table->json('holds')->nullable()->change();
+            $table->json('descriptives')->nullable()->change();
         });
     }
 
