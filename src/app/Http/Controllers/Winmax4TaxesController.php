@@ -38,6 +38,7 @@ class Winmax4TaxesController extends Controller
     public function getTaxes(){
 
         $taxes = Winmax4Tax::with('taxRates')->get()->map(function ($tax){
+
             $value = 0;
             $is_percentage = true;
             $rates = [];
