@@ -58,21 +58,21 @@ class Winmax4Article extends Model
 
     public function saleTaxes()
     {
-        return $this->hasMany(Winmax4ArticleSaleTaxes::class, 'article_id', 'id');
+        return $this->belongsToMany(Winmax4ArticleSaleTaxes::class, 'article_id', 'id');
     }
 
     public function purchaseTaxes()
     {
-        return $this->hasMany(Winmax4ArticlePurchaseTaxes::class, 'article_id', 'id');
+        return $this->belongsToMany(Winmax4ArticlePurchaseTaxes::class, 'article_id', 'id');
     }
 
     public function prices()
     {
-        return $this->hasMany(Winmax4ArticlePrices::class, 'article_id', 'id');
+        return $this->belongsToMany(Winmax4ArticlePrices::class, 'article_id', 'id');
     }
 
     public function stocks()
     {
-        return $this->hasMany(Winmax4ArticleStocks::class, 'article_id', 'id');
+        return $this->belongsToMany(Winmax4ArticleStocks::class, 'article_id', 'id');
     }
 }
