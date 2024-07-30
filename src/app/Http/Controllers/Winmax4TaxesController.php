@@ -42,26 +42,24 @@ class Winmax4TaxesController extends Controller
             $is_percentage = true;
             $rates = [];
 
-            if(isset($tax->taxRate)){
-                foreach($tax->taxRate as $rate){
-                    $is_percentage = true;
-                    if($rate->percentage == 0){
-                        if($rate->fixed_amount != 0){
-                            $value = $rate->fixed_amount;
-                            $is_percentage = false;
-                        }else{
-                            $value = 0;
-                        }
+            foreach($tax->taxRates as $rate){
+                $is_percentage = true;
+                if($rate->percentage == 0){
+                    if($rate->fixed_amount != 0){
+                        $value = $rate->fixed_amount;
+                        $is_percentage = false;
                     }else{
-                        $value = $rate->percentage;
+                        $value = 0;
                     }
-
-
-                    $rates[] = [
-                        'is_percentage' => $is_percentage,
-                        'tax_rate' => $value,
-                    ];
+                }else{
+                    $value = $rate->percentage;
                 }
+
+
+                $rates[] = [
+                    'is_percentage' => $is_percentage,
+                    'tax_rate' => $value,
+                ];
             }
 
             return [
