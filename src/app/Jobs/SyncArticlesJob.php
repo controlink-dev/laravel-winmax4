@@ -3,6 +3,10 @@
 namespace Controlink\LaravelWinmax4\app\Jobs;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
+use Controlink\LaravelWinmax4\app\Models\Winmax4ArticlePrices;
+use Controlink\LaravelWinmax4\app\Models\Winmax4ArticlePurchaseTaxes;
+use Controlink\LaravelWinmax4\app\Models\Winmax4ArticleSaleTaxes;
+use Controlink\LaravelWinmax4\app\Models\Winmax4ArticleStocks;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -53,10 +57,8 @@ class SyncArticlesJob implements ShouldQueue
                     'descriptives' => $this->article->Descriptives ?? null,
                 ]
             );
-
-            dd($article);
         }else{
-            Winmax4Article::updateOrCreate(
+            $article = Winmax4Article::updateOrCreate(
                 [
                     'code' => $this->article->Code,
                 ],
@@ -77,5 +79,83 @@ class SyncArticlesJob implements ShouldQueue
             );
         }
 
+        if($this->article->SaleTaxes){
+            foreach ($this->article->SaleTaxes as $saleTax) {
+                Winmax4ArticleSaleTaxes::updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                        'tax_fee_code' => $saleTax->TaxFeeCode,
+                    ],
+                    [
+                        'percentage' => $saleTax->Percentage,
+                        'fixedAmount' => $saleTax->FixedAmount,
+                    ]
+                );
+            }
+        }
+
+        if($this->article->PurchaseTaxes){
+            foreach ($this->article->PurchaseTaxes as $purchaseTax) {
+                Winmax4ArticlePurchaseTaxes::updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                        'tax_fee_code' => $purchaseTax->TaxFeeCode,
+                    ],
+                    [
+                        'percentage' => $purchaseTax->Percentage,
+                        'fixedAmount' => $purchaseTax->FixedAmount,
+                    ]
+                );
+            }
+        }
+
+        if($this->article->Prices){
+            foreach ($this->article->Prices as $price) {
+                Winmax4ArticlePrices::updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                        'currency_code' => $price->CurrencyCode,
+                    ],
+                    [
+                        'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
+                        'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
+                        'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
+                        'sales_price2_with_taxes' => $price->SalesPrice2WithTaxes ?? 0,
+                        'sales_price3_without_taxes' => $price->SalesPrice3WithoutTaxes ?? 0,
+                        'sales_price3_with_taxes' => $price->SalesPrice3WithTaxes ?? 0,
+                        'sales_price4_without_taxes' => $price->SalesPrice4WithoutTaxes ?? 0,
+                        'sales_price4_with_taxes' => $price->SalesPrice4WithTaxes ?? 0,
+                        'sales_price5_without_taxes' => $price->SalesPrice5WithoutTaxes ?? 0,
+                        'sales_price5_with_taxes' => $price->SalesPrice5WithTaxes ?? 0,
+                        'sales_price6_without_taxes' => $price->SalesPrice6WithoutTaxes ?? 0,
+                        'sales_price6_with_taxes' => $price->SalesPrice6WithTaxes ?? 0,
+                        'sales_price7_without_taxes' => $price->SalesPrice7WithoutTaxes ?? 0,
+                        'sales_price7_with_taxes' => $price->SalesPrice7WithTaxes ?? 0,
+                        'sales_price8_without_taxes' => $price->SalesPrice8WithoutTaxes ?? 0,
+                        'sales_price8_with_taxes' => $price->SalesPrice8WithTaxes ?? 0,
+                        'sales_price9_without_taxes' => $price->SalesPrice9WithoutTaxes ?? 0,
+                        'sales_price9_with_taxes' => $price->SalesPrice9WithTaxes ?? 0,
+                        'sales_price_extra_without_taxes' => $price->SalesPriceExtraWithoutTaxes ?? 0,
+                        'sales_price_extra_with_taxes' => $price->SalesPriceExtraWithTaxes ?? 0,
+                        'sales_price_hold_without_taxes' => $price->SalesPriceHoldWithoutTaxes ?? 0,
+                        'sales_price_hold_with_taxes' => $price->SalesPriceHoldWithTaxes ?? 0,
+                    ]
+                );
+            }
+        }
+
+        if($this->article->Stocks){
+            foreach ($this->article->Stocks as $stock) {
+                Winmax4ArticleStocks::updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                        'warehouse_code' => $stock->WarehouseCode,
+                    ],
+                    [
+                        'current' => $stock->Current,
+                    ]
+                );
+            }
+        }
     }
 }

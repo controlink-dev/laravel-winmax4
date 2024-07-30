@@ -56,12 +56,12 @@ class Winmax4Article extends Model
         return $this->belongsTo(Winmax4SubSubFamily::class, 'sub_sub_family_code', 'code');
     }
 
-    public function saleTax()
+    public function saleTaxes()
     {
         return $this->hasMany(Winmax4ArticleSaleTaxes::class, 'article_id', 'id');
     }
 
-    public function purchaseTax()
+    public function purchaseTaxes()
     {
         return $this->hasMany(Winmax4ArticlePurchaseTaxes::class, 'article_id', 'id');
     }
@@ -75,20 +75,4 @@ class Winmax4Article extends Model
     {
         return $this->hasMany(Winmax4ArticleStocks::class, 'article_id', 'id');
     }
-
-    public function categories()
-    {
-        return $this->hasMany(Winmax4ArticleCategories::class, 'article_id', 'id');
-    }
-
-    public function questions()
-    {
-        return $this->hasMany(Winmax4ArticleQuestions::class, 'article_id', 'id');
-    }
-
-    public function idioms()
-    {
-        return $this->hasMany(Winmax4ArticleIdioms::class, 'article_id', 'id');
-    }
-
 }
