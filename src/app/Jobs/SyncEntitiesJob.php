@@ -3,9 +3,6 @@
 namespace Controlink\LaravelWinmax4\app\Jobs;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
-use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
-use Controlink\LaravelWinmax4\app\Models\Winmax4SubFamily;
-use Controlink\LaravelWinmax4\app\Models\Winmax4SubSubFamily;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
