@@ -46,8 +46,8 @@ class Winmax4FamiliesController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getSubFamilies($family_code){
-        $family_id = Winmax4Family::where('code', $family_code)->first()->id;
-        return response()->json(Winmax4Family::find($family_id)->subFamilies, 200);
+        $family = Winmax4Family::with('subFamilies')->where('code', $family_code)->first();
+        return response()->json($family->subFamilies, 200);
     }
 
     /**
@@ -56,7 +56,7 @@ class Winmax4FamiliesController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getSubSubFamilies($sub_family_code){
-        $sub_family_id = Winmax4SubFamily::where('code', $sub_family_code)->first()->id;
-        return response()->json(Winmax4SubFamily::find($sub_family_id)->subSubFamilies, 200);
+        $sub_family = Winmax4SubFamily::with('subSubFamilies')->where('code', $sub_family_code)->first();
+        return response()->json($sub_family->subSubFamilies, 200);
     }
 }
