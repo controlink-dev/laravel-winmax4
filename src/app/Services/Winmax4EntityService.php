@@ -257,7 +257,7 @@ class Winmax4EntityService extends Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        return Winmax4Entity::where('code', $code)->update([
+        Winmax4Entity::where('code', $code)->update([
             'license_id' => session('licenseID'),
             'name' => $entity->Data->Entity->Name,
             'address' => $entity->Data->Entity->Address,
@@ -272,6 +272,8 @@ class Winmax4EntityService extends Winmax4Service
             'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
             'zip_code' => $entity->Data->Entity->ZipCode,
         ]);
+
+        return Winmax4Entity::where('code', $code)->first();
     }
 
     /**
