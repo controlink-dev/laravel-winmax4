@@ -47,6 +47,7 @@ class Winmax4ArticlesController extends Controller
      */
     public function postArticles(Request $request)
     {
+        dd($request->all());
         return response()->json($this->winmax4Service->postArticles($request->all()), 200);
     }
 

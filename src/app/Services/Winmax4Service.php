@@ -180,7 +180,6 @@ class Winmax4Service
             'json' => [
                 'Code' => $values['code'],
                 'Designation' => $values['designation'],
-                'ShortDesignation' => $values['shortDesignation'],
                 'IsActive' => 1,
                 'FamilyCode' => $values['familyCode'],
                 'SubFamilyCode'	 => $values['subFamilyCode'],
