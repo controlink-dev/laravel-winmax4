@@ -106,12 +106,12 @@ class Winmax4EntityService extends Winmax4Service
      * @param string $address Entity address
      * @param string $zipCode Entity zip code
      * @param string $locality Entity locality
-     * @param int $isActive Set entity as active or not, default is 1
+     * @param int|null $isActive Set entity as active or not, default is 1
      * @param string|null $phone Entity phone, default is null
      * @param string|null $fax Entity fax, default is null
      * @param string|null $mobilePhone Entity mobile phone, default is null
      * @param string|null $email Entity email, default is null
-     * @param string $country Entity country, default is 'PT'
+     * @param string|null $country Entity country, default is 'PT'
      * @return Winmax4Entity Returns the entity object
      * @throws GuzzleException If there is a problem with the HTTP request
      */
@@ -142,7 +142,13 @@ class Winmax4EntityService extends Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        return Winmax4Entity::updateOrCreate(
+        if(config('winmax4.use_soft_deletes')){
+            $builder = Winmax4Entity::withTrashed();
+        }else{
+            $builder = new Winmax4Entity();
+        }
+
+        return $builder->updateOrCreate(
             [
                 'code' => $entity->Data->Entity->Code,
             ],
@@ -219,12 +225,12 @@ class Winmax4EntityService extends Winmax4Service
      * @param string $address Entity address
      * @param string $zipCode Entity zip code
      * @param string $locality Entity locality
-     * @param int $isActive Set entity as active or not, default is 1
+     * @param int|null $isActive Set entity as active or not, default is 1
      * @param string|null $phone Entity phone, default is null
      * @param string|null $fax Entity fax, default is null
      * @param string|null $mobilePhone Entity mobile phone, default is null
      * @param string|null $email Entity email, default is null
-     * @param string $country Entity country, default is 'PT'
+     * @param string|null $country Entity country, default is 'PT'
      * @return Winmax4Entity Returns the entity object
      * @throws GuzzleException If there is a problem with the HTTP request
      */
