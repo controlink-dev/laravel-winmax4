@@ -13,6 +13,6 @@ class LicenseScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        $builder->where(config('winmax4.license_column'), session('licenseID'));
+        $builder->where(config('winmax4.license_column'), session(config('winmax4.license_session_key')));
     }
 }

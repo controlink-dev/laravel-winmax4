@@ -23,6 +23,10 @@ class Winmax4Family extends Model
     {
         if(config('winmax4.use_license') && !app()->runningInConsole()){
             static::addGlobalScope(new LicenseScope());
+
+            static::creating(function ($model) {
+                $model->{config('winmax4.license_column')} = session(config('winmax4.license_session_key'));
+            });
         }
     }
 

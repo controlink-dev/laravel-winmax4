@@ -17,7 +17,7 @@ class Winmax4Controller extends Controller
      */
     public function __construct()
     {
-        $winmaxSettings = Winmax4Setting::where(config('winmax4.license_column'), session('licenseID'))->first();
+        $winmaxSettings = Winmax4Setting::where(config('winmax4.license_column'), session(config('winmax4.license_session_key')))->first();
 
         if(!$winmaxSettings) {
             $this->winmax4Service = new Winmax4Service(true);
@@ -39,7 +39,7 @@ class Winmax4Controller extends Controller
      */
     public function getWinmax4Settings()
     {
-        $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), session('licenseID'))->first();
+        $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), session(config('winmax4.license_session_key')))->first();
 
         if (!$winmax4) {
             return response()->json([

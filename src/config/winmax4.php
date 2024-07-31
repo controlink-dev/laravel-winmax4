@@ -15,6 +15,7 @@ return [
     |
     */
     'use_license' => env('WINMAX4_USE_LICENSE', false),
+    'license_session_key' => env('WINMAX4_LICENSE_SESSION_KEY', 'licenseID'),
     'license_is_uuid' => env('WINMAX4_LICENSE_IS_UUID', false),
     'license_column' => env('WINMAX4_LICENSE_COLUMN', 'license_id'),
     'licenses_table' => env('WINMAX4_LICENSES_TABLE', 'licenses'),
