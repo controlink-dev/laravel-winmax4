@@ -142,52 +142,27 @@ class Winmax4EntityService extends Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        if(config('winmax4.use_license')){
-            return Winmax4Entity::updateOrCreate(
-                [
-                    'code' => $entity->Data->Entity->Code,
-                    'license_id' => session('licenseID'),
-                ],
-                [
-                    'id_winmax4' => $entity->Data->Entity->ID,
-                    'name' => $entity->Data->Entity->Name,
-                    'address' => $entity->Data->Entity->Address,
-                    'code' => $entity->Data->Entity->Code,
-                    'country_code' => $entity->Data->Entity->CountryCode,
-                    'email' => $entity->Data->Entity->Email,
-                    'entity_type' => $entity->Data->Entity->EntityType,
-                    'fax' => $entity->Data->Entity->Fax,
-                    'is_active' => $entity->Data->Entity->IsActive,
-                    'location' => $entity->Data->Entity->Location,
-                    'mobile_phone' => $entity->Data->Entity->MobilePhone,
-                    'phone' => $entity->Data->Entity->Phone,
-                    'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
-                    'zip_code' => $entity->Data->Entity->ZipCode,
-                ]
-            );
-        }else{
-            return Winmax4Entity::updateOrCreate(
-                [
-                    'code' => $entity->Data->Entity->Code,
-                ],
-                [
-                    'id_winmax4' => $entity->Data->Entity->ID,
-                    'name' => $entity->Data->Entity->Name,
-                    'address' => $entity->Data->Entity->Address,
-                    'code' => $entity->Data->Entity->Code,
-                    'country_code' => $entity->Data->Entity->CountryCode,
-                    'email' => $entity->Data->Entity->Email,
-                    'entity_type' => $entity->Data->Entity->EntityType,
-                    'fax' => $entity->Data->Entity->Fax,
-                    'is_active' => $entity->Data->Entity->IsActive,
-                    'location' => $entity->Data->Entity->Location,
-                    'mobile_phone' => $entity->Data->Entity->MobilePhone,
-                    'phone' => $entity->Data->Entity->Phone,
-                    'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
-                    'zip_code' => $entity->Data->Entity->ZipCode,
-                ]
-            );
-        }
+        return Winmax4Entity::updateOrCreate(
+            [
+                'code' => $entity->Data->Entity->Code,
+            ],
+            [
+                'id_winmax4' => $entity->Data->Entity->ID,
+                'name' => $entity->Data->Entity->Name,
+                'address' => $entity->Data->Entity->Address,
+                'code' => $entity->Data->Entity->Code,
+                'country_code' => $entity->Data->Entity->CountryCode,
+                'email' => $entity->Data->Entity->Email,
+                'entity_type' => $entity->Data->Entity->EntityType,
+                'fax' => $entity->Data->Entity->Fax,
+                'is_active' => $entity->Data->Entity->IsActive,
+                'location' => $entity->Data->Entity->Location,
+                'mobile_phone' => $entity->Data->Entity->MobilePhone,
+                'phone' => $entity->Data->Entity->Phone,
+                'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
+                'zip_code' => $entity->Data->Entity->ZipCode,
+            ]
+        );
     }
 
     /**
@@ -281,7 +256,6 @@ class Winmax4EntityService extends Winmax4Service
         $entity = json_decode($response->getBody()->getContents());
 
         Winmax4Entity::where('code', $code)->update([
-            'license_id' => session('licenseID'),
             'name' => $entity->Data->Entity->Name,
             'address' => $entity->Data->Entity->Address,
             'country_code' => $entity->Data->Entity->CountryCode,

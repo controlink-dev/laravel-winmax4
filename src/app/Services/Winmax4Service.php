@@ -15,17 +15,15 @@ class Winmax4Service
     protected $url;
     protected $settings;
     protected $token;
-    protected $license_id;
 
     const WINMAX4_RESPONSE_OK = 'OK';
     const WINMAX4_RESPONSE_EXCEPTION = 'EXCEPTION';
 
-    public function __construct($saveMode = false, $url = '', $company_code = '', $username = '', $password = '', $n_terminal = '', $license_id = null)
+    public function __construct($saveMode = false, $url = '', $company_code = '', $username = '', $password = '', $n_terminal = '')
     {
         $this->client = new Client();
         $this->settings = config('winmax4');
         $this->url = $url;
-        $this->license_id = $license_id;
 
         if (!$saveMode) {
             $this->token = $this->generateToken($url, $company_code, $username, $password, $n_terminal);

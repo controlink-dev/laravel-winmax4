@@ -36,5 +36,4 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::delete('/deleteEntities/{id}', [Winmax4EntitiesController::class, 'deleteEntities'])->name('winmax4.deleteEntities');
 
     Route::get('/getWarehouses', [Winmax4WarehousesController::class, 'getWarehouses'])->name('winmax4.getWarehouses');
-
 });
