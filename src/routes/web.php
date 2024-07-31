@@ -11,29 +11,47 @@ use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4WarehousesController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->prefix('winmax4')->group(function () {
+
     Route::get('/getWinmax4Settings', [Winmax4Controller::class, 'getWinmax4Settings'])->name('winmax4.getWinmax4Settings');
     Route::post('/generateToken', [Winmax4Controller::class, 'generateToken'])->name('winmax4.generateToken');
     Route::get('/getWinmax4SyncStatus/{model}', [Winmax4Controller::class, 'getWinmax4SyncStatus'])->name('winmax4.getWinmax4SyncStatus');
 
-    Route::get('/getCurrencies', [Winmax4CurrenciesController::class, 'getCurrencies'])->name('winmax4.getCurrencies');
+    Route::prefix('currencies')->group(function () {
+        Route::get('/get', [Winmax4CurrenciesController::class, 'getCurrencies'])->name('winmax4.getCurrencies');
+    });
 
-    Route::get('/getDocumentTypes', [Winmax4DocumentTypesController::class, 'getDocumentTypes'])->name('winmax4.getDocumentTypes');
+    Route::prefix('documentTypes')->group(function () {
+        Route::get('/get', [Winmax4DocumentTypesController::class, 'getDocumentTypes'])->name('winmax4.getDocumentTypes');
 
-    Route::get('/getFamilies', [Winmax4FamiliesController::class, 'getFamilies'])->name('winmax4.getFamilies');
-    Route::get('/getSubFamilies/{family_code}', [Winmax4FamiliesController::class, 'getSubFamilies'])->name('winmax4.getSubFamilies');
-    Route::get('/getSubSubFamilies/{sub_family_code}', [Winmax4FamiliesController::class, 'getSubSubFamilies'])->name('winmax4.getSubSubFamilies');
+    });
 
-    Route::get('/getTaxes', [Winmax4TaxesController::class, 'getTaxes'])->name('winmax4.getTaxes');
+    Route::prefix('families')->group(function () {
+        Route::get('/get', [Winmax4FamiliesController::class, 'getFamilies'])->name('winmax4.getFamilies');
+        Route::get('/getSubFamilies/{family_code}', [Winmax4FamiliesController::class, 'getSubFamilies'])->name('winmax4.getSubFamilies');
+        Route::get('/getSubSubFamilies/{sub_family_code}', [Winmax4FamiliesController::class, 'getSubSubFamilies'])->name('winmax4.getSubSubFamilies');
+    });
 
-    Route::get('/getArticles', [Winmax4ArticlesController::class, 'getArticles'])->name('winmax4.getArticles');
-    Route::post('/postArticles', [Winmax4ArticlesController::class, 'postArticles'])->name('winmax4.postArticles');
-    Route::post('/putArticles/{id}', [Winmax4ArticlesController::class, 'putArticles'])->name('winmax4.putArticles');
-    Route::delete('/deleteArticles/{id}', [Winmax4ArticlesController::class, 'deleteArticles'])->name('winmax4.deleteArticles');
+    Route::prefix('taxes')->group(function () {
+        Route::get('/get', [Winmax4TaxesController::class, 'query'])->name('winmax4.taxes.query');
+    });
 
-    Route::get('/getEntities', [Winmax4EntitiesController::class, 'getEntities'])->name('winmax4.getEntities');
-    Route::post('/postEntities', [Winmax4EntitiesController::class, 'postEntities'])->name('winmax4.postEntities');
-    Route::post('/putEntities/{id}', [Winmax4EntitiesController::class, 'putEntities'])->name('winmax4.putEntities');
-    Route::delete('/deleteEntities/{id}', [Winmax4EntitiesController::class, 'deleteEntities'])->name('winmax4.deleteEntities');
+    Route::prefix('articles')->group(function () {
+        Route::get('/query', [Winmax4ArticlesController::class, 'query'])->name('winmax4.articles.query');
+        Route::post('/store', [Winmax4ArticlesController::class, 'store'])->name('winmax4.articles.store');
+        Route::post('/update/{id}', [Winmax4ArticlesController::class, 'update'])->name('winmax4.articles.update');
+        Route::post('/delete/{id}', [Winmax4ArticlesController::class, 'delete'])->name('winmax4.articles.delete');
+        Route::post('/restore/{id}', [Winmax4ArticlesController::class, 'restore'])->name('winmax4.articles.restore');
+    });
 
-    Route::get('/getWarehouses', [Winmax4WarehousesController::class, 'getWarehouses'])->name('winmax4.getWarehouses');
+    Route::prefix('entities')->group(function () {
+        Route::get('/query', [Winmax4EntitiesController::class, 'query'])->name('winmax4.entities.query');
+        Route::post('/store', [Winmax4EntitiesController::class, 'store'])->name('winmax4.entities.store');
+        Route::post('/update/{id}', [Winmax4EntitiesController::class, 'update'])->name('winmax4.entities.update');
+        Route::post('/delete/{id}', [Winmax4EntitiesController::class, 'delete'])->name('winmax4.entities.delete');
+        Route::post('/restore/{id}', [Winmax4EntitiesController::class, 'restore'])->name('winmax4.entities.restore');
+    });
+
+    Route::prefix('warehouses')->group(function () {
+        Route::get('/get', [Winmax4WarehousesController::class, 'getWarehouses'])->name('winmax4.getWarehouses');
+    });
 });
