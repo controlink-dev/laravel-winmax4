@@ -121,7 +121,7 @@ class Winmax4EntitiesController extends Controller
             'address' => 'required|string|max:255',
             'zipCode' => 'required|string|max:20',
             'locality' => 'required|string|max:255',
-            'isActive' => 'required|boolean',
+            'isActive' => 'nullable|integer|in:0,1',
             'phone' => 'nullable|string|max:20',
             'fax' => 'nullable|string|max:20',
             'mobilePhone' => 'nullable|string|max:20',
@@ -137,10 +137,12 @@ class Winmax4EntitiesController extends Controller
             $request->address,
             $request->zipCode,
             $request->locality,
+            $request->isActive,
             $request->phone,
             $request->fax,
             $request->mobilePhone,
             $request->email,
+            $request->country
         ), 200);
     }
 
@@ -193,12 +195,12 @@ class Winmax4EntitiesController extends Controller
             'address' => 'required|string|max:255',
             'zipCode' => 'required|string|max:20',
             'locality' => 'required|string|max:255',
-            'isActive' => 'nullable|boolean',
+            'isActive' => 'nullable|integer|in:0,1',
             'phone' => 'nullable|string|max:20',
             'fax' => 'nullable|string|max:20',
             'mobilePhone' => 'nullable|string|max:20',
             'email' => 'nullable|string|email|max:255',
-            'country' => 'nullable|string|size:2|in:PT',
+            'country' => 'required|string|size:2|in:PT',
         ]);
 
         return response()->json($this->winmax4Service->putEntities(
