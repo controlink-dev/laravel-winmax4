@@ -348,13 +348,15 @@ class Winmax4EntityService extends Winmax4Service
 
         // If the result is OK, we will delete the entity or force delete it
         if(config('winmax4.use_soft_deletes')){
-            $e = Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
-            $e->is_active = 0;
-            $e->save();
+            Winmax4Entity::where('id_winmax4', $idWinmax4)->update([
+                'is_active' => 0,
+            ]);
 
-            $e->delete();
+            $entityToDelete = Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
+            $entityToDelete->delete();
 
-            return $e;
+            return $entityToDelete;
+
         }else{
 
             return Winmax4Entity::where('id_winmax4', $idWinmax4)->forceDelete();
