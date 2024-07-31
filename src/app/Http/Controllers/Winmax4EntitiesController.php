@@ -137,12 +137,10 @@ class Winmax4EntitiesController extends Controller
             $request->address,
             $request->zipCode,
             $request->locality,
-            $request->isActive,
             $request->phone,
             $request->fax,
             $request->mobilePhone,
             $request->email,
-            $request->country
         ), 200);
     }
 

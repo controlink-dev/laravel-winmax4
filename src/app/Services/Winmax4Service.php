@@ -243,8 +243,6 @@ class Winmax4Service
         //TODO: Delete article
     }
 
-
-
     /**---- Warehouses ----*/
     /**
      * Get warehouses from Winmax4 API
