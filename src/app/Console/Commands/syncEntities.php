@@ -7,6 +7,7 @@ use Controlink\LaravelWinmax4\app\Jobs\SyncEntitiesJob;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
+use Controlink\LaravelWinmax4\app\Services\Winmax4EntityService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Bus\Batch;
 use Illuminate\Console\Command;
@@ -58,7 +59,7 @@ class syncEntities extends Command
 
         foreach ($winmax4Settings as $winmax4Setting) {
             $this->info('Syncing entities  for ' . $winmax4Setting->company_code . '...');
-            $winmax4Service = new Winmax4Service(
+            $winmax4Service = new Winmax4EntityService(
                 false,
                 $winmax4Setting->url,
                 $winmax4Setting->company_code,
