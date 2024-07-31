@@ -217,8 +217,7 @@ class Winmax4EntitiesController extends Controller
             $request->fax,
             $request->mobilePhone,
             $request->email,
-            $request->country,
-            $winmax4Setting->license_id
+            $request->country
         ), 200);
     }
 
