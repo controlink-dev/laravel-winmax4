@@ -42,19 +42,21 @@ class Winmax4FamiliesController extends Controller
 
     /**
      * Get sub families from Winmax4 API
-     * @param $family_id
+     * @param $family_code
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getSubFamilies($family_id){
+    public function getSubFamilies($family_code){
+        $family_id = Winmax4Family::where('code', $family_code)->first()->id;
         return response()->json(Winmax4Family::find($family_id)->subFamilies, 200);
     }
 
     /**
      * Get sub sub families from Winmax4 API
-     * @param $sub_family_id
+     * @param $sub_family_code
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getSubSubFamilies($sub_family_id){
+    public function getSubSubFamilies($sub_family_code){
+        $sub_family_id = Winmax4SubFamily::where('code', $sub_family_code)->first()->id;
         return response()->json(Winmax4SubFamily::find($sub_family_id)->subSubFamilies, 200);
     }
 }
