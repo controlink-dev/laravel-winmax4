@@ -7,6 +7,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4ArticlePrices;
 use Controlink\LaravelWinmax4\app\Models\Winmax4ArticlePurchaseTaxes;
 use Controlink\LaravelWinmax4\app\Models\Winmax4ArticleSaleTaxes;
 use Controlink\LaravelWinmax4\app\Models\Winmax4ArticleStocks;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -147,6 +148,14 @@ class SyncArticlesJob implements ShouldQueue
 
         if(isset($this->article->Stocks)){
             foreach ($this->article->Stocks as $stock) {
+                foreach (Winmax4Warehouse::all() as $warehouse) {
+                    if($stock->WarehouseCode == $warehouse->code){
+                        $stock->WarehouseCode = $warehouse->id;
+                    }else{
+                        $stock->WarehouseCode = 0;
+                    }
+                }
+
                 Winmax4ArticleStocks::updateOrCreate(
                     [
                         'article_id' => $article->id,
