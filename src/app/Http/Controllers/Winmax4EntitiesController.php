@@ -7,6 +7,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4EntityService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,7 +19,7 @@ class Winmax4EntitiesController extends Controller
     protected $winmax4Service;
 
     /**
-     * Init the Winmax4EntityService.
+     * Init Constructor for Winmax4EntitiesController.
      *
      * This constructor initializes the `Winmax4EntityService` based on the settings retrieved from the database.
      * If no settings are found for the current license, the service is initialized in test mode.
@@ -47,7 +48,7 @@ class Winmax4EntitiesController extends Controller
      * | `password`   | Password for authentication                           |
      * | `n_terminal` | Terminal number used for transactions                 |
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If no settings are found for the current license.
+     * @throws ModelNotFoundException If no settings are found for the current license.
      */
     public function __construct()
     {
