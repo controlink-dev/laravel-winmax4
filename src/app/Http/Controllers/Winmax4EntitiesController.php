@@ -12,11 +12,42 @@ use Illuminate\Http\Request;
 
 class Winmax4EntitiesController extends Controller
 {
+    /**
+     * @var Winmax4EntityService The service responsible for handling interactions with the Winmax4 API.
+     */
     protected $winmax4Service;
 
     /**
-     * Winmax4Controller constructor.
+     * Init the Winmax4EntityService.
      *
+     * This constructor initializes the `Winmax4EntityService` based on the settings retrieved from the database.
+     * If no settings are found for the current license, the service is initialized in test mode.
+     *
+     * ### Configuration Details
+     *
+     * The constructor retrieves Winmax4 settings from the database using the following parameters:
+     *
+     * - **License Column**: The database column defined in `winmax4.license_column` config.
+     * - **License Session Key**: The session key for the current user's license, as defined in `winmax4.license_session_key`.
+     *
+     * Depending on whether the settings are found, the service is initialized differently:
+     *
+     * | Condition              | Service Initialization                             |
+     * |------------------------|-----------------------------------------------------|
+     * | No settings found      | Test mode (`isTestMode = true`)                     |
+     * | Settings found         | Production mode with retrieved settings applied     |
+     *
+     * ### Settings Retrieved from the Database
+     *
+     * | Setting      | Description                                           |
+     * |--------------|-------------------------------------------------------|
+     * | `url`        | API endpoint URL for Winmax4                          |
+     * | `company_code` | Code representing the company in Winmax4             |
+     * | `username`   | Username for authentication                           |
+     * | `password`   | Password for authentication                           |
+     * | `n_terminal` | Terminal number used for transactions                 |
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If no settings are found for the current license.
      */
     public function __construct()
     {

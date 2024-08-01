@@ -40,15 +40,13 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
         Route::post('/store', [Winmax4ArticlesController::class, 'store'])->name('winmax4.articles.store');
         Route::post('/update/{id}', [Winmax4ArticlesController::class, 'update'])->name('winmax4.articles.update');
         Route::post('/delete/{id}', [Winmax4ArticlesController::class, 'delete'])->name('winmax4.articles.delete');
-        Route::post('/restore/{id}', [Winmax4ArticlesController::class, 'restore'])->name('winmax4.articles.restore');
     });
 
     Route::prefix('entities')->group(function () {
-        Route::get('/query', [Winmax4EntitiesController::class, 'query'])->name('winmax4.entities.query');
-        Route::post('/store', [Winmax4EntitiesController::class, 'store'])->name('winmax4.entities.store');
-        Route::post('/update/{id}', [Winmax4EntitiesController::class, 'update'])->name('winmax4.entities.update');
-        Route::post('/delete/{id}', [Winmax4EntitiesController::class, 'delete'])->name('winmax4.entities.delete');
-        Route::post('/restore/{id}', [Winmax4EntitiesController::class, 'restore'])->name('winmax4.entities.restore');
+        Route::get('/query', [Winmax4EntitiesController::class, 'getEntities'])->name('winmax4.entities.query');
+        Route::post('/store', [Winmax4EntitiesController::class, 'postEntities'])->name('winmax4.entities.store');
+        Route::post('/update/{id}', [Winmax4EntitiesController::class, 'putEntities'])->name('winmax4.entities.update');
+        Route::post('/delete/{id}', [Winmax4EntitiesController::class, 'deleteEntities'])->name('winmax4.entities.delete');
     });
 
     Route::prefix('warehouses')->group(function () {

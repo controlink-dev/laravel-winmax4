@@ -4,6 +4,7 @@ namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\JsonResponse;
 
 class Winmax4EntityService extends Winmax4Service
 {
@@ -324,10 +325,10 @@ class Winmax4EntityService extends Winmax4Service
      * | `GuzzleHttp\Exception\GuzzleException`     | Throws when there is an HTTP client error during the DELETE request. |
      *
      * @param int $idWinmax4 The ID of the Winmax4 entity to delete.
-     * @return \Illuminate\Http\JsonResponse|Winmax4Entity JSON response or deleted entity object.
+     * @return JsonResponse|Winmax4Entity JSON response or deleted entity object.
      * @throws GuzzleException
      */
-    public function deleteEntities(int $idWinmax4): Winmax4Entity|\Illuminate\Http\JsonResponse
+    public function deleteEntities(int $idWinmax4): Winmax4Entity|JsonResponse
     {
         $response = $this->client->delete($this->url . '/Files/Entities/?id='.$idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
