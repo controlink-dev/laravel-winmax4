@@ -5,6 +5,7 @@ namespace Controlink\LaravelWinmax4\app\Console\Commands;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
+use Controlink\LaravelWinmax4\app\Services\Winmax4FamilyService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Controlink\LaravelWinmax4\app\Jobs\SyncFamiliesJob;
 use Illuminate\Bus\Batch;
@@ -56,7 +57,7 @@ class syncFamilies extends Command
 
         foreach ($winmax4Settings as $winmax4Setting) {
             $this->info('Syncing families  for ' . $winmax4Setting->company_code . '...');
-            $winmax4Service = new Winmax4Service(
+            $winmax4Service = new Winmax4FamilyService(
                 false,
                 $winmax4Setting->url,
                 $winmax4Setting->company_code,

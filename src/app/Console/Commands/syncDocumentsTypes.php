@@ -6,6 +6,7 @@ use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
+use Controlink\LaravelWinmax4\app\Services\Winmax4DocumentTypeService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Console\Command;
 
@@ -54,7 +55,7 @@ class syncDocumentsTypes extends Command
 
         foreach ($winmax4Settings as $winmax4Setting) {
             $this->info('Syncing document types for ' . $winmax4Setting->company_code . '...');
-            $winmax4Service = new Winmax4Service(
+            $winmax4Service = new Winmax4DocumentTypeService(
                 false,
                 $winmax4Setting->url,
                 $winmax4Setting->company_code,

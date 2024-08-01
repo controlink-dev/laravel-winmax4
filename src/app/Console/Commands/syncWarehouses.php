@@ -8,6 +8,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
+use Controlink\LaravelWinmax4\app\Services\Winmax4WarehouseService;
 use Illuminate\Console\Command;
 
 class syncWarehouses extends Command
@@ -55,7 +56,7 @@ class syncWarehouses extends Command
 
         foreach ($winmax4Settings as $winmax4Setting) {
             $this->info('Syncing warehouses for ' . $winmax4Setting->company_code . '...');
-            $winmax4Service = new Winmax4Service(
+            $winmax4Service = new Winmax4WarehouseService(
                 false,
                 $winmax4Setting->url,
                 $winmax4Setting->company_code,

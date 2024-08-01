@@ -7,6 +7,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Tax;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Controlink\LaravelWinmax4\app\Jobs\SyncFamiliesJob;
+use Controlink\LaravelWinmax4\app\Services\Winmax4TaxService;
 use Illuminate\Bus\Batch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
@@ -56,7 +57,7 @@ class syncTaxes extends Command
 
         foreach ($winmax4Settings as $winmax4Setting) {
             $this->info('Syncing taxes  for ' . $winmax4Setting->company_code . '...');
-            $winmax4Service = new Winmax4Service(
+            $winmax4Service = new Winmax4TaxService(
                 false,
                 $winmax4Setting->url,
                 $winmax4Setting->company_code,
