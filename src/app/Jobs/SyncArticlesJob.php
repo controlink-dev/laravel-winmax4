@@ -148,14 +148,6 @@ class SyncArticlesJob implements ShouldQueue
 
         if(isset($this->article->Stocks)){
             foreach ($this->article->Stocks as $stock) {
-                foreach (Winmax4Warehouse::all() as $warehouse) {
-                    if($stock->WarehouseCode == $warehouse->code){
-                        $stock->WarehouseCode = $warehouse->id;
-                    }else{
-                        $stock->WarehouseCode = 0;
-                    }
-                }
-
                 Winmax4ArticleStocks::updateOrCreate(
                     [
                         'article_id' => $article->id,
