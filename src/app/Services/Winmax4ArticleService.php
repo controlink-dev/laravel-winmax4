@@ -3,6 +3,7 @@
 namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Winmax4ArticleService extends Winmax4Service
@@ -52,6 +53,10 @@ class Winmax4ArticleService extends Winmax4Service
             $url .= "&PriceCurrencyCode=". $currency->code;
         }
 
+        foreach (Winmax4Warehouse::all() as $warehouse) {
+            $url .= "&StockWarehouseCode=". $warehouse->code;
+        }
+
         $response = $this->client->get($url, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -61,67 +66,5 @@ class Winmax4ArticleService extends Winmax4Service
         ]);
 
         return json_decode($response->getBody()->getContents());
-    }
-
-
-    public function postArticles($values){
-        $response = $this->client->post($this->url . '/Files/Articles', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'Code' => $values['code'],
-                'Designation' => $values['designation'],
-                'IsActive' => 1,
-                'FamilyCode' => $values['familyCode'],
-                'SubFamilyCode'	 => $values['subFamilyCode'],
-                'SubSubFamilyCode' => $values['subSubFamilyCode'],
-                'SubSubSubFamilyCode' => $values['subSubSubFamilyCode'],
-                'StockUnitCode' => $values['stockUnitCode'],
-                'ImageURLs' => $values['imageURLs'],
-            ],
-        ]);
-    }
-
-
-    public function putArticles($values){
-        $response = $this->client->put($this->url . '/Files/Articles/?id='.$values['id_winmax4'], [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'Code' => $values['code'],
-                'Designation' => $values['designation'],
-                'ShortDesignation' => $values['shortDesignation'],
-                'IsActive' => 1,
-                'FamilyCode' => $values['familyCode'],
-                'SubFamilyCode'	 => $values['subFamilyCode'],
-                'SubSubFamilyCode' => $values['subSubFamilyCode'],
-                'SubSubSubFamilyCode' => $values['subSubSubFamilyCode'],
-                'StockUnitCode' => $values['stockUnitCode'],
-                'ImageURLs' => $values['imageURLs'],
-            ],
-        ]);
-
-        //TODO: Update article
-    }
-
-
-    public function deleteArticles($valueID){
-        $response = $this->client->delete($this->url . '/Files/Articles/?id='.$valueID, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
-
-        $article = json_decode($response->getBody()->getContents());
-
-        //TODO: Delete article
     }
 }

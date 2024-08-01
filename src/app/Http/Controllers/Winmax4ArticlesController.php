@@ -6,6 +6,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4ArticleService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -72,20 +73,5 @@ class Winmax4ArticlesController extends Controller
         return response()->json(Winmax4Article::get(), 200);
     }
 
-
-    public function postArticles(Request $request)
-    {
-        return response()->json($this->winmax4Service->postArticles($request->all()), 200);
-    }
-
-
-    public function putArticles(Request $request){
-        return response()->json($this->winmax4Service->putArticles($request->all()), 200);
-    }
-
-
-    public function deleteArticles(Request $request)
-    {
-        return response()->json($this->winmax4Service->deleteArticles($request->all()), 200);
-    }
+    //TODO: Implement the postArticles method, putArticles method, and deleteArticles method when the Winmax4 API is available.
 }
