@@ -17,5 +17,6 @@ return [
 
     'messages' => [
         'success' => 'Winmax4 saved successfully!',
+        'syncNow' => 'Do you want to synchronize the data now?',
     ],
 ];
