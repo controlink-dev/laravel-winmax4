@@ -146,13 +146,13 @@ class Winmax4EntitiesController extends Controller
     public function postEntities(Request $request): JsonResponse
     {
         $request->validate([
-            'code' => 'required|string|max:255',
             'name' => 'required|string|max:255',
-            'entityType' => 'required|integer|in:0,1,2,3,4',
-            'taxPayerID' => 'required|string|max:50',
-            'address' => 'required|string|max:255',
-            'zipCode' => 'required|string|max:20',
-            'locality' => 'required|string|max:255',
+            'code' => 'string|max:255',
+            'entityType' => 'integer|in:0,1,2,3,4',
+            'taxPayerID' => 'string|max:50',
+            'address' => 'string|max:255',
+            'zipCode' => 'string|max:20',
+            'locality' => 'string|max:255',
             'isActive' => 'nullable|integer|in:0,1',
             'phone' => 'nullable|string|max:20',
             'fax' => 'nullable|string|max:20',
@@ -162,8 +162,8 @@ class Winmax4EntitiesController extends Controller
         ]);
 
         return response()->json($this->winmax4Service->postEntities(
-            $request->code,
             $request->name,
+            $request->code,
             $request->entityType,
             $request->taxPayerID,
             $request->address,

@@ -74,13 +74,13 @@ class Winmax4EntityService extends Winmax4Service
      *
      * | Parameter     | Type    | Description                                            | Default |
      * |---------------|---------|--------------------------------------------------------|---------|
-     * | `$code`       | `string`| Entity code                                            | N/A     |
      * | `$name`       | `string`| Entity name                                            | N/A     |
-     * | `$entityType` | `int`   | Type of the entity as described in the table above     | N/A     |
-     * | `$taxPayerID` | `string`| Entity tax payer ID                                    | N/A     |
-     * | `$address`    | `string`| Entity address                                         | N/A     |
-     * | `$zipCode`    | `string`| Entity zip code                                        | N/A     |
-     * | `$locality`   | `string`| Entity locality                                        | N/A     |
+     * | `$code`       | `string`| Entity code                                            | `null`  |
+     * | `$entityType` | `int`   | Type of the entity as described in the table above     | `null`  |
+     * | `$taxPayerID` | `string`| Entity tax payer ID                                    | `null`  |
+     * | `$address`    | `string`| Entity address                                         | `null`  |
+     * | `$zipCode`    | `string`| Entity zip code                                        | `null`  |
+     * | `$locality`   | `string`| Entity locality                                        | `null`  |
      * | `$isActive`   | `int`   | Set entity as active or not                            | `1`     |
      * | `$phone`      | `null`  | Entity phone                                           | `null`  |
      * | `$fax`        | `null`  | Entity fax                                             | `null`  |
@@ -100,13 +100,13 @@ class Winmax4EntityService extends Winmax4Service
      * |-------------------|-----------------------------------------|
      * | `GuzzleException` | Throws when there is a HTTP client error|
      *
-     * @param string $code Entity code
      * @param string $name Entity name
-     * @param int $entityType Entity type (See table above for possible values)
-     * @param string $taxPayerID Entity tax payer ID
+     * @param string|null $code Entity code
+     * @param int|null $entityType Entity type (See table above for possible values)
+     * @param string|null $taxPayerID Entity tax payer ID
      * @param string $address Entity address
-     * @param string $zipCode Entity zip code
-     * @param string $locality Entity locality
+     * @param string|null $zipCode Entity zip code
+     * @param string|null $locality Entity locality
      * @param int|null $isActive Set entity as active or not, default is 1
      * @param string|null $phone Entity phone, default is null
      * @param string|null $fax Entity fax, default is null
@@ -116,7 +116,7 @@ class Winmax4EntityService extends Winmax4Service
      * @return Winmax4Entity Returns the entity object
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postEntities(string $code, string $name, int $entityType, string $taxPayerID, string $address, string $zipCode, string $locality, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): Winmax4Entity
+    public function postEntities(string $name, string $code = null, int $entityType = null, string $taxPayerID = null, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): Winmax4Entity
     {
         $response = $this->client->post($this->url . '/Files/Entities', [
             'verify' => $this->settings['verify_ssl_guzzle'],
@@ -192,13 +192,13 @@ class Winmax4EntityService extends Winmax4Service
      * | Parameter     | Type    | Description                                            | Default |
      * |---------------|---------|--------------------------------------------------------|---------|
      * | `$idWinmax4`  | `int`   | Entity ID in Winmax4                                   | N/A     |
-     * | `$code`       | `string`| Entity code                                            | N/A     |
      * | `$name`       | `string`| Entity name                                            | N/A     |
-     * | `$entityType` | `int`   | Type of the entity as described in the table above     | N/A     |
-     * | `$taxPayerID` | `string`| Entity tax payer ID                                    | N/A     |
-     * | `$address`    | `string`| Entity address                                         | N/A     |
-     * | `$zipCode`    | `string`| Entity zip code                                        | N/A     |
-     * | `$locality`   | `string`| Entity locality                                        | N/A     |
+     * | `$code`       | `string`| Entity code                                            | `null`  |
+     * | `$entityType` | `int`   | Type of the entity as described in the table above     | `null`  |
+     * | `$taxPayerID` | `string`| Entity tax payer ID                                    | `null`  |
+     * | `$address`    | `string`| Entity address                                         | `null`  |
+     * | `$zipCode`    | `string`| Entity zip code                                        | `null`  |
+     * | `$locality`   | `string`| Entity locality                                        | `null`  |
      * | `$isActive`   | `int`   | Set entity as active or not                            | `1`     |
      * | `$phone`      | `null`  | Entity phone                                           | `null`  |
      * | `$fax`        | `null`  | Entity fax                                             | `null`  |
