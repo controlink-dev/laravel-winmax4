@@ -65,11 +65,12 @@ class Winmax4Service
      */
     public function getCompany(){
         $response = $this->client->get($this->url . '/Company/GetCompany', [
-            'verify' => $this ->settings['verify_ssl_guzzle'],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Token,
-                ],
-            ]);
+            'verify' => $this->settings['verify_ssl_guzzle'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                'Content-Type' => 'application/json',
+            ],
+        ]);
 
         return json_decode($response->getBody()->getContents());
     }
