@@ -16,10 +16,6 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::post('/generateToken', [Winmax4Controller::class, 'generateToken'])->name('winmax4.generateToken');
     Route::get('/getWinmax4SyncStatus/{model}', [Winmax4Controller::class, 'getWinmax4SyncStatus'])->name('winmax4.getWinmax4SyncStatus');
 
-    Route::prefix('companies')->group(function () {
-        Route::get('/getCompanyInfo', [Winmax4Controller::class, 'getCompanyInfo'])->name('winmax4.getCompanyInfo');
-    });
-
     Route::prefix('currencies')->group(function () {
         Route::get('/get', [Winmax4CurrenciesController::class, 'getCurrencies'])->name('winmax4.getCurrencies');
     });
