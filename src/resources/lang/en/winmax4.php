@@ -14,4 +14,11 @@ return [
         'creditNote' => 'Credit Note',
         'receipt' => 'Receipt',
     ],
+
+    'messages' => [
+        'error_integrating' => 'Error integrating with Winmax4',
+        'error_getting' => 'Error getting data from Winmax4',
+        'error_setting' => 'Error setting data from Winmax4',
+        'error_syncing' => 'Error syncing with Winmax4',
+    ],
 ];
