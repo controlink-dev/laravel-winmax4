@@ -120,6 +120,10 @@ class Winmax4Controller extends Controller
 
             $winmax4->save();
 
+            $response = $this->winmax4Service->getCompanyInfo();
+
+            dd($response);
+
             return response()->json([
                 'message' => 'Success',
                 'data' => $response->Results[0]->Message,

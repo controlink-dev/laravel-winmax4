@@ -14,9 +14,4 @@ return [
         'creditNote' => 'Nota de Crédito',
         'receipt' => 'Recibo',
     ],
-
-    'messages' => [
-        'success' => 'Winmax4 guardado com sucesso!',
-        'syncNow' => 'Quer sincronizar os dados agora?',
-    ],
 ];
