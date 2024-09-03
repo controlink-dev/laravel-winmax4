@@ -18,7 +18,7 @@ return [
     'messages' => [
         'error_integrating' => 'Erro ao integrar com o Winmax4',
         'error_getting' => 'Erro ao obter dados do Winmax4',
-        'error_setting' => 'Erro ao definir dados do Winmax4',
+        'error_setting' => 'Erro ao guardar configurações do Winmax4',
         'error_syncing' => 'Erro ao sincronizar com o Winmax4',
     ],
 ];

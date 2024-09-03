@@ -25,7 +25,7 @@ class Winmax4ServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../src/database/migrations');
 
         // Load translations
-        $this->loadTranslationsFrom(__DIR__.'/../src/resources/lang', 'winmax4');
+        $this->loadTranslationsFrom(__DIR__.'/../src/resources/lang', 'laravel-winmax4');
 
         // Publish migrations if running in console
         if ($this->app->runningInConsole()) {
