@@ -180,5 +180,4 @@ class Winmax4Controller extends Controller
             'winmax4SyncStatus' => $winmax4SyncStatus,
         ], 200);
     }
-
 }

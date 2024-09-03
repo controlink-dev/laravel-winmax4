@@ -1,6 +1,7 @@
 <?php
 
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4ArticlesController;
+use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4CompaniesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4CurrenciesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4DocumentTypesController;
@@ -15,6 +16,10 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::get('/getWinmax4Settings', [Winmax4Controller::class, 'getWinmax4Settings'])->name('winmax4.getWinmax4Settings');
     Route::post('/generateToken', [Winmax4Controller::class, 'generateToken'])->name('winmax4.generateToken');
     Route::get('/getWinmax4SyncStatus/{model}', [Winmax4Controller::class, 'getWinmax4SyncStatus'])->name('winmax4.getWinmax4SyncStatus');
+
+    Route::prefix('companies')->group(function () {
+        Route::get('/get', [Winmax4CompaniesController::class, 'getCompanies'])->name('winmax4.getCompanies');
+    });
 
     Route::prefix('currencies')->group(function () {
         Route::get('/get', [Winmax4CurrenciesController::class, 'getCurrencies'])->name('winmax4.getCurrencies');
