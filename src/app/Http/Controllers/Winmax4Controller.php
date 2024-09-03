@@ -120,10 +120,6 @@ class Winmax4Controller extends Controller
 
             $winmax4->save();
 
-            $response = $this->winmax4Service->getCompanyInfo();
-
-            dd($response);
-
             return response()->json([
                 'message' => 'Success',
                 'data' => $response->Results[0]->Message,
@@ -182,6 +178,20 @@ class Winmax4Controller extends Controller
         return response()->json([
             'message' => 'Success',
             'winmax4SyncStatus' => $winmax4SyncStatus,
+        ], 200);
+    }
+
+    /**
+     * Get company info
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getCompanyInfo(){
+        $response = $this->winmax4Service->getCompanyInfo();
+
+        return response()->json([
+            'message' => 'Success',
+            'company' => $response,
         ], 200);
     }
 
