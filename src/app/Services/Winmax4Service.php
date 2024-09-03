@@ -56,22 +56,4 @@ class Winmax4Service
 
         return json_decode($response->getBody()->getContents());
     }
-
-    /**
-     * Get Winmax4 Company
-     *
-     * @return object
-     * @throws GuzzleException
-     */
-    public function getCompany(){
-        $response = $this->client->get($this->url . '/Company/GetCompany', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
-
-        return json_decode($response->getBody()->getContents());
-    }
 }
