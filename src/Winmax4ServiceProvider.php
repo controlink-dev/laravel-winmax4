@@ -40,7 +40,7 @@ class Winmax4ServiceProvider extends ServiceProvider
 
             // Publish the language files
             $this->publishes([
-                __DIR__.'/../src/resources/lang' => resource_path('lang/vendor/winmax4'),
+                __DIR__.'/../src/resources/lang' => resource_path('lang'),
             ], 'winmax4-lang');
         }
 
