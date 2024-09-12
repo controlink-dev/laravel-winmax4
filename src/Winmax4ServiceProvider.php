@@ -30,6 +30,10 @@ class Winmax4ServiceProvider extends ServiceProvider
         // Publish migrations if running in console
         if ($this->app->runningInConsole()) {
             $this->publishes([
+                __DIR__.'/../src/app/Models' => app_path('Models/Winmax4'),
+            ], 'winmax4-models');
+
+            $this->publishes([
                 __DIR__.'/../src/database/migrations' => database_path('migrations'),
             ], 'winmax4-migrations');
 
