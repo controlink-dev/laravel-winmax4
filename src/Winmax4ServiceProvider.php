@@ -9,6 +9,7 @@ use Controlink\LaravelWinmax4\app\Console\Commands\syncEntities;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncFamilies;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncTaxes;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncWarehouses;
+use Controlink\LaravelWinmax4\app\Console\Commands\updateNamespace;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
@@ -50,6 +51,7 @@ class Winmax4ServiceProvider extends ServiceProvider
 
         // Register the command
         $this->commands([
+            updateNamespace::class,
             syncCurrencies::class,
             syncDocumentsTypes::class,
             syncTaxes::class,
