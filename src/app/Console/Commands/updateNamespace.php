@@ -20,8 +20,6 @@ class updateNamespace extends Command
             $files[] = $file;
         }
 
-        dd($files);
-
         foreach ($files as $file) {
             if (file_exists($file)) {
                 $content = file_get_contents($file);
