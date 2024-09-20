@@ -170,7 +170,7 @@ class Winmax4DocumentsController extends Controller
 
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType,
-            $request->entity,
+            $request->entityCode,
             $request->details
         ), 200);
     }
