@@ -186,6 +186,6 @@ class Winmax4DocumentService extends Winmax4Service
             $documentTax->save();
         }
 
-
+        return $document;
     }
 }
