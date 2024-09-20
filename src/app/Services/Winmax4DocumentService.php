@@ -94,7 +94,7 @@ class Winmax4DocumentService extends Winmax4Service
      * $response = $apiClient->postDocuments($documentType, $entity, $details);
      * ```
      *
-     * @param string $documentType Type of the document
+     * @param array $documentType Type of the document
      * @param string $entity Entity associated with the document
      * @param array $details Array of document details
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
