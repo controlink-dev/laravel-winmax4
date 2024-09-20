@@ -135,7 +135,7 @@ class Winmax4DocumentService extends Winmax4Service
         $document->terminal_code = $documentResponse->Data->TerminalCode;
         $document->source_warehouse_code = $documentResponse->Data->SourceWarehouseCode;
         $document->target_warehouse_code = $documentResponse->Data->TargetWarehouseCode ?? null;
-        $document->entity_id = Winmax4Entity::where('code', $documentResponse->Data->Entity->Code)->first();
+        $document->entity_id = Winmax4Entity::where('code', $documentResponse->Data->Entity->Code)->first()->id;
         $document->total_without_taxes = $documentResponse->Data->TotalWithoutTaxes;
         $document->total_applied_taxes = $documentResponse->Data->TotalAppliedTaxes;
         $document->total_with_taxes = $documentResponse->Data->TotalWithTaxes;
