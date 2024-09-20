@@ -158,6 +158,7 @@ class Winmax4DocumentsController extends Controller
      */
     public function postDocuments(Request $request): JsonResponse
     {
+        dd($request->documentType['invoice_receipt']);
         $request->validate([
             'documentType' => 'required',
             'entity' => 'required',
