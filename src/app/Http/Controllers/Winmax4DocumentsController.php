@@ -109,7 +109,7 @@ class Winmax4DocumentsController extends Controller
     {
         $request->validate([
             'documentType' => 'required|string',
-            'entity' => 'required|string',
+            'entityCode' => 'required|string',
             'details.*' => 'required|array',
             'details.*.ArticleCode' => 'required',
             'details.*.Quantity' => 'required',
