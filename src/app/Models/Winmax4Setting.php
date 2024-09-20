@@ -36,10 +36,10 @@ class Winmax4Setting extends Model
     public function DocumentTypeCodeAttribute()
     {
         return [
-            'invoice' => Winmax4DocumentType::find($this->type_docs_invoice)->code,
-            'invoice_receipt' => Winmax4DocumentType::find($this->type_docs_invoice_receipt)->code,
-            'credit_note' => Winmax4DocumentType::find($this->type_docs_credit_note)->code,
-            'receipt' => Winmax4DocumentType::find($this->type_docs_receipt)->code,
+            'invoice' => Winmax4DocumentType::find($this->type_docs_invoice),
+            'invoice_receipt' => Winmax4DocumentType::find($this->type_docs_invoice_receipt),
+            'credit_note' => Winmax4DocumentType::find($this->type_docs_credit_note),
+            'receipt' => Winmax4DocumentType::find($this->type_docs_receipt),
         ];
     }
 }

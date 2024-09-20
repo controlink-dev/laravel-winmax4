@@ -5,6 +5,7 @@ namespace Controlink\LaravelWinmax4\app\Services;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Document;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Dflydev\DotAccessData\Data;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -99,8 +100,9 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(Winmax4DocumentType $documentType, Winmax4Entity $entity, array $details): object|array|null
+    public function postDocuments(Winmax4Setting $documentType, Winmax4Entity $entity, array $details): object|array|null
     {
+        dd($documentType);
         $response = $this->client->post($this->url . '/Transactions/Documents', [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
