@@ -120,47 +120,47 @@ class Winmax4DocumentService extends Winmax4Service
             ],
         ]);
 
-        $document = json_decode($response->getBody()->getContents());
+        $documentResponse = json_decode($response->getBody()->getContents());
 
         $document = new Winmax4Document();
         $document->document_type_id = $documentType->id;
-        $document->document_number = $document->Data->DocumentNumber;
-        $document->serie = $document->Data->Serie;
-        $document->number = $document->Data->Number;
-        $document->date = $document->Data->Date;
-        $document->external_identification = $document->Data->ExternalIdentification;
-        $document->currency_code = $document->Data->CurrencyCode;
-        $document->is_deleted = $document->Data->IsDeleted;
-        $document->user_login = $document->Data->UserLogin;
-        $document->terminal_code = $document->Data->TerminalCode;
-        $document->source_warehouse_code = $document->Data->SourceWarehouseCode;
-        $document->target_warehouse_code = $document->Data->TargetWarehouseCode;
-        $document->entity_id = $document->Data->EntityID;
-        $document->total_without_taxes = $document->Data->TotalWithoutTaxes;
-        $document->total_applied_taxes = $document->Data->TotalAppliedTaxes;
-        $document->total_with_taxes = $document->Data->TotalWithTaxes;
-        $document->total_liquidated = $document->Data->TotalLiquidated;
-        $document->load_address = $document->Data->LoadAddress;
-        $document->load_location = $document->Data->LoadLocation;
-        $document->load_zip_code = $document->Data->LoadZipCode;
-        $document->load_date_time = $document->Data->LoadDateTime;
-        $document->load_vehicle_license_plate = $document->Data->LoadVehicleLicensePlate;
-        $document->load_country_code = $document->Data->LoadCountryCode;
-        $document->unload_address = $document->Data->UnloadAddress;
-        $document->unload_location = $document->Data->UnloadLocation;
-        $document->unload_zip_code = $document->Data->UnloadZipCode;
-        $document->unload_date_time = $document->Data->UnloadDateTime;
-        $document->unload_country_code = $document->Data->UnloadCountryCode;
-        $document->hash_characters = $document->Data->HashCharacters;
-        $document->ta_doc_code_id = $document->Data->TADocCodeID;
-        $document->atcudd = $document->Data->ATCUD;
-        $document->table_number = $document->Data->TableNumber;
-        $document->table_split_number = $document->Data->TableSplitNumber;
-        $document->sales_person_code = $document->Data->SalesPersonCode;
-        $document->remarks = $document->Data->Remarks;
+        $document->document_number = $documentResponse->Data->DocumentNumber;
+        $document->serie = $documentResponse->Data->Serie;
+        $document->number = $documentResponse->Data->Number;
+        $document->date = $documentResponse->Data->Date;
+        $document->external_identification = $documentResponse->Data->ExternalIdentification;
+        $document->currency_code = $documentResponse->Data->CurrencyCode;
+        $document->is_deleted = $documentResponse->Data->IsDeleted;
+        $document->user_login = $documentResponse->Data->UserLogin;
+        $document->terminal_code = $documentResponse->Data->TerminalCode;
+        $document->source_warehouse_code = $documentResponse->Data->SourceWarehouseCode;
+        $document->target_warehouse_code = $documentResponse->Data->TargetWarehouseCode;
+        $document->entity_id = $documentResponse->Data->EntityID;
+        $document->total_without_taxes = $documentResponse->Data->TotalWithoutTaxes;
+        $document->total_applied_taxes = $documentResponse->Data->TotalAppliedTaxes;
+        $document->total_with_taxes = $documentResponse->Data->TotalWithTaxes;
+        $document->total_liquidated = $documentResponse->Data->TotalLiquidated;
+        $document->load_address = $documentResponse->Data->LoadAddress;
+        $document->load_location = $documentResponse->Data->LoadLocation;
+        $document->load_zip_code = $documentResponse->Data->LoadZipCode;
+        $document->load_date_time = $documentResponse->Data->LoadDateTime;
+        $document->load_vehicle_license_plate = $documentResponse->Data->LoadVehicleLicensePlate;
+        $document->load_country_code = $documentResponse->Data->LoadCountryCode;
+        $document->unload_address = $documentResponse->Data->UnloadAddress;
+        $document->unload_location = $documentResponse->Data->UnloadLocation;
+        $document->unload_zip_code = $documentResponse->Data->UnloadZipCode;
+        $document->unload_date_time = $documentResponse->Data->UnloadDateTime;
+        $document->unload_country_code = $documentResponse->Data->UnloadCountryCode;
+        $document->hash_characters = $documentResponse->Data->HashCharacters;
+        $document->ta_doc_code_id = $documentResponse->Data->TADocCodeID;
+        $document->atcudd = $documentResponse->Data->ATCUD;
+        $document->table_number = $documentResponse->Data->TableNumber;
+        $document->table_split_number = $documentResponse->Data->TableSplitNumber;
+        $document->sales_person_code = $documentResponse->Data->SalesPersonCode;
+        $document->remarks = $documentResponse->Data->Remarks;
         $document->save();
 
-        foreach($document->Data->Details as $detail){
+        foreach($documentResponse->Data->Details as $detail){
             $documentDetail = new Winmax4DocumentDetail();
             $documentDetail->document_id = $document->id;
             $documentDetail->article_id = Winmax4Article::where('code', $detail->ArticleCode)->first()->id;
@@ -175,7 +175,7 @@ class Winmax4DocumentService extends Winmax4Service
             $documentDetail->save();
         }
 
-        foreach ($document->Data->Taxes as $tax) {
+        foreach ($documentResponse->Data->Taxes as $tax) {
             $documentTax = new Winmax4DocumentTax();
             $documentTax->document_id = $document->id;
             $documentTax->tax_fee_code = $tax->TaxFeeCode;
