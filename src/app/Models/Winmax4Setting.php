@@ -34,7 +34,7 @@ class Winmax4Setting extends Model
         }
     }
 
-    public function getDocumentTypeCodeAttribute()
+    public function DocumentTypeCodeAttribute()
     {
         return [
             'invoice' => $this->type_docs_invoice,
