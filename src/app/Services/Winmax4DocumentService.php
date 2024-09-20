@@ -185,10 +185,6 @@ class Winmax4DocumentService extends Winmax4Service
             }
         }
 
-        dd($this->getDocumentPrint($document->document_number));
-        $this->getDocumentPrint($document->document_number);
-
-
         return $document;
     }
 
