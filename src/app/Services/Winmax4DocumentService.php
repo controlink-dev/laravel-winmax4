@@ -100,7 +100,7 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(Winmax4Setting $documentType, Winmax4Entity $entity, array $details): object|array|null
+    public function postDocuments(Winmax4DocumentType $documentType, Winmax4Entity $entity, array $details): object|array|null
     {
         dd($documentType);
         $response = $this->client->post($this->url . '/Transactions/Documents', [
