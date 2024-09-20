@@ -172,7 +172,7 @@ class Winmax4DocumentService extends Winmax4Service
             $documentDetail->quantity = $detail->Quantity;
             $documentDetail->total_without_taxes = $detail->TotalWithoutTaxes;
             $documentDetail->total_with_taxes = $detail->TotalWithTaxes;
-            $documentDetail->remarks = $detail->Remarks;
+            $documentDetail->remarks = $detail->Remarks ?? null;
 
             $documentDetail->save();
         }

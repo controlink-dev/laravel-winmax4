@@ -82,7 +82,7 @@ return new class extends Migration
 
         Schema::create('winmax4_document_taxes', function (Blueprint $table){
             $table->id();
-            $table->foreignId('document_id')->constrained('winmax4_documents')->onDelete('cascade');
+            $table->foreignId('article_id')->constrained('winmax4_articles')->onDelete('cascade');
             $table->string('tax_fee_code')->nullable();
             $table->integer('percentage')->nullable();
             $table->decimal('fixedAmount')->nullable();
