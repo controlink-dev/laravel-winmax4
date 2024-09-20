@@ -106,6 +106,9 @@ class Winmax4DocumentsController extends Controller
 
     public function postDocuments(Request $request): JsonResponse
     {
+
+        dd($request->all());
+
         $request->validate([
 
         ]);
