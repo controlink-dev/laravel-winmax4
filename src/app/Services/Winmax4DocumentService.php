@@ -111,7 +111,7 @@ class Winmax4DocumentService extends Winmax4Service
                     'Code' => $entity,
                 ],
                 'Details' => $details,
-                'Format' => 'json',
+                'Format' => 'print',
             ],
         ]);
 
