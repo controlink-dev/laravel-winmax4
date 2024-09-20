@@ -13,22 +13,10 @@ class Winmax4DocumentTax extends Model
     protected $table = 'winmax4_document_taxes';
 
     protected $fillable = [
-        'license_id',
         'tax_fee_code',
         'percentage',
         'fixedAmount',
         'total_affected',
         'total',
     ];
-
-    protected static function booted()
-    {
-        if(config('winmax4.use_license') && !app()->runningInConsole()){
-            static::addGlobalScope(new LicenseScope());
-
-            static::creating(function ($model) {
-                $model->{config('winmax4.license_column')} = session(config('winmax4.license_session_key'));
-            });
-        }
-    }
 }
