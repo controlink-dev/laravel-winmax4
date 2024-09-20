@@ -108,7 +108,7 @@ class Winmax4DocumentService extends Winmax4Service
                 'Content-Type' => 'application/json',
             ],
             'json' => [
-                'DocumentTypeCode' => $documentType->code,
+                'DocumentTypeCode' => $documentType['invoice_receipt']->code,
                 'Entity' => [
                     'Code' => $entity->code,
                     'TaxPayerID' => $entity->tax_payer_id,
