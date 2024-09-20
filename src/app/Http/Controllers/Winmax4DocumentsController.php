@@ -160,7 +160,7 @@ class Winmax4DocumentsController extends Controller
     {
         $request->validate([
             'documentType' => 'required',
-            'entityCode' => 'required',
+            'entity' => 'required',
             'details.*' => 'required|array',
             'details.*.ArticleCode' => 'required',
             'details.*.Quantity' => 'required',
@@ -170,7 +170,7 @@ class Winmax4DocumentsController extends Controller
 
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType,
-            $request->entityCode,
+            $request->entity,
             $request->details
         ), 200);
     }
