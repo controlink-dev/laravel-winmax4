@@ -2,7 +2,10 @@
 
 namespace Controlink\LaravelWinmax4\app\Services;
 
+use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Document;
+use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentDetail;
+use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use GuzzleHttp\Exception\GuzzleException;
@@ -119,7 +122,6 @@ class Winmax4DocumentService extends Winmax4Service
 
         $document = json_decode($response->getBody()->getContents());
 
-        dd($document->Data);
         $document = new Winmax4Document();
         $document->document_type_id = $documentType->id;
         $document->document_number = $document->Data->DocumentNumber;
@@ -158,6 +160,32 @@ class Winmax4DocumentService extends Winmax4Service
         $document->remarks = $document->Data->Remarks;
         $document->save();
 
-        return $document;
+        foreach($document->Data->Details as $detail){
+            $documentDetail = new Winmax4DocumentDetail();
+            $documentDetail->document_id = $document->id;
+            $documentDetail->article_id = Winmax4Article::where('code', $detail->ArticleCode)->first()->id;
+            $documentDetail->unitary_price_without_taxes = $detail->UnitaryPriceWithoutTaxes;
+            $documentDetail->unitary_price_with_taxes = $detail->UnitaryPriceWithTaxes;
+            $documentDetail->discount_percentage_1 = $detail->DiscountPercentage1;
+            $documentDetail->quantity = $detail->Quantity;
+            $documentDetail->total_without_taxes = $detail->TotalWithoutTaxes;
+            $documentDetail->total_with_taxes = $detail->TotalWithTaxes;
+            $documentDetail->remarks = $detail->Remarks;
+
+            $documentDetail->save();
+        }
+
+        foreach ($document->Data->Taxes as $tax) {
+            $documentTax = new Winmax4DocumentTax();
+            $documentTax->document_id = $document->id;
+            $documentTax->tax_fee_code = $tax->TaxFeeCode;
+            $documentTax->percentage = $tax->Percentage;
+            $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
+            $documentTax->total_affected = $tax->TotalAffected;
+            $documentTax->total = $tax->Total;
+            $documentTax->save();
+        }
+
+
     }
 }

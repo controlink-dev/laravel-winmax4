@@ -11,16 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('winmax4_document_taxes', function (Blueprint $table){
-            $table->id();
-            $table->string('tax_fee_code')->nullable();
-            $table->integer('percentage')->nullable();
-            $table->decimal('fixedAmount')->nullable();
-            $table->decimal('total_affected')->nullable();
-            $table->decimal('total')->nullable();
-            $table->timestamps();
-        });
-
         Schema::create('winmax4_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('document_type_id')->constrained('winmax4_document_types')->onDelete('cascade');
@@ -58,7 +48,6 @@ return new class extends Migration
             $table->integer('table_split_number')->nullable();
             $table->string('sales_person_code')->nullable();
             $table->string('remarks')->nullable();
-            $table->foreignId('document_tax_id')->nullable()->constrained('winmax4_document_taxes')->onDelete('cascade');
             $table->string('url')->nullable();
 
             if(config('winmax4.use_license')){
@@ -88,6 +77,17 @@ return new class extends Migration
             $table->string('remarks')->nullable();
             $table->foreignId('tax_id')->nullable()->constrained('winmax4_taxes')->onDelete('cascade');
             $table->foreignId('tax_rate_id')->nullable()->constrained('winmax4_taxes_rates')->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('winmax4_document_taxes', function (Blueprint $table){
+            $table->id();
+            $table->foreignId('document_id')->constrained('winmax4_documents')->onDelete('cascade');
+            $table->string('tax_fee_code')->nullable();
+            $table->integer('percentage')->nullable();
+            $table->decimal('fixedAmount')->nullable();
+            $table->decimal('total_affected')->nullable();
+            $table->decimal('total')->nullable();
             $table->timestamps();
         });
     }
