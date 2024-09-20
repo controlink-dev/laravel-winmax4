@@ -65,9 +65,9 @@ class Winmax4DocumentService extends Winmax4Service
      *
      * | Parameter       | Type                     | Description                                                   | Default |
      * |-----------------|--------------------------|---------------------------------------------------------------|---------|
-     * | `$documentType`  | `Winmax4DocumentType`     | Type of the document to be posted                              | N/A     |
-     * | `$entity`        | `Winmax4Entity`           | Entity associated with the document                            | N/A     |
-     * | `$details`       | `array`                  | Array of document details                                      | N/A     |
+     * | `$documentType`  | `string`                | Type of the document to be posted                             | N/A     |
+     * | `$entity`        | `string`                | Entity associated with the document                           | N/A     |
+     * | `$details`       | `array`                 | Array of document details                                     | N/A     |
      *
      * ### Return
      *
@@ -91,13 +91,13 @@ class Winmax4DocumentService extends Winmax4Service
      * $response = $apiClient->postDocuments($documentType, $entity, $details);
      * ```
      *
-     * @param Winmax4DocumentType $documentType Type of the document
-     * @param Winmax4Entity $entity Entity associated with the document
+     * @param string $documentType Type of the document
+     * @param string $entity Entity associated with the document
      * @param array $details Array of document details
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(Winmax4DocumentType $documentType, Winmax4Entity $entity, array $details): object|array|null
+    public function postDocuments(string $documentType, string $entity, array $details): object|array|null
     {
         $response = $this->client->post($this->url . '/Transactions/Documents', [
             'verify' => $this->settings['verify_ssl_guzzle'],
@@ -106,9 +106,9 @@ class Winmax4DocumentService extends Winmax4Service
                 'Content-Type' => 'application/json',
             ],
             'json' => [
-                'DocumentType' => $documentType->Code,
+                'DocumentType' => $documentType,
                 'Entity' => [
-                    'Code' => $entity->Code,
+                    'Code' => $entity,
                 ],
                 'Details' => $details,
             ],
