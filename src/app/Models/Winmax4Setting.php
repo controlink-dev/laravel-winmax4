@@ -5,7 +5,6 @@ namespace Controlink\LaravelWinmax4\app\Models;
 use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Winmax4Setting extends Model
 {
@@ -37,10 +36,10 @@ class Winmax4Setting extends Model
     public function DocumentTypeCodeAttribute()
     {
         return [
-            'invoice' => $this->type_docs_invoice,
-            'invoice_receipt' => $this->type_docs_invoice_receipt,
-            'credit_note' => $this->type_docs_credit_note,
-            'receipt' => $this->type_docs_receipt,
+            'invoice' => Winmax4DocumentType::find($this->type_docs_invoice)->code,
+            'invoice_receipt' => Winmax4DocumentType::find($this->type_docs_invoice_receipt)->code,
+            'credit_note' => Winmax4DocumentType::find($this->type_docs_credit_note)->code,
+            'receipt' => Winmax4DocumentType::find($this->type_docs_receipt)->code,
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Document;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4CurrencyService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4DocumentService;
@@ -101,17 +102,22 @@ class Winmax4DocumentsController extends Controller
      */
     public function getDocuments(): JsonResponse
     {
-        return response()->json(Winmax4Currency::get(), 200);
+        return response()->json(Winmax4Document::get(), 200);
     }
 
     public function postDocuments(Request $request): JsonResponse
     {
+        $request->validate([
+            'documentType' => 'required|string',
+            'entity' => 'required|string',
+            'details.*' => 'required|array',
+            'details.*.ArticleCode' => 'required',
+            'details.*.Quantity' => 'required',
+            'details.*.DiscountPercentage1' => 'required',
+            'details.*.DiscountPercentage2' => 'required',
+        ]);
 
         dd($request->all());
-
-        $request->validate([
-
-        ]);
 
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType,
