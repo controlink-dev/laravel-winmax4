@@ -108,8 +108,8 @@ class Winmax4DocumentsController extends Controller
     public function postDocuments(Request $request): JsonResponse
     {
         $request->validate([
-            'documentType' => 'required|string',
-            'entityCode' => 'required|string',
+            'documentType' => 'required',
+            'entityCode' => 'required',
             'details.*' => 'required|array',
             'details.*.ArticleCode' => 'required',
             'details.*.Quantity' => 'required',
