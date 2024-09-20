@@ -13,6 +13,7 @@ class Winmax4DocumentTax extends Model
     protected $table = 'winmax4_document_taxes';
 
     protected $fillable = [
+        'article_id',
         'tax_fee_code',
         'percentage',
         'fixedAmount',
