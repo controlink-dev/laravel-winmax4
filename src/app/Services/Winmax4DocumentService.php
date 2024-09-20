@@ -153,7 +153,7 @@ class Winmax4DocumentService extends Winmax4Service
         $document->unload_country_code = $documentResponse->Data->UnloadCountryCode;
         $document->hash_characters = $documentResponse->Data->HashCharacters;
         $document->ta_doc_code_id = $documentResponse->Data->TADocCodeID ?? null;
-        $document->atcudd = $documentResponse->Data->ATCUD ?? null;
+        $document->atcud = $documentResponse->Data->ATCUD ?? null;
         $document->table_number = $documentResponse->Data->TableNumber ?? null;
         $document->table_split_number = $documentResponse->Data->TableSplitNumber ?? null;
         $document->sales_person_code = $documentResponse->Data->SalesPersonCode ?? null;
