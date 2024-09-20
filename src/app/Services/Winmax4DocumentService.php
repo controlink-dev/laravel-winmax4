@@ -4,6 +4,7 @@ namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use Dflydev\DotAccessData\Data;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Winmax4DocumentService extends Winmax4Service
@@ -111,10 +112,12 @@ class Winmax4DocumentService extends Winmax4Service
                     'Code' => $entity,
                 ],
                 'Details' => $details,
-                'Format' => 'PDF',
+                'Format' => 'json',
             ],
         ]);
 
-        dd($response->getBody()->getContents());
+        $document = json_decode($response->getBody()->getContents());
+
+        dd($document->Data);
     }
 }
