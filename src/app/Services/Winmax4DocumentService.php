@@ -144,7 +144,7 @@ class Winmax4DocumentService extends Winmax4Service
         $document->load_location = $documentResponse->Data->LoadLocation;
         $document->load_zip_code = $documentResponse->Data->LoadZipCode;
         $document->load_date_time = $documentResponse->Data->LoadDateTime;
-        $document->load_vehicle_license_plate = $documentResponse->Data->LoadVehicleLicensePlate;
+        $document->load_vehicle_license_plate = $documentResponse->Data->LoadVehicleLicensePlate ?? null;
         $document->load_country_code = $documentResponse->Data->LoadCountryCode;
         $document->unload_address = $documentResponse->Data->UnloadAddress;
         $document->unload_location = $documentResponse->Data->UnloadLocation;
