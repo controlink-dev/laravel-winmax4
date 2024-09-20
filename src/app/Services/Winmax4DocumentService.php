@@ -154,10 +154,10 @@ class Winmax4DocumentService extends Winmax4Service
         $document->hash_characters = $documentResponse->Data->HashCharacters;
         $document->ta_doc_code_id = $documentResponse->Data->TADocCodeID ?? null;
         $document->atcudd = $documentResponse->Data->ATCUD ?? null;
-        $document->table_number = $documentResponse->Data->TableNumber;
-        $document->table_split_number = $documentResponse->Data->TableSplitNumber;
-        $document->sales_person_code = $documentResponse->Data->SalesPersonCode;
-        $document->remarks = $documentResponse->Data->Remarks;
+        $document->table_number = $documentResponse->Data->TableNumber ?? null;
+        $document->table_split_number = $documentResponse->Data->TableSplitNumber ?? null;
+        $document->sales_person_code = $documentResponse->Data->SalesPersonCode ?? null;
+        $document->remarks = $documentResponse->Data->Remarks ?? null;
         $document->save();
 
         foreach($documentResponse->Data->Details as $detail){
