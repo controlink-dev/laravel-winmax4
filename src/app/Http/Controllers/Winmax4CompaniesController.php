@@ -2,7 +2,6 @@
 
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
-use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4CompanyService;
 

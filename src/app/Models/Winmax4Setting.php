@@ -33,4 +33,14 @@ class Winmax4Setting extends Model
             });
         }
     }
+
+    public function getDocumentTypeCodeAttribute()
+    {
+        return [
+            'invoice' => $this->type_docs_invoice,
+            'invoice_receipt' => $this->type_docs_invoice_receipt,
+            'credit_note' => $this->type_docs_credit_note,
+            'receipt' => $this->type_docs_receipt,
+        ];
+    }
 }

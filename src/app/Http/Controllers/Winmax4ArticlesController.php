@@ -5,10 +5,7 @@ namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4ArticleService;
-use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class Winmax4ArticlesController extends Controller
 {

@@ -4,6 +4,7 @@ use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4ArticlesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4CompaniesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4CurrenciesController;
+use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4DocumentsController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4DocumentTypesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4EntitiesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4FamiliesController;
@@ -53,5 +54,10 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
 
     Route::prefix('warehouses')->group(function () {
         Route::get('/get', [Winmax4WarehousesController::class, 'getWarehouses'])->name('winmax4.getWarehouses');
+    });
+
+    Route::prefix('documents')->group(function () {
+        Route::get('/get', [Winmax4DocumentsController::class, 'getDocuments'])->name('winmax4.documents.query');
+        Route::post('/store', [Winmax4DocumentsController::class, 'postDocuments'])->name('winmax4.documents.store');
     });
 });

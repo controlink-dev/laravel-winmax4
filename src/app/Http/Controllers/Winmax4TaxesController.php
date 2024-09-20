@@ -4,7 +4,6 @@ namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Tax;
-use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Controlink\LaravelWinmax4\app\Services\Winmax4TaxService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;

@@ -6,12 +6,11 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4CurrencyService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4DocumentService;
-use Controlink\LaravelWinmax4\app\Services\Winmax4EntityService;
-use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
-class Winmax4DocumentController extends Controller
+class Winmax4DocumentsController extends Controller
 {
     /**
      * @var Winmax4CurrencyService The service responsible for handling interactions with the Winmax4 API.
@@ -19,9 +18,9 @@ class Winmax4DocumentController extends Controller
     protected $winmax4Service;
 
     /**
-     * Init Constructor for Winmax4DocumentController.
+     * Init Constructor for Winmax4DocumentsController.
      *
-     * This constructor initializes the `Winmax4DocumentController` based on the settings retrieved from the database.
+     * This constructor initializes the `Winmax4DocumentsController` based on the settings retrieved from the database.
      * If no settings are found for the current license, the service is initialized in test mode.
      *
      * ### Configuration Details
@@ -103,5 +102,18 @@ class Winmax4DocumentController extends Controller
     public function getDocuments(): JsonResponse
     {
         return response()->json(Winmax4Currency::get(), 200);
+    }
+
+    public function postDocuments(Request $request): JsonResponse
+    {
+        $request->validate([
+
+        ]);
+
+        return response()->json($this->winmax4Service->postDocuments(
+            $request->documentType,
+            $request->entity,
+            $request->details
+        ), 200);
     }
 }

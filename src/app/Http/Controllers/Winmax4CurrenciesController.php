@@ -5,8 +5,6 @@ namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4CurrencyService;
-use Controlink\LaravelWinmax4\app\Services\Winmax4EntityService;
-use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 
