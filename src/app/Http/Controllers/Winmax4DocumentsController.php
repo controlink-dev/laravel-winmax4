@@ -105,6 +105,57 @@ class Winmax4DocumentsController extends Controller
         return response()->json(Winmax4Document::get(), 200);
     }
 
+    /**
+     * Post documents to the Winmax4 API.
+     *
+     * This method posts a document to the Winmax4 API using the provided document type, entity, and details.
+     *
+     * ### Request Body Parameters
+     *
+     * | Parameter            | Type      | Description                           |
+     * |----------------------|-----------|---------------------------------------|
+     * | `documentType`       | `string`  | Type of the document to be posted     |
+     * | `entity`             | `string`  | Entity associated with the document   |
+     * | `details`            | `array`   | Array of document details             |
+     *
+     * ### Example Request
+     *
+     * ```json
+     * {
+     *     "documentType": "invoice",
+     *     "entity": "customer",
+     *     "details": [
+     *         {
+     *             "ArticleCode": "12345",
+     *             "Quantity": 5,
+     *             "DiscountPercentage1": 10,
+     *             "DiscountPercentage2": 5
+     *         }
+     *     ]
+     * }
+     * ```
+     *
+     * ### Return Type
+     *
+     * | Type             | Description                        |
+     * |------------------|------------------------------------|
+     * | `JsonResponse`   | A JSON response with the API result|
+     *
+     * ### Exceptions
+     *
+     * | Exception         | Condition                                    |
+     * |-------------------|----------------------------------------------|
+     * | `GuzzleException` | Throws when there is a HTTP client error     |
+     *
+     * ### Example Usage
+     *
+     * ```php
+     * $response = $this->postDocuments($request);
+     * ```
+     *
+     * @param Request $request The HTTP request object.
+     * @return JsonResponse Returns a JSON response with the API result.
+     */
     public function postDocuments(Request $request): JsonResponse
     {
         $request->validate([
@@ -116,8 +167,6 @@ class Winmax4DocumentsController extends Controller
             'details.*.DiscountPercentage1' => 'required',
             'details.*.DiscountPercentage2' => 'required',
         ]);
-
-        dd($request->all());
 
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType,
