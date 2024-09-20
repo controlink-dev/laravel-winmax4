@@ -187,20 +187,4 @@ class Winmax4DocumentService extends Winmax4Service
 
         return $document;
     }
-
-    public function getDocumentPrint($filter): string
-    {
-        $response = $this->client->post($this->url . '/Transactions/DocumentPrint/' . $filter, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'Format' => 'PDF',
-            ],
-        ]);
-
-        return $response->getBody()->getContents();
-    }
 }

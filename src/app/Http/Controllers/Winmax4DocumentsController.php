@@ -105,6 +105,11 @@ class Winmax4DocumentsController extends Controller
         return response()->json(Winmax4Document::get(), 200);
     }
 
+    public function getDocument($filter)
+    {
+        return response()->json(Winmax4Document::where('filter', $filter)->get(), 200);
+    }
+
     /**
      * Post documents to the Winmax4 API.
      *
