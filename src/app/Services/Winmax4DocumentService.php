@@ -128,7 +128,7 @@ class Winmax4DocumentService extends Winmax4Service
         $document->serie = $documentResponse->Data->Serie;
         $document->number = $documentResponse->Data->Number;
         $document->date = $documentResponse->Data->Date;
-        $document->external_identification = $documentResponse->Data->ExternalIdentification;
+        $document->external_identification = $documentResponse->Data->ExternalIdentification ?? null;
         $document->currency_code = $documentResponse->Data->CurrencyCode;
         $document->is_deleted = $documentResponse->Data->IsDeleted;
         $document->user_login = $documentResponse->Data->UserLogin;
