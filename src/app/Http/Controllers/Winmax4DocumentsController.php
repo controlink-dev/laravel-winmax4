@@ -168,6 +168,7 @@ class Winmax4DocumentsController extends Controller
             'details.*.DiscountPercentage2' => 'required',
         ]);
 
+        dd($request->documentType['invoice_receipt']);
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType['invoice_receipt'],
             $request->entity,
