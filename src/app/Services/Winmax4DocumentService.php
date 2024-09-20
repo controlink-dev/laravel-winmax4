@@ -106,7 +106,7 @@ class Winmax4DocumentService extends Winmax4Service
                 'Content-Type' => 'application/json',
             ],
             'json' => [
-                'DocumentType' => $documentType,
+                'DocumentTypeCode' => $documentType,
                 'Entity' => [
                     'Code' => $entity,
                 ],
