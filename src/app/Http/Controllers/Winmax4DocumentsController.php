@@ -168,6 +168,7 @@ class Winmax4DocumentsController extends Controller
             'details.*.DiscountPercentage2' => 'required',
         ]);
 
+        dd($request->all());
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType,
             $request->entity,
