@@ -119,8 +119,9 @@ class Winmax4DocumentService extends Winmax4Service
 
         $document = json_decode($response->getBody()->getContents());
 
+        dd($document->Data);
         $document = new Winmax4Document();
-        $document->document_type_id = $document->Data->DocumentTypeID;
+        $document->document_type_id = $documentType->id;
         $document->document_number = $document->Data->DocumentNumber;
         $document->serie = $document->Data->Serie;
         $document->number = $document->Data->Number;
@@ -157,8 +158,6 @@ class Winmax4DocumentService extends Winmax4Service
         $document->remarks = $document->Data->Remarks;
         $document->save();
 
-
-
-        dd($document->Data);
+        return $document;
     }
 }
