@@ -171,19 +171,18 @@ class Winmax4DocumentService extends Winmax4Service
             $documentDetail->total_without_taxes = $detail->TotalWithoutTaxes;
             $documentDetail->total_with_taxes = $detail->TotalWithTaxes;
             $documentDetail->remarks = $detail->Remarks ?? null;
-
             $documentDetail->save();
-        }
 
-        foreach ($documentResponse->Data->Taxes as $tax) {
-            $documentTax = new Winmax4DocumentTax();
-            $documentDetail->article_id = Winmax4Article::where('code', $detail->ArticleCode)->first()->id;
-            $documentTax->tax_fee_code = $tax->TaxFeeCode;
-            $documentTax->percentage = $tax->Percentage;
-            $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
-            $documentTax->total_affected = $tax->TotalAffected;
-            $documentTax->total = $tax->Total;
-            $documentTax->save();
+            foreach ($documentResponse->Data->Taxes as $tax) {
+                $documentTax = new Winmax4DocumentTax();
+                $documentDetail->article_id =  $documentDetail->article_id;
+                $documentTax->tax_fee_code = $tax->TaxFeeCode;
+                $documentTax->percentage = $tax->Percentage;
+                $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
+                $documentTax->total_affected = $tax->TotalAffected;
+                $documentTax->total = $tax->Total;
+                $documentTax->save();
+            }
         }
 
         return $document;
