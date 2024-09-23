@@ -202,7 +202,7 @@ class Winmax4DocumentService extends Winmax4Service
 
         foreach ($documentResponse->Data->Taxes as $tax) {
             $documentTax = new Winmax4DocumentTax();
-            $documentDetail->document_id = $document->id;
+            $documentTax->document_id = $document->id;
             $documentTax->tax_fee_code = $tax->TaxFeeCode;
             $documentTax->percentage = $tax->Percentage;
             $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
