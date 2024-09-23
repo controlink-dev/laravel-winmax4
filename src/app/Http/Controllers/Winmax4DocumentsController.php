@@ -102,7 +102,7 @@ class Winmax4DocumentsController extends Controller
      */
     public function getDocuments(): JsonResponse
     {
-        return response()->json(Winmax4Document::get(), 200);
+        return response()->json($this->winmax4Service->getDocuments(), 200);
     }
 
     /**
