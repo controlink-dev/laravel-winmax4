@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
+use Carbon\Carbon;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4SyncStatus;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
@@ -158,6 +159,25 @@ class Winmax4Controller extends Controller
                 'last_synced_at' => now(),
             ]);
         }
+    }
+
+    /**
+     * Get the last synced at timestamp for the given model.
+     *
+     * @param string $model The model to get the last synced at timestamp for.
+     * @param int $licence_id The licence id to get the last synced at timestamp for.
+     * @return string|null The last synced at timestamp for the given model.
+     */
+    public function getLastSyncedAt($model, $licence_id = null){
+        if (config('winmax4.use_license')) {
+            $winmax4SyncStatus = Winmax4SyncStatus::where('model', class_basename($model))
+                ->where(config('winmax4.license_column'), $licence_id)
+                ->first();
+        } else {
+            $winmax4SyncStatus = Winmax4SyncStatus::where('model', class_basename($model))->first();
+        }
+
+        return $winmax4SyncStatus ? $winmax4SyncStatus->last_synced_at : Carbon::parse('2000-01-01 00:00:00');
     }
 
     /**

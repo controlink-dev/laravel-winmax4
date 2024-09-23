@@ -5,6 +5,7 @@ namespace Controlink\LaravelWinmax4\app\Services;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Document;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentDetail;
+use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentDetailTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
@@ -50,7 +51,7 @@ class Winmax4DocumentService extends Winmax4Service
     public function getDocuments($documentTypeCode = null, $documentNumber = null, $serie = null, $number = null,
     $externalIdentification = null, $fromDate = null, $toDate = null, $entityCode = null,
     $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails',
-    $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'PDF'): object|array|null
+    $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): object|array|null
     {
         $response = $this->client->get($this->url . '/Transactions/Documents?DocumentTypeCode=' . $documentTypeCode .
             '&DocumentNumber=' . $documentNumber .
@@ -190,16 +191,24 @@ class Winmax4DocumentService extends Winmax4Service
             $documentDetail->remarks = $detail->Remarks ?? null;
             $documentDetail->save();
 
-            foreach ($documentResponse->Data->Taxes as $tax) {
-                $documentTax = new Winmax4DocumentTax();
-                $documentTax->article_id = $documentDetail->article_id;
-                $documentTax->tax_fee_code = $tax->TaxFeeCode;
-                $documentTax->percentage = $tax->Percentage;
-                $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
-                $documentTax->total_affected = $tax->TotalAffected;
-                $documentTax->total = $tax->Total;
-                $documentTax->save();
+            foreach ($detail->Taxes as $tax) {
+                $documentDetailTax = new Winmax4DocumentDetailTax();
+                $documentDetailTax->document_detail_id = $documentDetail->id;
+                $documentDetailTax->tax_fee_code = $tax->TaxFeeCode;
+                $documentDetailTax->percentage = $tax->Percentage;
+                $documentDetailTax->save();
             }
+        }
+
+        foreach ($documentResponse->Data->Taxes as $tax) {
+            $documentTax = new Winmax4DocumentTax();
+            $documentDetail->document_id = $document->id;
+            $documentTax->tax_fee_code = $tax->TaxFeeCode;
+            $documentTax->percentage = $tax->Percentage;
+            $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
+            $documentTax->total_affected = $tax->TotalAffected;
+            $documentTax->total = $tax->Total;
+            $documentTax->save();
         }
 
         return $document;

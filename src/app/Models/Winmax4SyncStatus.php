@@ -19,6 +19,10 @@ class Winmax4SyncStatus extends Model
         'license_id',
     ];
 
+    protected $casts = [
+        'last_synced_at' => 'datetime',
+    ];
+
     protected static function booted()
     {
         if(config('winmax4.use_license') && !app()->runningInConsole()){

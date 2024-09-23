@@ -2,22 +2,18 @@
 
 namespace Controlink\LaravelWinmax4\app\Models;
 
-use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Winmax4DocumentTax extends Model
+class Winmax4DocumentDetailTax extends Model
 {
     use HasFactory;
 
-    protected $table = 'winmax4_document_taxes';
+    protected $table = 'winmax4_document_details_taxes';
 
     protected $fillable = [
-        'document_id',
+        'document_detail_id',
         'tax_fee_code',
         'percentage',
-        'fixedAmount',
-        'total_affected',
-        'total',
     ];
 }

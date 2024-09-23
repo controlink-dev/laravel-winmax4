@@ -80,9 +80,17 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        Schema::create('winmax4_document_details_taxes', function (Blueprint $table){
+            $table->id();
+            $table->foreignId('document_detail_id')->constrained('winmax4_document_details')->onDelete('cascade');
+            $table->string('tax_fee_code')->nullable();
+            $table->integer('percentage')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('winmax4_document_taxes', function (Blueprint $table){
             $table->id();
-            $table->foreignId('article_id')->constrained('winmax4_articles')->onDelete('cascade');
+            $table->foreignId('document_id')->constrained('winmax4_documents')->onDelete('cascade');
             $table->string('tax_fee_code')->nullable();
             $table->integer('percentage')->nullable();
             $table->decimal('fixedAmount')->nullable();
@@ -97,8 +105,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('winmax4_document_taxes');
         Schema::dropIfExists('winmax4_documents');
         Schema::dropIfExists('winmax4_document_details');
+        Schema::dropIfExists('winmax4_document_details_taxes');
+        Schema::dropIfExists('winmax4_document_taxes');
     }
 };
