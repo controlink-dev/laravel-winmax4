@@ -102,7 +102,10 @@ class Winmax4DocumentsController extends Controller
      */
     public function getDocuments(): JsonResponse
     {
-        return response()->json($this->winmax4Service->getDocuments(), 200);
+        return response()->json($this->winmax4Service->getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null,
+            $externalIdentification = null, $toDate = null, $entityCode = null,
+            $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails',
+            $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'), 200);
     }
 
     /**
