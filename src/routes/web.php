@@ -58,7 +58,6 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
 
     Route::prefix('documents')->group(function () {
         Route::get('/get', [Winmax4DocumentsController::class, 'getDocuments'])->name('winmax4.documents.query');
-        Route::get('/get/{filter}', [Winmax4DocumentsController::class, 'getDocument'])->name('winmax4.documents.get');
         Route::post('/store', [Winmax4DocumentsController::class, 'postDocuments'])->name('winmax4.documents.store');
     });
 });

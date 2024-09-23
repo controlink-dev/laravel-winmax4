@@ -47,13 +47,30 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the decoded JSON response.
      * @throws GuzzleException
      */
-    public function getDocuments(): object|array|null
+    public function getDocuments($documentTypeCode = null, $documentNumber = null, $serie = null, $number = null,
+    $externalIdentification = null, $fromDate = null, $toDate = null, $entityCode = null,
+    $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails',
+    $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'PDF'): object|array|null
     {
-        $response = $this->client->get($this->url . '/Transactions/Documents', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
+        $response = $this->client->get($this->url . '/Transactions/Documents?DocumentTypeCode=' . $documentTypeCode .
+            '&DocumentNumber=' . $documentNumber .
+            '&Serie=' . $serie .
+            '&Number=' . $number .
+            '&ExternalIdentification=' . $externalIdentification .
+            '&FromDate=' . $fromDate .
+            '&ToDate=' . $toDate .
+            '&EntityCode=' . $entityCode .
+            '&EntityTaxPayerID=' . $entityTaxPayerID .
+            '&SalesPersonCode=' . $salesPersonCode .
+            '&IncludeRemarks=' . $includeRemarks .
+            '&IncludeCustomContent=' . $includeCustomContent .
+            '&LiquidateStatus=' . $liquidateStatus .
+            '&Order=' . $order .
+            '&Format=' . $format, [
+                'verify' => $this->settings['verify_ssl_guzzle'],
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                    'Content-Type' => 'application/json',
             ],
         ]);
 

@@ -4,6 +4,7 @@ namespace Controlink\LaravelWinmax4;
 
 use Controlink\LaravelWinmax4\app\Console\Commands\syncArticles;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncCurrencies;
+use Controlink\LaravelWinmax4\app\Console\Commands\syncDocuments;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncDocumentsTypes;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncEntities;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncFamilies;
@@ -59,6 +60,7 @@ class Winmax4ServiceProvider extends ServiceProvider
             syncFamilies::class,
             syncArticles::class,
             syncEntities::class,
+            syncDocuments::class,
         ]);
 
         // Load routes
@@ -85,6 +87,7 @@ class Winmax4ServiceProvider extends ServiceProvider
             $schedule->command('winmax4:sync-families')->everyFifteenMinutes();
             $schedule->command('winmax4:sync-articles')->everyMinute();
             $schedule->command('winmax4:sync-entities')->everyMinute();
+            $schedule->command('winmax4:sync-documents')->everyFifteenMinutes();
         });
     }
 }
