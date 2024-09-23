@@ -111,7 +111,7 @@ class syncDocuments extends Command
                              'load_zip_code' => $document->LoadZipCode,
                              'load_date_time' => $document->LoadDateTime,
                              'load_vehicle_license_plate' => $document->LoadVehicleLicensePlate ?? null,
-                             'load_country_code' => $document->LoadCountryCode,
+                             'load_country_code' => $document->LoadCountryCode ?? null,
                              'unload_address' => $document->UnloadAddress,
                              'unload_location' => $document->UnloadLocation,
                              'unload_zip_code' => $document->UnloadZipCode,
