@@ -48,10 +48,7 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the decoded JSON response.
      * @throws GuzzleException
      */
-    public function getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null,
-    $externalIdentification = null, $toDate = null, $entityCode = null,
-    $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails',
-    $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): object|array|null
+    public function getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null, $externalIdentification = null, $toDate = null, $entityCode = null, $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails', $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): object|array|null
     {
         $response = $this->client->get($this->url . '/Transactions/Documents?DocumentTypeCode=' . $documentTypeCode .
             '&DocumentNumber=' . $documentNumber .
