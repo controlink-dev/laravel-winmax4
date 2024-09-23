@@ -10,7 +10,7 @@ return [
         'n_terminal' => 'Nº Terminal',
 
         'typeDocumentsForInvoice' => 'Type of Documents for Invoice',
-        'typeDocForInvoiceReceipt' => 'Type of Document for Invoice Receipt',
+        'typeDocForInvoiceReceipt' => 'Type of Document for Invoice/Receipt',
         'creditNote' => 'Credit Note',
         'receipt' => 'Receipt',
     ],

@@ -10,7 +10,7 @@ return [
         'n_terminal' => 'Nº Terminal',
 
         'typeDocumentsForInvoice' => 'Tipo de Documentos para Fatura',
-        'typeDocForInvoiceReceipt' => 'Tipo de Documento para Recibo de Fatura',
+        'typeDocForInvoiceReceipt' => 'Tipo de Documento para Fatura/Recibo',
         'creditNote' => 'Nota de Crédito',
         'receipt' => 'Recibo',
     ],
