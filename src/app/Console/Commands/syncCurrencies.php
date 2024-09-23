@@ -17,7 +17,7 @@ class syncCurrencies extends Command
      * @var string
      */
     protected $signature = 'winmax4:sync-currencies
-                            {--license_id=? : If you want to sync currencies for a specific license, specify the license id.}';
+                            {--license_id= : If you want to sync currencies for a specific license, specify the license id.}';
 
     /**
      * The console command description.

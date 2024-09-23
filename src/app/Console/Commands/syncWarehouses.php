@@ -19,7 +19,7 @@ class syncWarehouses extends Command
      * @var string
      */
     protected $signature = 'winmax4:sync-warehouses
-                            {--license_id=? : If you want to sync warehouses for a specific license, specify the license id.}';
+                            {--license_id= : If you want to sync warehouses for a specific license, specify the license id.}';
 
     /**
      * The console command description.
