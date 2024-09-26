@@ -20,4 +20,9 @@ class Winmax4DocumentTax extends Model
         'total_affected',
         'total',
     ];
+
+    public function document()
+    {
+        return $this->belongsTo(Winmax4Document::class, 'document_id');
+    }
 }

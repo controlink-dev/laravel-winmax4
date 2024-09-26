@@ -63,4 +63,19 @@ class Winmax4Document extends Model
             });
         }
     }
+
+    public function documentType()
+    {
+        return $this->belongsTo(Winmax4DocumentType::class, 'document_type_id', 'id');
+    }
+
+    public function entity()
+    {
+        return $this->belongsTo(Winmax4Entity::class, 'entity_id', 'id');
+    }
+
+    public function documentTax()
+    {
+        return $this->belongsTo(Winmax4DocumentTax::class, 'document_tax_id', 'id');
+    }
 }

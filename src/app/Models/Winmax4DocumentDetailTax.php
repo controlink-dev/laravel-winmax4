@@ -16,4 +16,9 @@ class Winmax4DocumentDetailTax extends Model
         'tax_fee_code',
         'percentage',
     ];
+
+    public function documentDetail()
+    {
+        return $this->belongsTo(Winmax4DocumentDetail::class, 'document_detail_id');
+    }
 }

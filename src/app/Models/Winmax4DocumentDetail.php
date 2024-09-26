@@ -25,4 +25,24 @@ class Winmax4DocumentDetail extends Model
         'tax_id',
         'tax_rate_id',
     ];
+
+    public function document()
+    {
+        return $this->belongsTo(Winmax4Document::class, 'document_id');
+    }
+
+    public function article()
+    {
+        return $this->belongsTo(Winmax4Article::class, 'article_id');
+    }
+
+    public function tax()
+    {
+        return $this->belongsTo(Winmax4Tax::class, 'tax_id');
+    }
+
+    public function taxRate()
+    {
+        return $this->belongsTo(Winmax4TaxRates::class, 'tax_rate_id');
+    }
 }
