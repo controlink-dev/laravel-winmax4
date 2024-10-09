@@ -141,9 +141,9 @@ class Winmax4EntityService extends Winmax4Service
             ],
         ]);
 
-        if(config('winmax4.use_soft_deletes')){
+        if(config('winmax4.use_soft_deletes')) {
             $builder = Winmax4Entity::withTrashed();
-        }else{
+        } else {
             $builder = new Winmax4Entity();
         }
 
