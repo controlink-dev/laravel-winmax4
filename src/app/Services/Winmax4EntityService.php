@@ -147,36 +147,34 @@ class Winmax4EntityService extends Winmax4Service
             $builder = new Winmax4Entity();
         }
 
-        dd(json_decode($response->getBody()->getContents()));
+        $responseDecoded = json_decode($response->getBody()->getContents());
 
-        if(json_decode($response->getBody()->getContents())->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
+        if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
             $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
 
             return $builder->where('code', $code)->first();
         }
 
-        $entity = json_decode($response->getBody()->getContents());
-
         return $builder->updateOrCreate(
             [
-                'code' => $entity->Data->Entity->Code,
+                'code' => $responseDecoded->Data->Entity->Code,
             ],
             [
-                'id_winmax4' => $entity->Data->Entity->ID,
-                'name' => $entity->Data->Entity->Name,
-                'address' => $entity->Data->Entity->Address,
-                'code' => $entity->Data->Entity->Code,
-                'country_code' => $entity->Data->Entity->CountryCode,
-                'email' => $entity->Data->Entity->Email,
-                'entity_type' => $entity->Data->Entity->EntityType,
-                'fax' => $entity->Data->Entity->Fax,
-                'is_active' => $entity->Data->Entity->IsActive,
-                'location' => $entity->Data->Entity->Location,
-                'mobile_phone' => $entity->Data->Entity->MobilePhone,
-                'phone' => $entity->Data->Entity->Phone,
-                'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
-                'zip_code' => $entity->Data->Entity->ZipCode,
+                'id_winmax4' => $responseDecoded->Data->Entity->ID,
+                'name' => $responseDecoded->Data->Entity->Name,
+                'address' => $responseDecoded->Data->Entity->Address,
+                'code' => $responseDecoded->Data->Entity->Code,
+                'country_code' => $responseDecoded->Data->Entity->CountryCode,
+                'email' => $responseDecoded->Data->Entity->Email,
+                'entity_type' => $responseDecoded->Data->Entity->EntityType,
+                'fax' => $responseDecoded->Data->Entity->Fax,
+                'is_active' => $responseDecoded->Data->Entity->IsActive,
+                'location' => $responseDecoded->Data->Entity->Location,
+                'mobile_phone' => $responseDecoded->Data->Entity->MobilePhone,
+                'phone' => $responseDecoded->Data->Entity->Phone,
+                'tax_payer_id' => $responseDecoded->Data->Entity->TaxPayerID,
+                'zip_code' => $responseDecoded->Data->Entity->ZipCode,
             ]
         );
     }
