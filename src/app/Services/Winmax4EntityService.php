@@ -330,6 +330,8 @@ class Winmax4EntityService extends Winmax4Service
      */
     public function deleteEntities(int $idWinmax4): Winmax4Entity|JsonResponse
     {
+        $localEntity = Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
+
         $response = $this->client->delete($this->url . '/Files/Entities/?id='.$idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -346,6 +348,9 @@ class Winmax4EntityService extends Winmax4Service
             Winmax4Entity::where('id_winmax4', $idWinmax4)->update([
                 'is_active' => 0,
             ]);
+
+        }else {
+            $this->putEntities($idWinmax4, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
 
             return response()->json(['message' => 'Entity disabled successfully!'], 200);
         }
