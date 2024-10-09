@@ -149,15 +149,15 @@ class Winmax4EntitiesController extends Controller
             'code' => 'string|max:255',
             'entityType' => 'integer|in:0,1,2,3,4',
             'taxPayerID' => 'string|max:50',
-            'address' => 'string|max:255',
-            'zipCode' => 'string|max:20',
-            'locality' => 'string|max:255',
+            'address' => 'string|max:255|nullable',
+            'zipCode' => 'string|max:20|nullable',
+            'locality' => 'string|max:255|nullable',
             'isActive' => 'nullable|integer|in:0,1',
             'phone' => 'nullable|string|max:20',
             'fax' => 'nullable|string|max:20',
             'mobilePhone' => 'nullable|string|max:20',
             'email' => 'nullable|string|email|max:255',
-            'country' => 'nullable|string|size:2|in:PT',
+            'country' => 'string|size:2|in:PT',
         ]);
 
         return response()->json($this->winmax4Service->postEntities(
