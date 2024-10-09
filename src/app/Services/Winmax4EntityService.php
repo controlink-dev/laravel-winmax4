@@ -156,6 +156,7 @@ class Winmax4EntityService extends Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
+        dd($entity);
         return $builder->updateOrCreate(
             [
                 'code' => $entity->Data->Entity->Code,
