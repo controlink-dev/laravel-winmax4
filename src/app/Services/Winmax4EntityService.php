@@ -147,6 +147,8 @@ class Winmax4EntityService extends Winmax4Service
             $builder = new Winmax4Entity();
         }
 
+        dd(json_decode($response->getBody()->getContents()));
+
         if(json_decode($response->getBody()->getContents())->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
             $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
@@ -154,7 +156,6 @@ class Winmax4EntityService extends Winmax4Service
             return $builder->where('code', $code)->first();
         }
 
-        dd($response->getBody()->getContents());
         $entity = json_decode($response->getBody()->getContents());
 
         return $builder->updateOrCreate(
