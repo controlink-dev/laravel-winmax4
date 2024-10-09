@@ -352,30 +352,25 @@ class Winmax4EntityService extends Winmax4Service
         if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
 
             // If the result is not OK, we will disable the entity
-            Winmax4Entity::where('id_winmax4', $idWinmax4)->update([
-                'is_active' => 0,
-            ]);
+            $entity = $this->putEntities($idWinmax4, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
 
+            return $entity;
         }else {
-            $this->putEntities($idWinmax4, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
+            // If the result is OK, we will delete the entity or force delete it
+            if(config('winmax4.use_soft_deletes')){
+                Winmax4Entity::where('id_winmax4', $idWinmax4)->update([
+                    'is_active' => 0,
+                ]);
 
-            return response()->json(['message' => 'Entity disabled successfully!'], 200);
-        }
+                $entityToDelete = Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
+                $entityToDelete->delete();
 
-        // If the result is OK, we will delete the entity or force delete it
-        if(config('winmax4.use_soft_deletes')){
-            Winmax4Entity::where('id_winmax4', $idWinmax4)->update([
-                'is_active' => 0,
-            ]);
+                return $entityToDelete;
 
-            $entityToDelete = Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
-            $entityToDelete->delete();
+            }else{
 
-            return $entityToDelete;
-
-        }else{
-
-            return Winmax4Entity::where('id_winmax4', $idWinmax4)->forceDelete();
+                return Winmax4Entity::where('id_winmax4', $idWinmax4)->forceDelete();
+            }
         }
     }
 }
