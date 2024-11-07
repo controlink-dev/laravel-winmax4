@@ -73,16 +73,26 @@ class syncEntities extends Command
             $entities = $winmax4Service->getEntities()->Data->Entities;
 
             //Delete all local entities that don't exist in Winmax4
-            foreach ($localEntities as $localEntity) {
-                $found = false;
+            foreach ($localEntities as $key => $localEntity) {
+                $delete = true; // Flag to indicate whether to delete the entity
                 foreach ($entities as $entity) {
-                    if ($localEntity->id_winmax4 == $entity->ID) {
-                        $found = true;
-                        break;
+                    if ($localEntity->code === $entity->Code) {
+                        if ($localEntity->id_winmax4 === $entity->ID) {
+                            $delete = false; // A perfect match was found, so we keep the entity
+                            break;
+                        } else {
+                            // Same code but different ID; mark for deletion and exit inner loop
+                            $delete = true;
+                            break;
+                        }
                     }
                 }
 
-                if (!$found) {
+                if ($delete) {
+                    // Remove from collection
+                    $localEntities->forget($key);
+
+                    // Remove from database (assuming it's an Eloquent model)
                     if(config('winmax4.use_soft_deletes')){
                         $localEntity->delete();
                     }else{
@@ -90,7 +100,6 @@ class syncEntities extends Command
                     }
                 }
             }
-
             $job = [];
             foreach ($entities as $entity) {
                 if(config('winmax4.use_license')){
