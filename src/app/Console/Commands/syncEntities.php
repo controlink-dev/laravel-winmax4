@@ -83,7 +83,7 @@ class syncEntities extends Command
             }
 
             //If getEntities returns bad response, skip the sync
-            if ($winmax4Service->getEntities()->Data->Entities->count() == 0) {
+            if ($winmax4Service->getEntities()->Data == null) {
                 foreach ($localEntities as $localEntity) {
                     if(config('winmax4.use_soft_deletes')){
                         $localEntity->is_active = false;
