@@ -85,7 +85,7 @@ class syncFamilies extends Command
                     if ($localFamily->is_active != $family->IsActive) {
 
                         //Update the local family
-                        $localFamily->is_active = $family->IsActive;
+                        $localFamily->is_active = $family->IsActive ?? false;
                         $localFamily->save();
                     }
                 }

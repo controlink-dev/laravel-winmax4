@@ -82,7 +82,7 @@ class syncCurrencies extends Command
                     if ($localCurrency->is_active != $currency->IsActive) {
 
                         //If has changed, update the currency
-                        $localCurrency->is_active = $currency->IsActive;
+                        $localCurrency->is_active = $currency->IsActive ?? false;
                         $localCurrency->save();
                     }
                 }
