@@ -81,12 +81,20 @@ class syncFamilies extends Command
             foreach ($families as $family) {
                 foreach ($localFamilies as $localFamily) {
 
-                    //Check if the family is_active status has changed
-                    if ($localFamily->is_active != $family->IsActive) {
+                    if ($localFamily->code == $family->Code) {
 
-                        //Update the local family
-                        $localFamily->is_active = $family->IsActive ?? false;
+                        //Check if the family is_active status has changed
+                        if ($localFamily->is_active != $family->IsActive) {
+
+                            //Update the local family
+                            $localFamily->is_active = $family->IsActive;
+                            $localFamily->save();
+                        }
+                    }else{
+
+                        $localFamily->is_active = false;
                         $localFamily->save();
+                        
                     }
                 }
             }

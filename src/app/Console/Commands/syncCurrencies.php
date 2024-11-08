@@ -78,11 +78,19 @@ class syncCurrencies extends Command
             foreach ($currencies as $currency) {
                 foreach ($localCurrencies as $localCurrency) {
 
-                    //Check if the currency is_active status has changed
-                    if ($localCurrency->is_active != $currency->IsActive) {
+                    if ($localCurrency->code == $currency->Code) {
 
-                        //If has changed, update the currency
-                        $localCurrency->is_active = $currency->IsActive ?? false;
+                        //Check if the currency is_active status has changed
+                        if ($localCurrency->is_active != $currency->IsActive) {
+
+                            //If has changed, update the currency
+                            $localCurrency->is_active = $currency->IsActive;
+                            $localCurrency->save();
+                        }
+                    }else{
+
+                        //If the currency is not found in Winmax4, deactivate it
+                        $localCurrency->is_active = false;
                         $localCurrency->save();
                     }
                 }
