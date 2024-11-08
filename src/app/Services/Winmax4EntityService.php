@@ -50,6 +50,7 @@ class Winmax4EntityService extends Winmax4Service
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 'Content-Type' => 'application/json',
             ],
+            'http_errors' => false,
         ]);
 
         return json_decode($response->getBody()->getContents());

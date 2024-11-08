@@ -83,7 +83,7 @@ class syncEntities extends Command
             }
 
             //If getEntities returns bad response, skip the sync
-            if ($winmax4Service->getEntities()->Status == 404 || $winmax4Service->getEntities()->Status == 500 || $winmax4Service->getEntities()->Status == 400) {
+            if ($winmax4Service->getEntities()->Data->Entities->count() == 0) {
                 foreach ($localEntities as $localEntity) {
                     if(config('winmax4.use_soft_deletes')){
                         $localEntity->is_active = false;
@@ -94,70 +94,70 @@ class syncEntities extends Command
                         $localEntity->forceDelete();
                     }
                 }
-            }
+            }else {
+                $entities = $winmax4Service->getEntities()->Data->Entities;
 
-            $entities = $winmax4Service->getEntities()->Data->Entities;
+                //Delete all local entities that don't exist in Winmax4
+                foreach ($localEntities as $localEntity) {
+                    $found = false;
+                    foreach ($entities as $entity) {
 
-            //Delete all local entities that don't exist in Winmax4
-            foreach ($localEntities as $localEntity) {
-                $found = false;
-                foreach ($entities as $entity) {
+                        if ($localEntity->id_winmax4 == $entity->ID) {
+                            $found = true;
 
-                    if ($localEntity->id_winmax4 == $entity->ID) {
-                        $found = true;
+                            //Check if the entities is_active status has changed
+                            if ($localEntity->is_active != $entity->IsActive) {
 
-                        //Check if the entities is_active status has changed
-                        if ($localEntity->is_active != $entity->IsActive) {
+                                //If has changed, update the entity
+                                $localEntity->is_active = $entity->IsActive;
+                                $localEntity->save();
+                            }
 
-                            //If has changed, update the entity
-                            $localEntity->is_active = $entity->IsActive;
-                            $localEntity->save();
+                            break;
                         }
+                    }
 
-                        break;
+                    if (!$found) {
+                        if(config('winmax4.use_soft_deletes')){
+
+                            //If the entity is not found in Winmax4, deactivate it
+                            $localEntity->is_active = false;
+                            $localEntity->save();
+
+                            $localEntity->delete();
+                        }else{
+
+                            //If the entity is not found in Winmax4, delete it
+                            $localEntity->forceDelete();
+                        }
                     }
                 }
 
-                if (!$found) {
-                    if(config('winmax4.use_soft_deletes')){
 
-                        //If the entity is not found in Winmax4, deactivate it
-                        $localEntity->is_active = false;
-                        $localEntity->save();
-
-                        $localEntity->delete();
+                $job = [];
+                foreach ($entities as $entity) {
+                    if(config('winmax4.use_license')){
+                        $job[] = new SyncEntitiesJob($entity, $winmax4Setting->license_id);
                     }else{
-
-                        //If the entity is not found in Winmax4, delete it
-                        $localEntity->forceDelete();
+                        $job[] = new SyncEntitiesJob($entity);
                     }
                 }
-            }
 
+                $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
+                    if(config('winmax4.use_license')){
+                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class, $winmax4Setting->license_id);
+                    }else{
+                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class);
+                    }
 
-            $job = [];
-            foreach ($entities as $entity) {
-                if(config('winmax4.use_license')){
-                    $job[] = new SyncEntitiesJob($entity, $winmax4Setting->license_id);
-                }else{
-                    $job[] = new SyncEntitiesJob($entity);
+                    $batch->delete();
+                })->name('winmax4_entities')->onQueue(config('winmax4.queue'))->dispatch();
+
+                $chunks = array_chunk($job, 100);
+
+                foreach ($chunks as $chunk){
+                    $batch->add($chunk);
                 }
-            }
-
-            $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
-                if(config('winmax4.use_license')){
-                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class, $winmax4Setting->license_id);
-                }else{
-                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class);
-                }
-
-                $batch->delete();
-            })->name('winmax4_entities')->onQueue(config('winmax4.queue'))->dispatch();
-
-            $chunks = array_chunk($job, 100);
-
-            foreach ($chunks as $chunk){
-                $batch->add($chunk);
             }
 
         }
