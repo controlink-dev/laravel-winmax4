@@ -102,7 +102,7 @@ class syncEntities extends Command
                     $found = false;
                     foreach ($entities as $entity) {
 
-                        dump($localEntity->id_winmax4, $entity->ID);
+                        dump('Local Entity:' .$localEntity->id_winmax4, 'Entity Winmax4:' . $entity->ID);
                         if ($localEntity->id_winmax4 == $entity->ID) {
                             $found = true;
 
