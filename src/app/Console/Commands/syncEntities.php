@@ -133,7 +133,6 @@ class syncEntities extends Command
                     }
                 }
 
-
                 $job = [];
                 foreach ($entities as $entity) {
                     if(config('winmax4.use_license')){

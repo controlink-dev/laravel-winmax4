@@ -34,8 +34,7 @@ class SyncEntitiesJob implements ShouldQueue
         if(config('winmax4.use_license')){
             Winmax4Entity::updateOrCreate(
                 [
-                    'code' => $this->entity->Code,
-                    'tax_payer_id' => $this->entity->TaxPayerID,
+                    'id_winmax4' => $this->entity->Code,
                     config('winmax4.license_column') => $this->license_id,
                 ],
                 [
@@ -57,8 +56,7 @@ class SyncEntitiesJob implements ShouldQueue
         }else{
             Winmax4Entity::updateOrCreate(
                 [
-                    'code' => $this->entity->Code,
-                    'tax_payer_id' => $this->entity->TaxPayerID,
+                    'id_winmax4' => $this->entity->Code,
                 ],
                 [
                     'id_winmax4' => $this->entity->ID,
