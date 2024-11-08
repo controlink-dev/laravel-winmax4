@@ -82,6 +82,20 @@ class syncEntities extends Command
                 $localEntities = Winmax4Entity::get();
             }
 
+            //If getEntities returns bad response, skip the sync
+            if ($winmax4Service->getEntities()->Status == 404 || $winmax4Service->getEntities()->Status == 500 || $winmax4Service->getEntities()->Status == 400) {
+                foreach ($localEntities as $localEntity) {
+                    if(config('winmax4.use_soft_deletes')){
+                        $localEntity->is_active = false;
+                        $localEntity->save();
+
+                        $localEntity->delete();
+                    }else{
+                        $localEntity->forceDelete();
+                    }
+                }
+            }
+
             $entities = $winmax4Service->getEntities()->Data->Entities;
 
             //Delete all local entities that don't exist in Winmax4
