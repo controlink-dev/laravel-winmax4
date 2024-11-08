@@ -63,7 +63,56 @@ class syncCurrencies extends Command
                 $winmax4Setting->n_terminal
             );
 
+            if (config('winmax4.use_license')) {
+
+                if (config('winmax4.use_soft_deletes')) {
+                    //If the license_id option is set and soft deletes are enabled, get all currencies including the deleted ones
+                    $localCurrencies = Winmax4Currency::where('license_id', $winmax4Setting->license_id)->withTrashed()->get();
+                } else {
+                    //If the license_id option is set, get all currencies by license_id
+                    $localCurrencies = Winmax4Currency::where('license_id', $winmax4Setting->license_id)->get();
+                }
+            } else {
+                //If the license_id option is not set, get all currencies
+                $localCurrencies = Winmax4Currency::get();
+            }
+
+            // Get all currencies from Winmax4
             $currencies = $winmax4Service->getCurrencies()->Data->Currencies;
+
+            //Check if the currencies is_active status has changed
+            foreach ($currencies as $currency) {
+                foreach ($localCurrencies as $localCurrency) {
+
+                    if ($localCurrency->code == $currency->Code) {
+
+                        //Check if the currency is_active status has changed
+                        if ($localCurrency->is_active != $currency->IsActive) {
+
+                            //If has changed, update the currency
+                            $localCurrency->is_active = $currency->IsActive;
+                            $localCurrency->save();
+                        }
+                    }
+                }
+            }
+
+            //Delete all local articles that don't exist in Winmax4
+            foreach ($localCurrencies as $localCurrency) {
+                $found = false;
+                foreach ($currencies as $currency) {
+                    if ($localCurrency->code == $currency->Code) {
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    //If the currency is not found in Winmax4, deactivate it
+                    $localCurrency->is_active = false;
+                    $localCurrency->save();
+                }
+            }
 
             foreach ($currencies as $currency) {
                 if(config('winmax4.use_license')){

@@ -66,7 +66,39 @@ class syncFamilies extends Command
                 $winmax4Setting->n_terminal
             );
 
+            if(config('winmax4.use_license')){
+
+                if(config('winmax4.use_soft_deletes')){
+                    //If the license_id option is set and soft deletes are enabled, get all families including the deleted ones
+                    $localFamilies = Winmax4Family::where('license_id', $winmax4Setting->license_id)->withTrashed()->get();
+                }else{
+                    //If the license_id option is set, get all families by license_id
+                    $localFamilies = Winmax4Family::where('license_id', $winmax4Setting->license_id)->get();
+                }
+            }else{
+                //If the license_id option is not set, get all families
+                $localFamilies = Winmax4Family::get();
+            }
+
+            // Get all families from Winmax4
             $families = $winmax4Service->getFamilies()->Data->Families;
+
+            //Check if the families is_active status has changed
+            foreach ($families as $family) {
+                foreach ($localFamilies as $localFamily) {
+
+                    if ($localFamily->code == $family->Code) {
+
+                        //Check if the family is_active status has changed
+                        if ($localFamily->is_active != $family->IsActive) {
+
+                            //Update the local family
+                            $localFamily->is_active = $family->IsActive;
+                            $localFamily->save();
+                        }
+                    }
+                }
+            }
 
             $job = [];
             foreach ($families as $family) {

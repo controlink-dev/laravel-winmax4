@@ -69,24 +69,54 @@ class syncArticles extends Command
                 $winmax4Setting->n_terminal
             );
 
-            $localArticles = Winmax4Article::where('license_id', $winmax4Setting->license_id)->get();
+            if(config('winmax4.use_license')){
 
+                if(config('winmax4.use_soft_deletes')){
+                    //If the license_id option is set and soft deletes are enabled, get all articles including the deleted ones
+                    $localArticles = Winmax4Article::where('license_id', $winmax4Setting->license_id)->withTrashed()->get();
+                }else{
+                    //If the license_id option is set, get all articles by license_id
+                    $localArticles = Winmax4Article::where('license_id', $winmax4Setting->license_id)->get();
+                }
+            }else{
+                //If the license_id option is not set, get all articles
+                $localArticles = Winmax4Article::get();
+            }
+
+            // Get all articles from Winmax4
             $articles = $winmax4Service->getArticles()->Data->Articles;
 
             //Delete all local articles that don't exist in Winmax4
             foreach ($localArticles as $localArticle) {
                 $found = false;
                 foreach ($articles as $article) {
+
                     if ($localArticle->id_winmax4 == $article->ID) {
                         $found = true;
+
+                        //Check if the articles is_active status has changed
+                        if ($localArticle->is_active != $article->IsActive) {
+
+                            //If has changed, update the article
+                            $localArticle->is_active = $article->IsActive;
+                            $localArticle->save();
+                        }
+
                         break;
                     }
                 }
 
                 if (!$found) {
                     if(config('winmax4.use_soft_deletes')){
+
+                        //If the article is not found in Winmax4, deactivate it
+                        $localArticle->is_active = false;
+                        $localArticle->save();
+
                         $localArticle->delete();
                     }else{
+
+                        //If the article is not found in Winmax4, delete it
                         $localArticle->forceDelete();
                     }
                 }

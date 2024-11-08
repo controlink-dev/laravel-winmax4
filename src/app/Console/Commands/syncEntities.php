@@ -68,38 +68,59 @@ class syncEntities extends Command
                 $winmax4Setting->n_terminal
             );
 
-            $localEntities = Winmax4Entity::where('license_id', $winmax4Setting->license_id)->get();
+            if(config('winmax4.use_license')){
+
+                if(config('winmax4.use_soft_deletes')){
+                    //If the license_id option is set and soft deletes are enabled, get all entities including the deleted ones
+                    $localEntities = Winmax4Entity::where('license_id', $winmax4Setting->license_id)->withTrashed()->get();
+                }else{
+                    //If the license_id option is set, get all entities by license_id
+                    $localEntities = Winmax4Entity::where('license_id', $winmax4Setting->license_id)->get();
+                }
+            }else{
+                //If the license_id option is not set, get all entities
+                $localEntities = Winmax4Entity::get();
+            }
 
             $entities = $winmax4Service->getEntities()->Data->Entities;
 
             //Delete all local entities that don't exist in Winmax4
-            foreach ($localEntities as $key => $localEntity) {
-                $delete = true; // Flag to indicate whether to delete the entity
+            foreach ($localEntities as $localEntity) {
+                $found = false;
                 foreach ($entities as $entity) {
-                    if ($localEntity->code === $entity->Code) {
-                        if ($localEntity->id_winmax4 === $entity->ID) {
-                            $delete = false; // A perfect match was found, so we keep the entity
-                            break;
-                        } else {
-                            // Same code but different ID; mark for deletion and exit inner loop
-                            $delete = true;
-                            break;
+
+                    if ($localEntity->id_winmax4 == $entity->ID) {
+                        $found = true;
+
+                        //Check if the entities is_active status has changed
+                        if ($localEntity->is_active != $entity->IsActive) {
+
+                            //If has changed, update the entity
+                            $localEntity->is_active = $entity->IsActive;
+                            $localEntity->save();
                         }
+
+                        break;
                     }
                 }
 
-                if ($delete) {
-                    // Remove from collection
-                    $localEntities->forget($key);
-
-                    // Remove from database (assuming it's an Eloquent model)
+                if (!$found) {
                     if(config('winmax4.use_soft_deletes')){
+
+                        //If the entity is not found in Winmax4, deactivate it
+                        $localEntity->is_active = false;
+                        $localEntity->save();
+
                         $localEntity->delete();
                     }else{
+
+                        //If the entity is not found in Winmax4, delete it
                         $localEntity->forceDelete();
                     }
                 }
             }
+
+
             $job = [];
             foreach ($entities as $entity) {
                 if(config('winmax4.use_license')){
