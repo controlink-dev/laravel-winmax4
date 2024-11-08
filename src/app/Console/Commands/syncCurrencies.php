@@ -78,15 +78,12 @@ class syncCurrencies extends Command
             foreach ($currencies as $currency) {
                 foreach ($localCurrencies as $localCurrency) {
 
-                    if ($localCurrency->code == $currency->Code) {
+                    //Check if the currency is_active status has changed
+                    if ($localCurrency->is_active != $currency->IsActive) {
 
-                        //Check if the currency is_active status has changed
-                        if ($localCurrency->is_active != $currency->IsActive) {
-
-                            //If has changed, update the currency
-                            $localCurrency->is_active = $currency->IsActive;
-                            $localCurrency->save();
-                        }
+                        //If has changed, update the currency
+                        $localCurrency->is_active = $currency->IsActive;
+                        $localCurrency->save();
                     }
                 }
             }
