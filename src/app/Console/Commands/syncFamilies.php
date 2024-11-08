@@ -67,14 +67,8 @@ class syncFamilies extends Command
             );
 
             if(config('winmax4.use_license')){
-
-                if(config('winmax4.use_soft_deletes')){
-                    //If the license_id option is set and soft deletes are enabled, get all families including the deleted ones
-                    $localFamilies = Winmax4Family::where('license_id', $winmax4Setting->license_id)->withTrashed()->get();
-                }else{
-                    //If the license_id option is set, get all families by license_id
-                    $localFamilies = Winmax4Family::where('license_id', $winmax4Setting->license_id)->get();
-                }
+                //If the license_id option is set, get all families by license_id
+                $localFamilies = Winmax4Family::where('license_id', $winmax4Setting->license_id)->get();
             }else{
                 //If the license_id option is not set, get all families
                 $localFamilies = Winmax4Family::get();

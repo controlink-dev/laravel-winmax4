@@ -72,7 +72,7 @@ class syncEntities extends Command
 
                 if(config('winmax4.use_soft_deletes')){
                     //If the license_id option is set and soft deletes are enabled, get all entities including the deleted ones
-                    $localEntities = Winmax4Entity::where('license_id', $winmax4Setting->license_id)->withTrashed()->get();
+                    $localEntities = Winmax4Entity::withTrashed()->where('license_id', $winmax4Setting->license_id)->get();
                 }else{
                     //If the license_id option is set, get all entities by license_id
                     $localEntities = Winmax4Entity::where('license_id', $winmax4Setting->license_id)->get();

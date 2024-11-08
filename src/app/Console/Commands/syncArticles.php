@@ -73,7 +73,7 @@ class syncArticles extends Command
 
                 if(config('winmax4.use_soft_deletes')){
                     //If the license_id option is set and soft deletes are enabled, get all articles including the deleted ones
-                    $localArticles = Winmax4Article::where('license_id', $winmax4Setting->license_id)->withTrashed()->get();
+                    $localArticles = Winmax4Article::withTrashed()->where('license_id', $winmax4Setting->license_id)->get();
                 }else{
                     //If the license_id option is set, get all articles by license_id
                     $localArticles = Winmax4Article::where('license_id', $winmax4Setting->license_id)->get();

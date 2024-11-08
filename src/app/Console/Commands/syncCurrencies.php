@@ -64,14 +64,8 @@ class syncCurrencies extends Command
             );
 
             if (config('winmax4.use_license')) {
-
-                if (config('winmax4.use_soft_deletes')) {
-                    //If the license_id option is set and soft deletes are enabled, get all currencies including the deleted ones
-                    $localCurrencies = Winmax4Currency::where('license_id', $winmax4Setting->license_id)->withTrashed()->get();
-                } else {
-                    //If the license_id option is set, get all currencies by license_id
-                    $localCurrencies = Winmax4Currency::where('license_id', $winmax4Setting->license_id)->get();
-                }
+                //If the license_id option is set, get all currencies by license_id
+                $localCurrencies = Winmax4Currency::where('license_id', $winmax4Setting->license_id)->get();
             } else {
                 //If the license_id option is not set, get all currencies
                 $localCurrencies = Winmax4Currency::get();
