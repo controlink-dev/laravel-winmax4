@@ -246,6 +246,7 @@ class Winmax4EntityService extends Winmax4Service
      */
     public function putEntities(int $idWinmax4, string $code, string $name, int $entityType, string $taxPayerID, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): Winmax4Entity
     {
+        dd($idWinmax4);
         $response = $this->client->put($this->url . '/Files/Entities/?id='.$idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
