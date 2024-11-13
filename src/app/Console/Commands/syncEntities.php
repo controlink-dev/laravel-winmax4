@@ -99,11 +99,9 @@ class syncEntities extends Command
 
                 //Delete all local entities that don't exist in Winmax4
                 foreach ($localEntities as $localEntity) {
-                    dump('Local Entity:' .$localEntity->id_winmax4);
                     $found = false;
                     foreach ($entities as $entity) {
 
-                        dump('Local Entity:' .$localEntity->id_winmax4, 'Entity Winmax4:' . $entity->ID);
                         if ($localEntity->id_winmax4 == $entity->ID) {
                             $found = true;
 

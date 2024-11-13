@@ -39,6 +39,7 @@ class SyncEntitiesJob implements ShouldQueue
                 ],
                 [
                     'id_winmax4' => $this->entity->ID,
+                    'code' => $this->entity->Code,
                     'name' => $this->entity->Name,
                     'address' => $this->entity->Address,
                     'country_code' => $this->entity->CountryCode,
@@ -60,6 +61,7 @@ class SyncEntitiesJob implements ShouldQueue
                 ],
                 [
                     'id_winmax4' => $this->entity->ID,
+                    'code' => $this->entity->Code,
                     'name' => $this->entity->Name,
                     'address' => $this->entity->Address,
                     'country_code' => $this->entity->CountryCode,
