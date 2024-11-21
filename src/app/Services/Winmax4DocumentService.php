@@ -137,6 +137,13 @@ class Winmax4DocumentService extends Winmax4Service
 
         $documentResponse = json_decode($response->getBody()->getContents());
 
+        if($documentResponse->Results[0]->Code == "COULDNTCREATEDOCUMENT"){
+            return response()->json([
+                'status' => 'error',
+                'message' => __('erros.winmax4.error_create_document'),
+            ], 404);
+        }
+
         $document = new Winmax4Document();
         $document->document_type_id = $documentType->id;
         $document->document_number = $documentResponse->Data->DocumentNumber;
