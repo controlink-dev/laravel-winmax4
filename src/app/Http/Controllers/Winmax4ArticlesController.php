@@ -131,7 +131,7 @@ class Winmax4ArticlesController extends Controller
             $request->first_price,
             $request->second_price,
             $request->stock,
-            $request->is_active
+            $request->is_active,
         ), 200);
     }
 
@@ -195,7 +195,7 @@ class Winmax4ArticlesController extends Controller
             $request->first_price,
             $request->second_price,
             $request->stock,
-            $request->is_active
+            $request->is_active,
         ), 200);
     }
 
