@@ -174,23 +174,21 @@ class Winmax4ArticleService extends Winmax4Service
 
         return $builder->updateOrCreate(
             [
-                'id_winmax4' => $responseDecoded->Data->Entity->ID,
+                'id_winmax4' => $responseDecoded->Data->Article->ID,
             ],
             [
-                'id_winmax4' => $responseDecoded->Data->Entity->ID,
-                'name' => $responseDecoded->Data->Entity->Name,
-                'address' => $responseDecoded->Data->Entity->Address,
-                'code' => $responseDecoded->Data->Entity->Code,
-                'country_code' => $responseDecoded->Data->Entity->CountryCode,
-                'email' => $responseDecoded->Data->Entity->Email,
-                'entity_type' => $responseDecoded->Data->Entity->EntityType,
-                'fax' => $responseDecoded->Data->Entity->Fax,
-                'is_active' => $responseDecoded->Data->Entity->IsActive,
-                'location' => $responseDecoded->Data->Entity->Location,
-                'mobile_phone' => $responseDecoded->Data->Entity->MobilePhone,
-                'phone' => $responseDecoded->Data->Entity->Phone,
-                'tax_payer_id' => $responseDecoded->Data->Entity->TaxPayerID,
-                'zip_code' => $responseDecoded->Data->Entity->ZipCode,
+                'id_winmax4' => $responseDecoded->Data->Article->ID,
+                'code' => $responseDecoded->Data->Article->Code,
+                'designation' => $responseDecoded->Data->Article->Designation,
+                'family_code' => $responseDecoded->Data->Article->FamilyCode,
+                'sub_family_code' => $responseDecoded->Data->Article->SubFamilyCode,
+                'sub_sub_family_code' => $responseDecoded->Data->Article->SubSubFamilyCode,
+                'vat_code' => $responseDecoded->Data->Article->VatCode,
+                'vat_rate' => $responseDecoded->Data->Article->VatRate,
+                'first_price' => $responseDecoded->Data->Article->First_price,
+                'second_price' => $responseDecoded->Data->Article->Second_price,
+                'has_stock' => $responseDecoded->Data->Article->Has_stock,
+                'stock' => $responseDecoded->Data->Article->Stock,
             ]
         );
     }
