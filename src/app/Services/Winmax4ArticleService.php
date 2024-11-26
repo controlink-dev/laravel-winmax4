@@ -119,16 +119,15 @@ class Winmax4ArticleService extends Winmax4Service
      * @param string $code Unique article code
      * @param string $designation Article name or designation.
      * @param string $familyCode Code of the article's family.
-     * @param string|null $subFamilyCode Code of the article's subfamily (optional).
-     * @param string|null $subSubFamilyCode Code of the article's sub-subfamily (optional).
      * @param string $vatCode VAT code for the article.
      * @param string $vatRate VAT rate as a percentage (e.g., "23").
      * @param string $firstPrice First price of the article.
      * @param string $secondPrice Second price of the article.
+     * @param string|null $subFamilyCode Code of the article's subfamily (optional).
+     * @param string|null $subSubFamilyCode Code of the article's sub-subfamily (optional).
      * @param int|null $stock Stock quantity (optional, if applicable).
      * @param int|null $is_active Indicates if the article is active
      * @return object|array|null Decoded JSON response from the API.
-     * @throws GuzzleException If there is a problem with the HTTP request.
      */
     public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
@@ -246,7 +245,6 @@ class Winmax4ArticleService extends Winmax4Service
      * @param int|null $stock The stock quantity (optional if applicable).
      * @param int|null $is_active Indicates if the article is active.
      * @return Winmax4Article Returns the updated article object.
-     * @throws GuzzleException If there is a problem with the HTTP request.
      */
     public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, ?string $subFamilyCode, ?string $subSubFamilyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, ?int $stock = 0, ?int $is_active = 1): Winmax4Article {
         $response = $this->client->put($this->url . '/Files/Articles/?id=' . $idWinmax4, [
