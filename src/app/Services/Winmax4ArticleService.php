@@ -130,7 +130,7 @@ class Winmax4ArticleService extends Winmax4Service
      * @return object|array|null Decoded JSON response from the API.
      * @throws GuzzleException If there is a problem with the HTTP request.
      */
-    public function postArticles(string $code, string $designation, string $familyCode,  string|null $subFamilyCode, string|null $subSubFamilyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, ?int $stock = 0, ?int $is_active = 1): object|array|null
+    public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
         $url = $this->url . '/Files/Articles';
 
