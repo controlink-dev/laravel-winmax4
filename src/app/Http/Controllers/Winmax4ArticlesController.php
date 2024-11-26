@@ -5,8 +5,10 @@ namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4ArticleService;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-
+use Illuminate\Http\Request;
 class Winmax4ArticlesController extends Controller
 {
     protected $winmax4Service;
@@ -71,4 +73,65 @@ class Winmax4ArticlesController extends Controller
     }
 
     //TODO: Implement the postArticles method, putArticles method, and deleteArticles method when the Winmax4 API is available.
+    /**
+     * Post articles to the Winmax4 API.
+     *
+     * This method validates the request data and sends the article information to the Winmax4 API.
+     * It expects specific input fields and ensures they conform to the validation rules defined within.
+     *
+     * ### Request Validation
+     *
+     * | Parameter       | Type     | Rules                                   | Description                                    |
+     * |-----------------|----------|-----------------------------------------|------------------------------------------------|
+     * | code            | string   | required                                | The article code.                              |
+     * | designation     | string   | required                                | The article designation.                       |
+     * | familyCode      | string   | required                                | The article family code.                       |
+     * | subFamilyCode   | string   | nullable                                | The article sub-family code.                   |
+     * | subSubFamilyCode| string   | nullable                                | The article sub-sub-family code.               |
+     * | vatCode         | string   | required                                | The article VAT code.                          |
+     * | vatRate         | string   | required                                | The article VAT rate.                          |
+     * | first_price     | string   | required                                | The article first price.                       |
+     * | second_price    | string   | required                                | The article second price.                      |
+     * | has_stock       | boolean  | required_if:has_stock,1                 | The article stock status.                      |
+     * | stock           | integer  | required_if:has_stock,1                 | The article stock quantity.                    |
+     *
+     * ### Entity Type Values
+     *
+     * | Type                  | Value |
+     * |-----------------------|-------|
+     * | Product               | 1     |
+     * | Service               | 2     |
+     *
+     * @param Request $request The HTTP request instance containing all required data.
+     * @return JsonResponse Returns a JSON response with the API result.
+     * @throws GuzzleException If an error occurs during the API request.
+     */
+    public function postArticles(Request $request): JsonResponse{
+        $request->validate([
+            'code' => 'required|string',
+            'designation' => 'required|string',
+            'familyCode' => 'required|string',
+            'subFamilyCode' => 'nullable|string',
+            'subSubFamilyCode' => 'nullable|string',
+            'vatCode' => 'required|string',
+            'vatRate' => 'required|string',
+            'first_price' => 'required|string',
+            'second_price' => 'required|string',
+            'stock' => 'required_if:has_stock,1',
+        ]);
+
+        return response()->json($this->winmax4Service->postArticles(
+            $request->code,
+            $request->designation,
+            $request->familyCode,
+            $request->subFamilyCode,
+            $request->subSubFamilyCode,
+            $request->vatCode,
+            $request->vatRate,
+            $request->first_price,
+            $request->second_price,
+            $request->has_stock,
+            $request->stock
+        ), 200);
+    }
 }
