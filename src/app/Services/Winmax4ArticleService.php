@@ -100,7 +100,6 @@ class Winmax4ArticleService extends Winmax4Service
      * | `VatRate`         | `string`  | VAT rate as a percentage (e.g., "23").       |
      * | `First_price`     | `string`  | First price of the article.                  |
      * | `Second_price`    | `string`  | Second price of the article.                 |
-     * | `Has_stock`       | `bool`    | Indicates if the article has stock.          |
      * | `Stock`           | `int|null`| Stock quantity (optional, if applicable).    |
      *
      * ### Return
@@ -117,7 +116,7 @@ class Winmax4ArticleService extends Winmax4Service
      * |----------------------------------------|---------------------------------------------------|
      * | `GuzzleHttp\Exception\GuzzleException` | Thrown when the HTTP request fails for any reason.|
      *
-     * @param string $code Unique article code.
+     * @param string $code Unique article code
      * @param string $designation Article name or designation.
      * @param string $familyCode Code of the article's family.
      * @param string|null $subFamilyCode Code of the article's subfamily (optional).
@@ -126,16 +125,15 @@ class Winmax4ArticleService extends Winmax4Service
      * @param string $vatRate VAT rate as a percentage (e.g., "23").
      * @param string $firstPrice First price of the article.
      * @param string $secondPrice Second price of the article.
-     * @param bool $hasStock Indicates if the article has stock.
      * @param int|null $stock Stock quantity (optional, if applicable).
+     * @param int|null $is_active Indicates if the article is active
      * @return object|array|null Decoded JSON response from the API.
      * @throws GuzzleException If there is a problem with the HTTP request.
      */
-    public function postArticles(string $code, string $designation, string $familyCode, string|null $subFamilyCode, string|null $subSubFamilyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, bool $hasStock, int|null $stock): object|array|null
+    public function postArticles(string $code, string $designation, string $familyCode,  string|null $subFamilyCode, string|null $subSubFamilyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, int|null $stock, ?int $is_active = 1): object|array|null
     {
         $url = $this->url . '/Files/Articles';
 
-        dd($this->token->Data->AccessToken->Value);
         $response = $this->client->post($url, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -148,12 +146,18 @@ class Winmax4ArticleService extends Winmax4Service
                 'FamilyCode' => $familyCode,
                 'SubFamilyCode' => $subFamilyCode,
                 'SubSubFamilyCode' => $subSubFamilyCode,
-                'VatCode' => $vatCode,
-                'VatRate' => $vatRate,
-                'First_price' => $firstPrice,
-                'Second_price' => $secondPrice,
-                'Has_stock' => $hasStock,
-                'Stock' => $stock,
+                'SaleTaxes' => [
+                    'TaxFeeCode' => $vatCode,
+                    'FixedAmount' => $vatRate,
+                ],
+                'Price' => [
+                    'SalesPrice1WithTaxes' => $firstPrice,
+                    'SalesPrice2WithTaxes' => $secondPrice,
+                ],
+                'Stocks' => [
+                    'current' => $stock,
+                ],
+                'IsActive' => $is_active,
             ],
         ]);
 
@@ -167,7 +171,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
-            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $subFamilyCode, $subSubFamilyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $hasStock, $stock);
+            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $subFamilyCode, $subSubFamilyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $stock, $is_active);
 
             return $builder->where('code', $code)->first();
         }
@@ -187,8 +191,8 @@ class Winmax4ArticleService extends Winmax4Service
                 'vat_rate' => $responseDecoded->Data->Article->VatRate,
                 'first_price' => $responseDecoded->Data->Article->First_price,
                 'second_price' => $responseDecoded->Data->Article->Second_price,
-                'has_stock' => $responseDecoded->Data->Article->Has_stock,
                 'stock' => $responseDecoded->Data->Article->Stock,
+                'is_active' => $is_active,
             ]
         );
     }
@@ -212,8 +216,8 @@ class Winmax4ArticleService extends Winmax4Service
      * | `$vatRate`        | `string`| VAT rate as a percentage.                     | N/A     |
      * | `$firstPrice`     | `string`| The primary price of the article.             | N/A     |
      * | `$secondPrice`    | `string`| The secondary price of the article.           | N/A     |
-     * | `$hasStock`       | `bool`  | Indicates if the article has stock.           | N/A     |
      * | `$stock`          | `int`   | The stock quantity (optional if applicable).  | `null`  |
+     * | `$is_active`      | `int`   | Indicates if the article is active.           | `1`     |
      *
      * ### Return
      *
@@ -237,12 +241,12 @@ class Winmax4ArticleService extends Winmax4Service
      * @param string $vatRate VAT rate as a percentage.
      * @param string $firstPrice The primary price of the article.
      * @param string $secondPrice The secondary price of the article.
-     * @param bool $hasStock Indicates if the article has stock.
      * @param int|null $stock The stock quantity (optional if applicable).
+     * @param int|null $is_active Indicates if the article is active.
      * @return Winmax4Article Returns the updated article object.
      * @throws GuzzleException If there is a problem with the HTTP request.
      */
-    public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, ?string $subFamilyCode, ?string $subSubFamilyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, bool $hasStock, ?int $stock): Winmax4Article {
+    public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, ?string $subFamilyCode, ?string $subSubFamilyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, ?int $stock, ?int $is_active): Winmax4Article {
         $response = $this->client->put($this->url . '/Files/Articles/?id=' . $idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -260,8 +264,8 @@ class Winmax4ArticleService extends Winmax4Service
                 'VatRate' => $vatRate,
                 'First_price' => $firstPrice,
                 'Second_price' => $secondPrice,
-                'Has_stock' => $hasStock,
                 'Stock' => $stock,
+                'IsActive' => $is_active,
             ],
         ]);
 
@@ -279,6 +283,7 @@ class Winmax4ArticleService extends Winmax4Service
             'second_price' => $article->Data->Article->Second_price,
             'has_stock' => $article->Data->Article->Has_stock,
             'stock' => $article->Data->Article->Stock,
+            'is_active' => $article->Data->Article->IsActive,
         ]);
 
         return Winmax4Article::where('id_winmax4', $idWinmax4)->first();
@@ -350,7 +355,7 @@ class Winmax4ArticleService extends Winmax4Service
         if ($article->Results[0]->Code !== self::WINMAX4_RESPONSE_OK) {
 
             // If the result is not OK, we will disable the article
-            $article = $this->putArticles($idWinmax4, $localArticle->code, $localArticle->designation, $localArticle->family_code, $localArticle->sub_family_code, $localArticle->sub_sub_family_code, $localArticle->vat_code, $localArticle->vat_rate, $localArticle->first_price, $localArticle->second_price, $article->has_stock, $article->stock);
+            $article = $this->putArticles($idWinmax4, $localArticle->code, $localArticle->designation, $localArticle->family_code, $localArticle->sub_family_code, $localArticle->sub_sub_family_code, $localArticle->vat_code, $localArticle->vat_rate, $localArticle->first_price, $localArticle->second_price, $article->stock, 0);
 
             return $article;
 
