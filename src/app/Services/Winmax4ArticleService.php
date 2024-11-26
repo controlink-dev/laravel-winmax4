@@ -167,7 +167,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
-            $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
+            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $subFamilyCode, $subSubFamilyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $hasStock, $stock);
 
             return $builder->where('code', $code)->first();
         }
@@ -195,5 +195,175 @@ class Winmax4ArticleService extends Winmax4Service
         );
     }
 
+    /**
+     * Update articles in the Winmax4 API
+     *
+     * This method updates an article in the Winmax4 API using the provided article details.
+     *
+     * ### Parameters
+     *
+     * | Parameter         | Type    | Description                                   | Default |
+     * |-------------------|---------|-----------------------------------------------|---------|
+     * | `$idWinmax4`      | `int`   | The article ID in Winmax4.                    | N/A     |
+     * | `$code`           | `string`| Unique code for the article.                  | N/A     |
+     * | `$designation`    | `string`| The article designation (name).               | N/A     |
+     * | `$familyCode`     | `string`| Code of the article's family.                 | N/A     |
+     * | `$subFamilyCode`  | `string`| Code of the article's sub-family (optional).  | `null`  |
+     * | `$subSubFamilyCode`| `string`| Code of the article's sub-sub-family (optional). | `null`  |
+     * | `$vatCode`        | `string`| VAT code associated with the article.         | N/A     |
+     * | `$vatRate`        | `string`| VAT rate as a percentage.                     | N/A     |
+     * | `$firstPrice`     | `string`| The primary price of the article.             | N/A     |
+     * | `$secondPrice`    | `string`| The secondary price of the article.           | N/A     |
+     * | `$hasStock`       | `bool`  | Indicates if the article has stock.           | N/A     |
+     * | `$stock`          | `int`   | The stock quantity (optional if applicable).  | `null`  |
+     *
+     * ### Return
+     *
+     * | Type         | Description                                  |
+     * |--------------|----------------------------------------------|
+     * | `Winmax4Article` | Returns the updated article object from the database. |
+     *
+     * ### Exceptions
+     *
+     * | Exception         | Condition                                   |
+     * |-------------------|---------------------------------------------|
+     * | `GuzzleException` | Throws when there is an HTTP client error.  |
+     *
+     * @param int $idWinmax4 The article ID in Winmax4.
+     * @param string $code Unique code for the article.
+     * @param string $designation The article designation (name).
+     * @param string $familyCode Code of the article's family.
+     * @param string|null $subFamilyCode Code of the article's sub-family (optional).
+     * @param string|null $subSubFamilyCode Code of the article's sub-sub-family (optional).
+     * @param string $vatCode VAT code associated with the article.
+     * @param string $vatRate VAT rate as a percentage.
+     * @param string $firstPrice The primary price of the article.
+     * @param string $secondPrice The secondary price of the article.
+     * @param bool $hasStock Indicates if the article has stock.
+     * @param int|null $stock The stock quantity (optional if applicable).
+     * @return Winmax4Article Returns the updated article object.
+     * @throws GuzzleException If there is a problem with the HTTP request.
+     */
+    public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, ?string $subFamilyCode, ?string $subSubFamilyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, bool $hasStock, ?int $stock): Winmax4Article {
+        $response = $this->client->put($this->url . '/Files/Articles/?id=' . $idWinmax4, [
+            'verify' => $this->settings['verify_ssl_guzzle'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                'Content-Type' => 'application/json',
+                'http_errors' => false,
+            ],
+            'json' => [
+                'Code' => $code,
+                'Designation' => $designation,
+                'FamilyCode' => $familyCode,
+                'SubFamilyCode' => $subFamilyCode,
+                'SubSubFamilyCode' => $subSubFamilyCode,
+                'VatCode' => $vatCode,
+                'VatRate' => $vatRate,
+                'First_price' => $firstPrice,
+                'Second_price' => $secondPrice,
+                'Has_stock' => $hasStock,
+                'Stock' => $stock,
+            ],
+        ]);
+
+        $article = json_decode($response->getBody()->getContents());
+
+        Winmax4Article::where('id_winmax4', $idWinmax4)->update([
+            'code' => $article->Data->Article->Code,
+            'designation' => $article->Data->Article->Designation,
+            'family_code' => $article->Data->Article->FamilyCode,
+            'sub_family_code' => $article->Data->Article->SubFamilyCode,
+            'sub_sub_family_code' => $article->Data->Article->SubSubFamilyCode,
+            'vat_code' => $article->Data->Article->VatCode,
+            'vat_rate' => $article->Data->Article->VatRate,
+            'first_price' => $article->Data->Article->First_price,
+            'second_price' => $article->Data->Article->Second_price,
+            'has_stock' => $article->Data->Article->Has_stock,
+            'stock' => $article->Data->Article->Stock,
+        ]);
+
+        return Winmax4Article::where('id_winmax4', $idWinmax4)->first();
+    }
+
+    /**
+     * Delete articles from Winmax4 API
+     *
+     * This method attempts to delete an article from the Winmax4 system using its API.
+     * It sends a DELETE request to the API, which returns a response indicating the
+     * success or failure of the operation. Depending on the response, the article is
+     * either disabled locally in the database or deleted.
+     *
+     * ### API Response Handling
+     *
+     * The API responds with a JSON object containing a `Results` array. The method
+     * checks the first result's `Code` to determine the success of the deletion.
+     *
+     * | Response Code           | Description                             |
+     * |-------------------------|-----------------------------------------|
+     * | `WINMAX4_RESPONSE_OK`   | Article deleted successfully on API side |
+     * | `other`                 | API deletion failed; article is disabled locally |
+     *
+     * ### Soft Deletes
+     *
+     * The method supports soft deletes based on the application's configuration.
+     * When soft deletes are enabled (`winmax4.use_soft_deletes`), the article is
+     * marked as inactive in the local database without removing it completely.
+     * Otherwise, a hard delete (force delete) is performed.
+     *
+     * ### Parameters
+     *
+     * | Parameter      | Type    | Description                           |
+     * |----------------|---------|---------------------------------------|
+     * | `$idWinmax4`   | `int`   | The ID of the article to be deleted.  |
+     *
+     * ### Return
+     *
+     * | Type             | Description                                                           |
+     * |------------------|-----------------------------------------------------------------------|
+     * | `JsonResponse`   | Returns a JSON response if the article is disabled locally.           |
+     * | `Winmax4Article` | Returns the article object if deleted successfully.                   |
+     *
+     * ### Exceptions
+     *
+     * | Exception                                  | Condition                                         |
+     * |--------------------------------------------|---------------------------------------------------|
+     * | `GuzzleHttp\Exception\GuzzleException`     | Throws when there is an HTTP client error during the DELETE request. |
+     *
+     * @param int $idWinmax4 The ID of the Winmax4 article to delete.
+     * @return JsonResponse|Winmax4Article JSON response or deleted article object.
+     * @throws GuzzleException
+     */
+    public function deleteArticles(int $idWinmax4): Winmax4Article|JsonResponse
+    {
+        $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
+
+        $response = $this->client->delete($this->url . '/Files/Articles/?id=' . $idWinmax4, [
+            'verify' => $this->settings['verify_ssl_guzzle'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                'Content-Type' => 'application/json',
+                'http_errors' => false,
+            ],
+        ]);
+
+        $article = json_decode($response->getBody()->getContents());
+
+        if ($article->Results[0]->Code !== self::WINMAX4_RESPONSE_OK) {
+
+            // If the result is not OK, we will disable the article
+            $article = $this->putArticles($idWinmax4, $localArticle->code, $localArticle->designation, $localArticle->family_code, $localArticle->sub_family_code, $localArticle->sub_sub_family_code, $localArticle->vat_code, $localArticle->vat_rate, $localArticle->first_price, $localArticle->second_price, $article->has_stock, $article->stock);
+
+            return $article;
+
+        } else {
+
+            $localArticle->forceDelete();
+
+            return response()->json([
+                'message' => 'Article deleted successfully',
+            ]);
+        }
+    }
 
 }
