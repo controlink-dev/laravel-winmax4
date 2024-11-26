@@ -117,7 +117,7 @@ class Winmax4ArticlesController extends Controller
             'vatRate' => 'required|string',
             'first_price' => 'required|string',
             'second_price' => 'required|string',
-            'stock' => 'required_if:has_stock,1',
+            'stock' => 'nullable|string',
         ]);
 
         return response()->json($this->winmax4Service->postArticles(
@@ -130,8 +130,8 @@ class Winmax4ArticlesController extends Controller
             $request->vatRate,
             $request->first_price,
             $request->second_price,
-            $request->has_stock,
-            $request->stock
+            $request->stock,
+            $request->is_active
         ), 200);
     }
 
@@ -180,10 +180,11 @@ class Winmax4ArticlesController extends Controller
             'vatRate' => 'required|string',
             'first_price' => 'required|string',
             'second_price' => 'required|string',
-            'stock' => 'required_if:has_stock,1',
+            'stock' => 'nullable|string',
         ]);
 
         return response()->json($this->winmax4Service->putArticles(
+            $request->id_winmax4,
             $request->code,
             $request->designation,
             $request->familyCode,
@@ -193,8 +194,8 @@ class Winmax4ArticlesController extends Controller
             $request->vatRate,
             $request->first_price,
             $request->second_price,
-            $request->has_stock,
-            $request->stock
+            $request->stock,
+            $request->is_active
         ), 200);
     }
 
