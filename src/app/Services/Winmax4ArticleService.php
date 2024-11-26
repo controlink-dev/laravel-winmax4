@@ -160,11 +160,40 @@ class Winmax4ArticleService extends Winmax4Service
         if(config('winmax4.use_soft_deletes')) {
             $builder = Winmax4Article::withTrashed();
         } else {
-            $builder = new Winmax4Entity();
+            $builder = new Winmax4Article();
         }
 
         $responseDecoded = json_decode($response->getBody()->getContents());
 
-        return false;
+        if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
+            $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
+            $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
+
+            return $builder->where('code', $code)->first();
+        }
+
+        return $builder->updateOrCreate(
+            [
+                'id_winmax4' => $responseDecoded->Data->Entity->ID,
+            ],
+            [
+                'id_winmax4' => $responseDecoded->Data->Entity->ID,
+                'name' => $responseDecoded->Data->Entity->Name,
+                'address' => $responseDecoded->Data->Entity->Address,
+                'code' => $responseDecoded->Data->Entity->Code,
+                'country_code' => $responseDecoded->Data->Entity->CountryCode,
+                'email' => $responseDecoded->Data->Entity->Email,
+                'entity_type' => $responseDecoded->Data->Entity->EntityType,
+                'fax' => $responseDecoded->Data->Entity->Fax,
+                'is_active' => $responseDecoded->Data->Entity->IsActive,
+                'location' => $responseDecoded->Data->Entity->Location,
+                'mobile_phone' => $responseDecoded->Data->Entity->MobilePhone,
+                'phone' => $responseDecoded->Data->Entity->Phone,
+                'tax_payer_id' => $responseDecoded->Data->Entity->TaxPayerID,
+                'zip_code' => $responseDecoded->Data->Entity->ZipCode,
+            ]
+        );
     }
+
+
 }
