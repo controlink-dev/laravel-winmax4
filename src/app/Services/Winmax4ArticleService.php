@@ -172,7 +172,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
-            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $subFamilyCode, $subSubFamilyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $is_active, $stock);
+            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $subFamilyCode, $subSubFamilyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $stock, $is_active);
 
             return $builder->where('code', $code)->first();
         }
