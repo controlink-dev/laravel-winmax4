@@ -131,6 +131,7 @@ class Winmax4ArticleService extends Winmax4Service
      */
     public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
+        dd($code, $designation, $familyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $subFamilyCode, $subSubFamilyCode, $stock, $is_active);
         $url = $this->url . '/Files/Articles';
 
         $response = $this->client->post($url, [

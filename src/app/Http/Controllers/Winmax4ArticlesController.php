@@ -120,7 +120,6 @@ class Winmax4ArticlesController extends Controller
             'stock' => 'nullable|string',
         ]);
 
-        dd($request->all());
         return response()->json($this->winmax4Service->postArticles(
             $request->code,
             $request->designation,
