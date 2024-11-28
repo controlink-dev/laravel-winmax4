@@ -172,7 +172,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
-            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $subFamilyCode, $subSubFamilyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $stock, $is_active);
+            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $subFamilyCode, $subSubFamilyCode, $stock, $is_active);
 
             return $builder->where('code', $code)->first();
         }
@@ -246,7 +246,7 @@ class Winmax4ArticleService extends Winmax4Service
      * @param int|null $is_active Indicates if the article is active.
      * @return Winmax4Article Returns the updated article object.
      */
-    public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, ?string $subFamilyCode, ?string $subSubFamilyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, ?int $stock = 0, ?int $is_active = 1): Winmax4Article {
+    public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): Winmax4Article {
         $response = $this->client->put($this->url . '/Files/Articles/?id=' . $idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
