@@ -195,7 +195,7 @@ class Winmax4ArticlesController extends Controller
             $request->subFamilyCode,
             $request->subSubFamilyCode,
             $request->stock,
-            $request->is_active == 'true' ? 1 : 0,
+            $request->is_active,
         ), 200);
     }
 
