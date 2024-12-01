@@ -50,7 +50,7 @@ class Winmax4ArticleService extends Winmax4Service
      */
     public function getArticles(): object|array|null
     {
-        $url = $this->url . '/files/articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
+        $url = $this->url . '/Files/Articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
 
         foreach (Winmax4Currency::all() as $currency) {
             $url .= "&PriceCurrencyCode=". $currency->code;
