@@ -145,16 +145,14 @@ class Winmax4ArticleService extends Winmax4Service
                 'FamilyCode' => $familyCode,
                 'SubFamilyCode' => $subFamilyCode,
                 'SubSubFamilyCode' => $subSubFamilyCode,
-                'SaleTaxes' => [
+                'SaleTaxFees' => [
                     'TaxFeeCode' => $vatCode,
                     'FixedAmount' => $vatRate,
                 ],
-                'Price' => [
-                    'SalesPrice1WithTaxes' => $firstPrice,
-                    'SalesPrice2WithTaxes' => $secondPrice,
-                ],
-                'Stocks' => [
-                    'current' => $stock,
+                'ArticlePrices' => [
+                    'PricesIncludeTaxes' => true,
+                    'SalesPrice1' => $firstPrice,
+                    'SalesPrice2' => $secondPrice,
                 ],
                 'IsActive' => $is_active,
             ],
