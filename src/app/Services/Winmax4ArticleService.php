@@ -50,7 +50,7 @@ class Winmax4ArticleService extends Winmax4Service
      */
     public function getArticles(): object|array|null
     {
-        $url = $this->url . '/Files/Articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
+        $url = $this->url . '/files/articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
 
         foreach (Winmax4Currency::all() as $currency) {
             $url .= "&PriceCurrencyCode=". $currency->code;
@@ -131,7 +131,7 @@ class Winmax4ArticleService extends Winmax4Service
      */
     public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
-        $url = $this->url . '/Files/Articles';
+        $url = $this->url . '/files/articles';
 
         $response = $this->client->post($url, [
             'verify' => $this->settings['verify_ssl_guzzle'],
@@ -245,7 +245,7 @@ class Winmax4ArticleService extends Winmax4Service
      * @return Winmax4Article Returns the updated article object.
      */
     public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): Winmax4Article {
-        $response = $this->client->put($this->url . '/Files/Articles/?id=' . $idWinmax4, [
+        $response = $this->client->put($this->url . '/files/articles/?id=' . $idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
@@ -339,7 +339,7 @@ class Winmax4ArticleService extends Winmax4Service
     {
         $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
 
-        $response = $this->client->delete($this->url . '/Files/Articles/?id=' . $idWinmax4, [
+        $response = $this->client->delete($this->url . '/files/articles/?id=' . $idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
