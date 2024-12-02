@@ -199,6 +199,7 @@ class Winmax4ArticleService extends Winmax4Service
                 $article->saleTaxes()->updateOrCreate(
                     [
                         'tax_fee_code' => $saleTax->TaxFeeCode,
+                        'article_id' => $article->id,
                     ],
                     [
                         'article_id' => $article->id,
@@ -215,6 +216,7 @@ class Winmax4ArticleService extends Winmax4Service
                 $article->purchaseTaxes()->updateOrCreate(
                     [
                         'tax_fee_code' => $purchaseTax->TaxFeeCode,
+                        'article_id' => $article->id,
                     ],
                     [
                         'article_id' => $article->id,
