@@ -129,7 +129,7 @@ class Winmax4ArticleService extends Winmax4Service
      * @param int|null $is_active Indicates if the article is active
      * @return object|array|null Decoded JSON response from the API.
      */
-    public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
+    public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, ?string $subFamilyCode = null, ?string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
         $url = $this->url . '/files/articles';
 
