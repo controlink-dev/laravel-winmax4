@@ -149,10 +149,6 @@ class Winmax4ArticleService extends Winmax4Service
                 'ArticlePrices' => [
                     [
                         'CurrencyCode' => 'EUR',
-                        'PricesIncludeTaxes' => false,
-                        'SalesPrice1' => $firstPrice,
-                    ],
-                    [
                         'PricesIncludeTaxes' => true,
                         'SalesPrice1' => $secondPrice,
                     ]
