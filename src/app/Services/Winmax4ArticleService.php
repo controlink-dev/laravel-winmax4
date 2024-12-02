@@ -242,6 +242,8 @@ class Winmax4ArticleService extends Winmax4Service
             }
         }
 
+        dd($article);
+
         return $article;
     }
 
