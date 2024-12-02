@@ -153,9 +153,8 @@ class Winmax4ArticleService extends Winmax4Service
                         'SalesPrice1' => $firstPrice,
                     ],
                     [
-                        'CurrencyCode' => 'EUR',
                         'PricesIncludeTaxes' => true,
-                        'SalesPrice2' => $secondPrice,
+                        'SalesPrice1' => $secondPrice,
                     ]
                 ],
                 'SaleTaxFees' => [[
@@ -204,8 +203,8 @@ class Winmax4ArticleService extends Winmax4Service
             ]
         );
 
-        if (isset($articleData->ArticlePrices) && is_array($articleData->ArticlePrices)) {
-            foreach ($articleData->ArticlePrices as $price) {
+        if (isset($articleData->Prices) && is_array($articleData->Prices)) {
+            foreach ($articleData->Prices as $price) {
                 $article->prices()->updateOrCreate(
                     [
                         'article_id' => $article->id,
