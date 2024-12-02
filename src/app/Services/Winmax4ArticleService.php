@@ -171,7 +171,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
-            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $vatCode, $vatRate, $firstPrice, $secondPrice, $subFamilyCode, $subSubFamilyCode, $stock, $is_active);
+            $this->putEntities($idWinmax4, $code, $designation, $familyCode, $vatCode, $vatRate, $priceWithoutVat, $priceWithVat, $subFamilyCode, $subSubFamilyCode, $stock, $is_active);
 
             return $builder->where('code', $code)->first();
         }
@@ -218,7 +218,7 @@ class Winmax4ArticleService extends Winmax4Service
             foreach ($articleData->SaleTaxes as $saleTax) {
                 $article->saleTaxes()->updateOrCreate(
                     [
-                        'tax_fee_code' => $saleTax->TaxFeeCode,
+                        'article_id' => $article->id,
                     ],
                     [
                         'article_id' => $article->id,
@@ -234,7 +234,7 @@ class Winmax4ArticleService extends Winmax4Service
             foreach ($articleData->PurchaseTaxes as $purchaseTax) {
                 $article->purchaseTaxes()->updateOrCreate(
                     [
-                        'tax_fee_code' => $purchaseTax->TaxFeeCode,
+                        'article_id' => $article->id,
                     ],
                     [
                         'article_id' => $article->id,
