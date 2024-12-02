@@ -177,9 +177,6 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         $articleData = $responseDecoded->Data->Article;
-
-        dd($articleData);
-
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
         $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
         $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
@@ -207,8 +204,8 @@ class Winmax4ArticleService extends Winmax4Service
                     ],
                     [
                         'article_id' => $article->id,
-                        'sales_price1_with_taxes' => $price->SalesPrice1,
-                        'sales_price2_with_taxes' => $price->SalesPrice2,
+                        'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes,
+                        'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes,
                     ]
                 );
             }
