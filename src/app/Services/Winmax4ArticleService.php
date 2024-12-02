@@ -175,13 +175,11 @@ class Winmax4ArticleService extends Winmax4Service
 
         $articleData = $responseDecoded->Data->Article;
 
-        dd($articleData);
-
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
         $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
         $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
 
-        return $builder->updateOrCreate(
+        $article = $builder->updateOrCreate(
             [
                 'id_winmax4' => $articleData->ID,
             ],
@@ -192,14 +190,38 @@ class Winmax4ArticleService extends Winmax4Service
                 'family_code' => $articleData->FamilyCode,
                 'sub_family_code' => $subFamilyCode,
                 'sub_sub_family_code' => $subSubFamilyCode,
-                'vat_code' => $articleData->VatCode,
-                'vat_rate' => $articleData->VatRate,
-                'first_price' => $articleData->First_price ?? null,
-                'second_price' => $articleData->Second_price ?? null,
-                'stock' => $stock,
-                'is_active' => $is_active,
+                'is_active' => $articleData->IsActive,
             ]
         );
+
+        if (isset($articleData->SaleTaxes) && is_array($articleData->SaleTaxes)) {
+            foreach ($articleData->SaleTaxes as $saleTax) {
+                $article->saleTaxes()->updateOrCreate(
+                    [
+                        'tax_fee_code' => $saleTax->TaxFeeCode,
+                    ],
+                    [
+                        'percentage' => $saleTax->Percentage,
+                        'tax_use' => $saleTax->TaxUse ?? null,
+                    ]
+                );
+            }
+        }
+
+        if (isset($articleData->PurchaseTaxes) && is_array($articleData->PurchaseTaxes)) {
+            foreach ($articleData->PurchaseTaxes as $purchaseTax) {
+                $article->purchaseTaxes()->updateOrCreate(
+                    [
+                        'tax_fee_code' => $purchaseTax->TaxFeeCode,
+                    ],
+                    [
+                        'percentage' => $purchaseTax->Percentage,
+                    ]
+                );
+            }
+        }
+
+        return $article;
     }
 
     /**
