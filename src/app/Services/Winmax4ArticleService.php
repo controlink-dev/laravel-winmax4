@@ -129,7 +129,7 @@ class Winmax4ArticleService extends Winmax4Service
      * @param int|null $is_active Indicates if the article is active
      * @return object|array|null Decoded JSON response from the API.
      */
-    public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, ?string $subFamilyCode = null, ?string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
+    public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
         $url = $this->url . '/files/articles';
 
@@ -173,22 +173,27 @@ class Winmax4ArticleService extends Winmax4Service
             return $builder->where('code', $code)->first();
         }
 
+        $articleData = $responseDecoded->Data->Article;
+        $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
+        $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
+        $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
+
         return $builder->updateOrCreate(
             [
-                'id_winmax4' => $responseDecoded->Data->Article->ID,
+                'id_winmax4' => $articleData->ID,
             ],
             [
-                'id_winmax4' => $responseDecoded->Data->Article->ID,
-                'code' => $responseDecoded->Data->Article->Code,
-                'designation' => $responseDecoded->Data->Article->Designation,
-                'family_code' => $responseDecoded->Data->Article->FamilyCode,
-                'sub_family_code' => $responseDecoded->Data->Article->SubFamilyCode,
-                'sub_sub_family_code' => $responseDecoded->Data->Article->SubSubFamilyCode,
-                'vat_code' => $responseDecoded->Data->Article->VatCode,
-                'vat_rate' => $responseDecoded->Data->Article->VatRate,
-                'first_price' => $responseDecoded->Data->Article->First_price,
-                'second_price' => $responseDecoded->Data->Article->Second_price,
-                'stock' => $responseDecoded->Data->Article->Stock,
+                'id_winmax4' => $articleData->ID,
+                'code' => $articleData->Code,
+                'designation' => $articleData->Designation,
+                'family_code' => $articleData->FamilyCode,
+                'sub_family_code' => $subFamilyCode,
+                'sub_sub_family_code' => $subSubFamilyCode,
+                'vat_code' => $articleData->VatCode,
+                'vat_rate' => $articleData->VatRate,
+                'first_price' => $articleData->First_price ?? null,
+                'second_price' => $articleData->Second_price ?? null,
+                'stock' => $stock,
                 'is_active' => $is_active,
             ]
         );
