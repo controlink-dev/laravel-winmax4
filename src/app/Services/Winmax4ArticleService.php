@@ -145,16 +145,17 @@ class Winmax4ArticleService extends Winmax4Service
                 'FamilyCode' => $familyCode,
                 'SubFamilyCode' => $subFamilyCode,
                 'SubSubFamilyCode' => $subSubFamilyCode,
-                'SaleTaxFees' => [
-                    'TaxFeeCode' => $vatCode,
-                    'FixedAmount' => $vatRate,
-                ],
+                'IsActive' => $is_active,
                 'ArticlePrices' => [
+                    'CurrencyCode' => 'EUR',
                     'PricesIncludeTaxes' => true,
                     'SalesPrice1' => $firstPrice,
                     'SalesPrice2' => $secondPrice,
                 ],
-                'IsActive' => $is_active,
+                'SaleTaxFees' => [
+                    'TaxFeeCode' => $vatCode,
+                    'FixedAmount' => $vatRate,
+                ],
             ],
         ]);
 
@@ -194,12 +195,22 @@ class Winmax4ArticleService extends Winmax4Service
             ]
         );
 
+        $article->prices()->updateOrCreate(
+            [
+                'article_id' => $article->id,
+            ],
+            [
+                'article_id' => $article->id,
+                'sales_price1_with_taxes' => $articleData->ArticlePrices->SalesPrice1,
+                'sales_price2_with_taxes' => $articleData->ArticlePrices->SalesPrice2,
+            ]
+        );
+
         if (isset($articleData->SaleTaxes) && is_array($articleData->SaleTaxes)) {
             foreach ($articleData->SaleTaxes as $saleTax) {
                 $article->saleTaxes()->updateOrCreate(
                     [
                         'tax_fee_code' => $saleTax->TaxFeeCode,
-                        'article_id' => $article->id,
                     ],
                     [
                         'article_id' => $article->id,
@@ -216,7 +227,6 @@ class Winmax4ArticleService extends Winmax4Service
                 $article->purchaseTaxes()->updateOrCreate(
                     [
                         'tax_fee_code' => $purchaseTax->TaxFeeCode,
-                        'article_id' => $article->id,
                     ],
                     [
                         'article_id' => $article->id,
