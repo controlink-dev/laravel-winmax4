@@ -120,7 +120,7 @@ class Winmax4ArticlesController extends Controller
             'stock' => 'nullable|string',
         ]);
 
-        return response()->json($this->winmax4Service->postArticles(
+        $article = $this->winmax4Service->postArticles(
             $request->code,
             $request->designation,
             $request->familyCode,
@@ -132,7 +132,9 @@ class Winmax4ArticlesController extends Controller
             $request->subSubFamilyCode,
             $request->stock,
             $request->is_active ?? 1,
-        ), 200);
+        );
+
+        return response()->json($article, 200);
     }
 
     /**
