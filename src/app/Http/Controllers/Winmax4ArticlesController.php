@@ -90,9 +90,8 @@ class Winmax4ArticlesController extends Controller
      * | subSubFamilyCode| string   | nullable                                | The article sub-sub-family code.               |
      * | vatCode         | string   | required                                | The article VAT code.                          |
      * | vatRate         | string   | required                                | The article VAT rate.                          |
-     * | first_price     | string   | required                                | The article first price.                       |
-     * | second_price    | string   | required                                | The article second price.                      |
-     * | has_stock       | boolean  | required_if:has_stock,1                 | The article stock status.                      |
+     * | price_without_vat     | string   | required                                | The article first price.                 |
+     * | price_with_vat    | string   | required                                | The article second price.                    |
      * | stock           | integer  | required_if:has_stock,1                 | The article stock quantity.                    |
      *
      * ### Entity Type Values
@@ -115,8 +114,8 @@ class Winmax4ArticlesController extends Controller
             'subSubFamilyCode' => 'nullable|string',
             'vatCode' => 'required|string',
             'vatRate' => 'required|string',
-            'first_price' => 'required|string',
-            'second_price' => 'required|string',
+            'price_without_vat' => 'required|string',
+            'price_with_vat' => 'required|string',
             'stock' => 'nullable|string',
         ]);
 
@@ -126,8 +125,8 @@ class Winmax4ArticlesController extends Controller
             $request->familyCode,
             $request->vatCode,
             $request->vatRate,
-            $request->first_price,
-            $request->second_price,
+            $request->price_without_vat,
+            $request->price_with_vat,
             $request->subFamilyCode,
             $request->subSubFamilyCode,
             $request->stock,

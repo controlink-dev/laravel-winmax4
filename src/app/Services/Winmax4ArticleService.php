@@ -121,15 +121,15 @@ class Winmax4ArticleService extends Winmax4Service
      * @param string $familyCode Code of the article's family.
      * @param string $vatCode VAT code for the article.
      * @param string $vatRate VAT rate as a percentage (e.g., "23").
-     * @param string $firstPrice First price of the article.
-     * @param string $secondPrice Second price of the article.
+     * @param string $priceWithoutVat Price without VAT.
+     * @param string $priceWithVat Price with VAT.
      * @param string|null $subFamilyCode Code of the article's subfamily (optional).
      * @param string|null $subSubFamilyCode Code of the article's sub-subfamily (optional).
      * @param int|null $stock Stock quantity (optional, if applicable).
      * @param int|null $is_active Indicates if the article is active
      * @return object|array|null Decoded JSON response from the API.
      */
-    public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
+    public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
         $url = $this->url . '/files/articles';
 
@@ -150,7 +150,7 @@ class Winmax4ArticleService extends Winmax4Service
                     [
                         'CurrencyCode' => 'EUR',
                         'PricesIncludeTaxes' => true,
-                        'SalesPrice1' => $secondPrice,
+                        'SalesPrice1' => $priceWithVat,
                     ]
                 ],
                 'SaleTaxFees' => [[
