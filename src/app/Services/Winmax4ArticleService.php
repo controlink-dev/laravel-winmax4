@@ -169,6 +169,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         $responseDecoded = json_decode($response->getBody()->getContents());
 
+        // If the response is not OK, we will update the article locally
         if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
             $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
             $this->putEntities($idWinmax4, $code, $designation, $familyCode, $vatCode, $vatRate, $priceWithoutVat, $priceWithVat, $subFamilyCode, $subSubFamilyCode, $stock, $is_active);
