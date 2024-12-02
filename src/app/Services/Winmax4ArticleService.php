@@ -133,7 +133,6 @@ class Winmax4ArticleService extends Winmax4Service
     {
         $url = $this->url . '/files/articles';
 
-        dd($this->token->Data->AccessToken->Value);
         $response = $this->client->post($url, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
