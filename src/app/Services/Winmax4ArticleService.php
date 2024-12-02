@@ -204,6 +204,7 @@ class Winmax4ArticleService extends Winmax4Service
                     ],
                     [
                         'article_id' => $article->id,
+                        'currency_code' => $price->CurrencyCode,
                         'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes,
                         'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes,
                     ]
