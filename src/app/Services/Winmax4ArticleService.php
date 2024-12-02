@@ -220,6 +220,7 @@ class Winmax4ArticleService extends Winmax4Service
                         'article_id' => $article->id,
                         'tax_fee_code' => $purchaseTax->TaxFeeCode,
                         'percentage' => $purchaseTax->Percentage,
+                        'fixedAmount' => $purchaseTax->TaxUse ?? 0,
                     ]
                 );
             }
