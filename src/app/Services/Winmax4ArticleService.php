@@ -146,15 +146,22 @@ class Winmax4ArticleService extends Winmax4Service
                 'SubFamilyCode' => $subFamilyCode,
                 'SubSubFamilyCode' => $subSubFamilyCode,
                 'IsActive' => $is_active,
-                'ArticlePrices' => [[
-                    'CurrencyCode' => 'EUR',
-                    'PricesIncludeTaxes' => true,
-                    'SalesPrice1' => $firstPrice,
-                    'SalesPrice2' => $secondPrice,
-                ]],
+                'ArticlePrices' => [
+                    [
+                        'CurrencyCode' => 'EUR',
+                        'PricesIncludeTaxes' => false,
+                        'SalesPrice1' => $firstPrice,
+                    ],
+                    [
+                        'CurrencyCode' => 'EUR',
+                        'PricesIncludeTaxes' => true,
+                        'SalesPrice2' => $secondPrice,
+                    ]
+                ],
                 'SaleTaxFees' => [[
                     'TaxFeeCode' => $vatCode,
-                    'FixedAmount' => $vatRate,
+                    'Percentage' => $vatRate,
+                    'FixedAmount' => 0,
                 ]],
             ],
         ]);
@@ -175,6 +182,8 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         $articleData = $responseDecoded->Data->Article;
+
+        dd($articleData);
 
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
         $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
