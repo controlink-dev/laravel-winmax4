@@ -270,7 +270,7 @@ class Winmax4ArticleService extends Winmax4Service
                 return [
                     'error' => true,
                     'status' => $errorResponse->getStatusCode(),
-                    'message' => $errorJson,
+                    'message' => $this->renderErrorMessage($errorJson),
                 ];
             }
 
@@ -451,6 +451,17 @@ class Winmax4ArticleService extends Winmax4Service
                 'message' => 'Article deleted successfully',
             ]);
         }
+    }
+
+    public function renderErrorMessage($errorJson){
+        switch ($errorJson['Results'][0]['Code']) {
+            case 'ARTICLECODEINUSE':
+                $errorJson['Results'][0]['Message'] = 'Article code already in use';
+            default:
+                $errorJson['Results'][0]['Message'] = 'An unknown error occurred';
+        }
+
+        return $errorJson;
     }
 
 }
