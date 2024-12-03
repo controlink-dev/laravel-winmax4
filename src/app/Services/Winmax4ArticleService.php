@@ -173,7 +173,7 @@ class Winmax4ArticleService extends Winmax4Service
             // If the response is not OK, we will update the article locally
             if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
                 $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
-                $this->putEntities($idWinmax4, $code, $designation, $familyCode, $vatCode, $vatRate, $priceWithoutVat, $priceWithVat, $subFamilyCode, $subSubFamilyCode, $stock, $is_active);
+                $this->putEntities($idWinmax4, $code, $designation, $familyCode, $vatCode, $vatRate, $priceWithoutVat, $priceWithVat, $subFamilyCode, $subSubFamilyCode, $stock, 1);
 
                 return $builder->where('code', $code)->first();
             }
@@ -338,7 +338,7 @@ class Winmax4ArticleService extends Winmax4Service
      * @param int|null $is_active Indicates if the article is active.
      * @return Winmax4Article Returns the updated article object.
      */
-    public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $firstPrice, string $secondPrice, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): Winmax4Article {
+    public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): Winmax4Article {
         $response = $this->client->put($this->url . '/files/articles/?id=' . $idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -352,30 +352,30 @@ class Winmax4ArticleService extends Winmax4Service
                 'FamilyCode' => $familyCode,
                 'SubFamilyCode' => $subFamilyCode,
                 'SubSubFamilyCode' => $subSubFamilyCode,
-                'VatCode' => $vatCode,
-                'VatRate' => $vatRate,
-                'First_price' => $firstPrice,
-                'Second_price' => $secondPrice,
-                'Stock' => $stock,
                 'IsActive' => $is_active,
+                'ArticlePrices' => [
+                    [
+                        'CurrencyCode' => 'EUR',
+                        'PricesIncludeTaxes' => true,
+                        'SalesPrice1' => $priceWithVat,
+                    ]
+                ],
+                'SaleTaxFees' => [[
+                    'TaxFeeCode' => $vatCode,
+                    'Percentage' => $vatRate,
+                    'FixedAmount' => 0,
+                ]],
             ],
         ]);
 
-        $article = json_decode($response->getBody()->getContents());
-
-        Winmax4Article::where('id_winmax4', $idWinmax4)->update([
-            'code' => $article->Data->Article->Code,
-            'designation' => $article->Data->Article->Designation,
-            'family_code' => $article->Data->Article->FamilyCode,
-            'sub_family_code' => $article->Data->Article->SubFamilyCode,
-            'sub_sub_family_code' => $article->Data->Article->SubSubFamilyCode,
-            'vat_code' => $article->Data->Article->VatCode,
-            'vat_rate' => $article->Data->Article->VatRate,
-            'first_price' => $article->Data->Article->First_price,
-            'second_price' => $article->Data->Article->Second_price,
-            'has_stock' => $article->Data->Article->Has_stock,
-            'stock' => $article->Data->Article->Stock,
-            'is_active' => $article->Data->Article->IsActive,
+        dd(Winmax4Article::where('id_winmax4', $idWinmax4)->first());
+        $article = Winmax4Article::where('id_winmax4', $idWinmax4)->update([
+            'code' => $code,
+            'designation' => $designation,
+            'family_code' => $familyCode,
+            'sub_family_code' => $subFamilyCode,
+            'sub_sub_family_code' => $subSubFamilyCode,
+            'is_active' => $is_active,
         ]);
 
         return Winmax4Article::where('id_winmax4', $idWinmax4)->first();

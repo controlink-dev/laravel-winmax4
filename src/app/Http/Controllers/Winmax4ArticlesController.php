@@ -179,25 +179,24 @@ class Winmax4ArticlesController extends Controller
             'subSubFamilyCode' => 'nullable|string',
             'vatCode' => 'required|string',
             'vatRate' => 'required|string',
-            'first_price' => 'required|string',
-            'second_price' => 'required|string',
+            'price_without_vat' => 'required|string',
+            'price_with_vat' => 'required|string',
             'stock' => 'nullable|string',
         ]);
 
-        return response()->json($this->winmax4Service->putArticles(
-            $request->id_winmax4,
+        $article = $this->winmax4Service->putArticles(
             $request->code,
             $request->designation,
             $request->familyCode,
             $request->vatCode,
             $request->vatRate,
-            $request->first_price,
-            $request->second_price,
+            $request->price_without_vat,
+            $request->price_with_vat,
             $request->subFamilyCode,
             $request->subSubFamilyCode,
             $request->stock,
-            $request->is_active,
-        ), 200);
+            $request->is_active ?? 1,
+        );
     }
 
     /**
