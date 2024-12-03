@@ -457,8 +457,10 @@ class Winmax4ArticleService extends Winmax4Service
         switch ($errorJson['Results'][0]['Code']) {
             case 'ARTICLECODEINUSE':
                 $errorJson['Results'][0]['Message'] = 'Article code already in use';
+                break;
             default:
                 $errorJson['Results'][0]['Message'] = 'An unknown error occurred';
+                break;
         }
 
         return $errorJson;
