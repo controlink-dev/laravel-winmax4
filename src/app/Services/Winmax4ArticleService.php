@@ -361,7 +361,7 @@ class Winmax4ArticleService extends Winmax4Service
             $responseDecoded = json_decode($response->getBody()->getContents());
 
             if(!isset($responseDecoded->Data)){
-                throw new \GuzzleHttp\Exception\RequestException('An error occurred', $responseDecoded);
+                throw new \Exception('An error occurred: ' . json_encode($responseDecoded));
             }
 
             $articleData = $responseDecoded->Data->Article;
