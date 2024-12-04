@@ -202,14 +202,14 @@ class Winmax4ArticlesController extends Controller
     /**
      * Delete articles from the Winmax4 API.
      *
-     * This method interfaces with the Winmax4Service to delete an article specified by the given code.
+     * This method interfaces with the Winmax4Service to delete an article specified by the given ID.
      * It returns the result of the deletion operation as a JSON response with an HTTP status code of 200.
      *
      * ### Parameters
      *
-     * | Parameter | Type    | Description                       |
-     * |-----------|---------|-----------------------------------|
-     * | `$code`   | `string`| The unique code of the article to delete. |
+     * | Parameter | Type  | Description                     |
+     * |-----------|-------|---------------------------------|
+     * | `$id`     | `int` | The ID of the article to delete. |
      *
      * ### Return
      *
@@ -224,13 +224,13 @@ class Winmax4ArticlesController extends Controller
      * |--------------------------------------------|--------------------------------------------------------|
      * | `Exception`                                | Throws when the deletion process encounters an error.  |
      *
-     * @param string $code The unique code of the article to be deleted.
+     * @param int $id The ID of the article to be deleted.
      * @return \Illuminate\Http\JsonResponse JSON response with the deletion result.
-     * @throws GuzzleException If an error occurs during the HTTP request.
+     * @throws GuzzleException
      */
-    public function deleteArticles(string $code): JsonResponse
+    public function deleteArticles(int $id): JsonResponse
     {
-        return response()->json($this->winmax4Service->deleteArticles($code), 200);
+        return response()->json($this->winmax4Service->deleteArticles($id), 200);
     }
 
 

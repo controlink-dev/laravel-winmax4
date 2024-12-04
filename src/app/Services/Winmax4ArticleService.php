@@ -530,10 +530,10 @@ class Winmax4ArticleService extends Winmax4Service
      * | `GuzzleHttp\Exception\GuzzleException`     | Throws when there is an HTTP client error during the DELETE request. |
      *
      * @param int $idWinmax4 The ID of the Winmax4 article to delete.
-     * @return JsonResponse|Winmax4Article JSON response or deleted article object.
+     * @return array JSON response or deleted article object.
      * @throws GuzzleException
      */
-    public function deleteArticles(int $idWinmax4): Winmax4Article|JsonResponse
+    public function deleteArticles(int $idWinmax4): array
     {
         $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
 
