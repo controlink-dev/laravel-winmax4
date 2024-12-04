@@ -157,6 +157,11 @@ class Winmax4ArticleService extends Winmax4Service
                         'Percentage' => $vatRate,
                         'FixedAmount' => 0,
                     ]],
+                    'PurchaseTaxFees' => [[
+                        'TaxFeeCode' => $vatCode,
+                        'Percentage' => $vatRate,
+                        'FixedAmount' => 0,
+                    ]],
                 ],
             ]);
 
@@ -351,6 +356,11 @@ class Winmax4ArticleService extends Winmax4Service
                         ]
                     ],
                     'SaleTaxFees' => [[
+                        'TaxFeeCode' => $vatCode,
+                        'Percentage' => $vatRate,
+                        'FixedAmount' => 0,
+                    ]],
+                    'PurchaseTaxFees' => [[
                         'TaxFeeCode' => $vatCode,
                         'Percentage' => $vatRate,
                         'FixedAmount' => 0,
