@@ -358,11 +358,12 @@ class Winmax4ArticleService extends Winmax4Service
                 ],
             ]);
 
-            dd($response->getBody());
-
             $responseDecoded = json_decode($response->getBody()->getContents());
 
-            dd($responseDecoded);
+            if(!isset($responseDecoded->Data)){
+                throw new \GuzzleHttp\Exception\RequestException('An error occurred', $responseDecoded);
+            }
+
             $articleData = $responseDecoded->Data->Article;
             $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
             $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
