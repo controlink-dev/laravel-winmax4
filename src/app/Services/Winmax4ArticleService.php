@@ -461,7 +461,7 @@ class Winmax4ArticleService extends Winmax4Service
                 }
             }
 
-            return response()->json($article->toArray());
+            return Winmax4Article::where('id_winmax4', $idWinmax4)->first();
 
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             // Log or handle the error response
