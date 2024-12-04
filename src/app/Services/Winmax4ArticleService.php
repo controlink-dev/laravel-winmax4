@@ -551,7 +551,19 @@ class Winmax4ArticleService extends Winmax4Service
         if ($article->Results[0]->Code !== self::WINMAX4_RESPONSE_OK) {
 
             // If the result is not OK, we will disable the article
-            $article = $this->putArticles($idWinmax4, $localArticle->code, $localArticle->designation, $localArticle->family_code, $localArticle->sub_family_code, $localArticle->sub_sub_family_code, $localArticle->vat_code, $localArticle->vat_rate, $localArticle->first_price, $localArticle->second_price, $article->stock, 0);
+            $article = $this->putArticles(
+                $idWinmax4,
+                $localArticle->code,
+                $localArticle->family_code,
+                $localArticle->saleTaxes[0]->tax_fee_code,
+                $localArticle->saleTaxes[0]->percentage,
+                $localArticle->prices[0]->sales_price1_without_taxes,
+                $localArticle->prices[0]->sales_price1_with_taxes,
+                $localArticle->sub_family_code,
+                $localArticle->sub_sub_family_code,
+                $localArticle->stock,
+                0
+            );
 
             return $article;
 
