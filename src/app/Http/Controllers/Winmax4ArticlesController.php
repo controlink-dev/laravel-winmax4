@@ -195,6 +195,8 @@ class Winmax4ArticlesController extends Controller
             $request->stock,
             $request->is_active ?? 1,
         );
+
+        return response()->json($article, 200);
     }
 
     /**
