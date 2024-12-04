@@ -185,6 +185,7 @@ class Winmax4ArticlesController extends Controller
         ]);
 
         $article = $this->winmax4Service->putArticles(
+            $request->id_winmax4,
             $request->code,
             $request->designation,
             $request->familyCode,

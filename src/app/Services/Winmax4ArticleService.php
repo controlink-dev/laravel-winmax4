@@ -331,6 +331,8 @@ class Winmax4ArticleService extends Winmax4Service
      * @return Winmax4Article Returns the updated article object.
      */
     public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): Winmax4Article {
+        dd(Winmax4Article::where('id_winmax4', $idWinmax4)->first());
+
         $response = $this->client->put($this->url . '/files/articles/?id=' . $idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -360,7 +362,6 @@ class Winmax4ArticleService extends Winmax4Service
             ],
         ]);
 
-        dd(Winmax4Article::where('id_winmax4', $idWinmax4)->first());
         $article = Winmax4Article::where('id_winmax4', $idWinmax4)->update([
             'code' => $code,
             'designation' => $designation,
