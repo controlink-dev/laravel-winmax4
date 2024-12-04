@@ -328,7 +328,7 @@ class Winmax4ArticleService extends Winmax4Service
      * @param int|null $is_active Indicates if the article is active.
      * @return array Returns the updated article object.
      */
-    public function putArticles(int $idWinmax4, string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): array
+    public function putArticles(int $idWinmax4, string $code, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): array
     {
         try {
             $response = $this->client->put($this->url . '/files/articles/?id=' . $idWinmax4, [
@@ -340,7 +340,6 @@ class Winmax4ArticleService extends Winmax4Service
                 ],
                 'json' => [
                     'Code' => $code,
-                    'Designation' => $designation,
                     'FamilyCode' => $familyCode,
                     'SubFamilyCode' => $subFamilyCode,
                     'SubSubFamilyCode' => $subSubFamilyCode,
@@ -550,9 +549,37 @@ class Winmax4ArticleService extends Winmax4Service
     }
 
     public function renderErrorMessage($errorJson){
+        /*RequiredFieldsAreMissing
+ArticleCodeInUse
+DuplicateArticleSaleTaxFees
+DuplicateArticlePurchaseTaxFees
+TaxFeeCodeNotFound
+CurrencyNotFound
+DuplicateArticlePriceCurrency*/
         switch ($errorJson['Results'][0]['Code']) {
+            case 'REQUIREDFIELDSAREMISSING':
+                $errorJson['Results'][0]['Message'] = 'Required fields are missing';
+                break;
             case 'ARTICLECODEINUSE':
-                $errorJson['Results'][0]['Message'] = 'Article code already in use';
+                $errorJson['Results'][0]['Message'] = 'Article code is already in use';
+                break;
+            case 'ARTICLEDESIGNATIONCANTBECHANGED':
+                $errorJson['Results'][0]['Message'] = 'Article designation cannot be changed';
+                break;
+            case 'DUPLICATEARTICLESALETAXFEES':
+                $errorJson['Results'][0]['Message'] = 'Duplicate article sale tax fees';
+                break;
+            case 'DUPLICATEARTICLEPURCHASETAXFEES':
+                $errorJson['Results'][0]['Message'] = 'Duplicate article purchase tax fees';
+                break;
+            case 'TAXFEECODENOTFOUND':
+                $errorJson['Results'][0]['Message'] = 'Tax fee code not found';
+                break;
+            case 'CURRENCYNOTFOUND':
+                $errorJson['Results'][0]['Message'] = 'Currency not found';
+                break;
+            case 'DUPLICATEARTICLEPRICECURRENCY':
+                $errorJson['Results'][0]['Message'] = 'Duplicate article price currency';
                 break;
             default:
                 $errorJson['Results'][0]['Message'] = 'An unknown error occurred';

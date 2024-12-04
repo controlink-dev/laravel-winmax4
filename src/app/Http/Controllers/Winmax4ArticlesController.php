@@ -172,7 +172,6 @@ class Winmax4ArticlesController extends Controller
     public function putArticles(Request $request): JsonResponse{
         $request->validate([
             'code' => 'required|string',
-            'designation' => 'required|string',
             'familyCode' => 'required|string',
             'subFamilyCode' => 'nullable|string',
             'subSubFamilyCode' => 'nullable|string',
@@ -186,7 +185,6 @@ class Winmax4ArticlesController extends Controller
         $article = $this->winmax4Service->putArticles(
             $request->id_winmax4,
             $request->code,
-            $request->designation,
             $request->familyCode,
             $request->vatCode,
             $request->vatRate,
