@@ -358,7 +358,7 @@ class Winmax4ArticleService extends Winmax4Service
                 ],
             ]);
 
-            dd($response);
+            dd($response->getBody());
 
             $responseDecoded = json_decode($response->getBody()->getContents());
 
