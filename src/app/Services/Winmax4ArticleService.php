@@ -546,11 +546,9 @@ class Winmax4ArticleService extends Winmax4Service
             ],
         ]);
 
-        $article = json_decode($response->getBody()->getContents());
+        $article = json_decode($response->getBody()->getContents(), true);
 
-        if ($article->Results[0]->Code !== self::WINMAX4_RESPONSE_OK) {
-
-            // If the result is not OK, we will disable the article
+        if ($article['Results'][0]['Code'] !== self::WINMAX4_RESPONSE_OK) {
             $article = $this->putArticles(
                 $idWinmax4,
                 $localArticle->code,
@@ -564,14 +562,13 @@ class Winmax4ArticleService extends Winmax4Service
                 $localArticle->stock,
                 0
             );
-
         } else {
-
             $localArticle->forceDelete();
         }
 
-        return $article->toArray();
+        return $article;
     }
+
 
     public function renderErrorMessage($errorJson){
         switch ($errorJson['Results'][0]['Code']) {
