@@ -565,7 +565,7 @@ class Winmax4ArticleService extends Winmax4Service
                 0
             );
 
-            return $article;
+            return $article->toArray();
 
         } else {
 
