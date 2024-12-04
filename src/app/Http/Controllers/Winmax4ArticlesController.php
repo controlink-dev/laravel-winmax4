@@ -72,7 +72,6 @@ class Winmax4ArticlesController extends Controller
         return response()->json(Winmax4Article::get(), 200);
     }
 
-    //TODO: Implement the postArticles method, putArticles method, and deleteArticles method when the Winmax4 API is available.
     /**
      * Post articles to the Winmax4 API.
      *
