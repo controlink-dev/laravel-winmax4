@@ -563,6 +563,10 @@ class Winmax4ArticleService extends Winmax4Service
                 0
             );
         } else {
+            $localArticle->prices()->delete();
+            $localArticle->saleTaxes()->delete();
+            $localArticle->purchaseTaxes()->delete();
+
             $localArticle->forceDelete();
         }
 
