@@ -581,6 +581,9 @@ DuplicateArticlePriceCurrency*/
             case 'DUPLICATEARTICLEPRICECURRENCY':
                 $errorJson['Results'][0]['Message'] = 'Duplicate article price currency';
                 break;
+            case 'EXCEPTION':
+                $errorJson['Results'][0]['Message'] = 'An exception occurred';
+                break;
             default:
                 $errorJson['Results'][0]['Message'] = 'An unknown error occurred';
                 break;
