@@ -382,14 +382,16 @@ class Winmax4ArticleService extends Winmax4Service
             $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
             $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
 
-            $article = Winmax4Article::where('id_winmax4', $idWinmax4)->update([
+            Winmax4Article::where('id_winmax4', $idWinmax4)->update([
                 'code' => $articleData->Code,
                 'designation' => $articleData->Designation,
                 'family_code' => $articleData->FamilyCode,
                 'sub_family_code' => $subFamilyCode,
                 'sub_sub_family_code' => $subSubFamilyCode,
                 'is_active' => $articleData->IsActive,
-            ])->first();
+            ]);
+
+            $article = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
 
             if (isset($articleData->Prices) && is_array($articleData->Prices)) {
                 foreach ($articleData->Prices as $price) {
