@@ -360,8 +360,11 @@ class Winmax4ArticleService extends Winmax4Service
 
             $responseDecoded = json_decode($response->getBody()->getContents());
 
-            if(!isset($responseDecoded->Data)){
-                throw new \Exception('An error occurred: ' . json_encode($responseDecoded));
+            if (!isset($responseDecoded->Data)) {
+                $errorMessage = isset($responseDecoded->Results[0])
+                    ? json_encode($responseDecoded->Results[0])
+                    : 'Unknown error: Data not found in response.';
+                throw new \Exception($errorMessage);
             }
 
             $articleData = $responseDecoded->Data->Article;
