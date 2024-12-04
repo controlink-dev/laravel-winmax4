@@ -389,7 +389,7 @@ class Winmax4ArticleService extends Winmax4Service
                 'sub_family_code' => $subFamilyCode,
                 'sub_sub_family_code' => $subSubFamilyCode,
                 'is_active' => $articleData->IsActive,
-            ]);
+            ])->first();
 
             if (isset($articleData->Prices) && is_array($articleData->Prices)) {
                 foreach ($articleData->Prices as $price) {
@@ -459,7 +459,7 @@ class Winmax4ArticleService extends Winmax4Service
                 }
             }
 
-            return Winmax4Article::where('id_winmax4', $idWinmax4)->first()->toArray();
+            return $article->toArray();
 
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             // Log or handle the error response
