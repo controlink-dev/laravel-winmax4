@@ -565,16 +565,12 @@ class Winmax4ArticleService extends Winmax4Service
                 0
             );
 
-            return $article->toArray();
-
         } else {
 
             $localArticle->forceDelete();
-
-            return response()->json([
-                'message' => 'Article deleted successfully',
-            ]);
         }
+
+        return $article->toArray();
     }
 
     public function renderErrorMessage($errorJson){
