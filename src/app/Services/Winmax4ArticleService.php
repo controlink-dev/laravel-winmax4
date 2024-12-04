@@ -378,7 +378,6 @@ class Winmax4ArticleService extends Winmax4Service
             }
 
             $articleData = $responseDecoded->Data->Article;
-            dd($articleData);
             $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
             $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
             $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
@@ -390,7 +389,7 @@ class Winmax4ArticleService extends Winmax4Service
                 'sub_family_code' => $subFamilyCode,
                 'sub_sub_family_code' => $subSubFamilyCode,
                 'is_active' => $articleData->IsActive,
-            ]);
+            ])->first();
 
             if (isset($articleData->Prices) && is_array($articleData->Prices)) {
                 foreach ($articleData->Prices as $price) {
