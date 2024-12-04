@@ -461,7 +461,7 @@ class Winmax4ArticleService extends Winmax4Service
                 }
             }
 
-            return $article->toArray();
+            return response()->json($article->toArray());
 
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             // Log or handle the error response
