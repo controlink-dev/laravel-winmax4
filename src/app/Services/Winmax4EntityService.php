@@ -187,7 +187,7 @@ class Winmax4EntityService extends Winmax4Service
                     if($idWinmax4 && Winmax4Entity::where('code', $code)->first()->is_active == 0){
                         $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
 
-                        return Winmax4Entity::where('code', $code)->first();
+                        return Winmax4Entity::where('code', $code)->first()->toArray();
                     }
                 }
 
