@@ -573,7 +573,6 @@ class Winmax4ArticleService extends Winmax4Service
         return $article;
     }
 
-
     public function renderErrorMessage($errorJson){
         switch ($errorJson['Results'][0]['Code']) {
             case 'REQUIREDFIELDSAREMISSING':

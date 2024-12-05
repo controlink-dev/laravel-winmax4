@@ -114,71 +114,95 @@ class Winmax4EntityService extends Winmax4Service
      * @param string|null $mobilePhone Entity mobile phone, default is null
      * @param string|null $email Entity email, default is null
      * @param string|null $country Entity country, default is 'PT'
-     * @return Winmax4Entity Returns the entity object
+     * @return array Returns the entity object
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postEntities(string $name, string $code = null, int $entityType = null, string $taxPayerID = null, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): Winmax4Entity
+    public function postEntities(string $name, string $code = null, int $entityType = null, string $taxPayerID = null, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): array
     {
-        $response = $this->client->post($this->url . '/Files/Entities', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-                'http_errors' => false,
-            ],
-            'json' => [
-                'Code' => $code,
-                'Name' => $name,
-                'IsActive' => $isActive,
-                'EntityType' => $entityType,
-                'TaxPayerID' => $taxPayerID,
-                'Address' => $address,
-                'ZipCode' => $zipCode,
-                'Phone' => $phone,
-                'Fax' => $fax,
-                'MobilePhone' => $mobilePhone,
-                'Email' => $email,
-                'Location' => $locality,
-                'Country' => $country,
-            ],
-        ]);
+        try{
+            $response = $this->client->post($this->url . '/files/entities', [
+                'verify' => $this->settings['verify_ssl_guzzle'],
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                    'Content-Type' => 'application/json',
+                    'http_errors' => false,
+                ],
+                'json' => [
+                    'Code' => $code,
+                    'Name' => $name,
+                    'IsActive' => $isActive,
+                    'EntityType' => $entityType,
+                    'TaxPayerID' => $taxPayerID,
+                    'Address' => $address,
+                    'ZipCode' => $zipCode,
+                    'Phone' => $phone,
+                    'Fax' => $fax,
+                    'MobilePhone' => $mobilePhone,
+                    'Email' => $email,
+                    'Location' => $locality,
+                    'Country' => $country,
+                ],
+            ]);
 
-        if(config('winmax4.use_soft_deletes')) {
-            $builder = Winmax4Entity::withTrashed();
-        } else {
-            $builder = new Winmax4Entity();
+            if(config('winmax4.use_soft_deletes')) {
+                $builder = Winmax4Entity::withTrashed();
+            } else {
+                $builder = new Winmax4Entity();
+            }
+
+            $responseDecoded = json_decode($response->getBody()->getContents());
+
+            if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
+                $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
+                $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
+
+                return $builder->where('code', $code)->first();
+            }
+
+            return $builder->updateOrCreate(
+                [
+                    'id_winmax4' => $responseDecoded->Data->Entity->ID,
+                ],
+                [
+                    'id_winmax4' => $responseDecoded->Data->Entity->ID,
+                    'name' => $responseDecoded->Data->Entity->Name,
+                    'address' => $responseDecoded->Data->Entity->Address,
+                    'code' => $responseDecoded->Data->Entity->Code,
+                    'country_code' => $responseDecoded->Data->Entity->CountryCode,
+                    'email' => $responseDecoded->Data->Entity->Email,
+                    'entity_type' => $responseDecoded->Data->Entity->EntityType,
+                    'fax' => $responseDecoded->Data->Entity->Fax,
+                    'is_active' => $responseDecoded->Data->Entity->IsActive,
+                    'location' => $responseDecoded->Data->Entity->Location,
+                    'mobile_phone' => $responseDecoded->Data->Entity->MobilePhone,
+                    'phone' => $responseDecoded->Data->Entity->Phone,
+                    'tax_payer_id' => $responseDecoded->Data->Entity->TaxPayerID,
+                    'zip_code' => $responseDecoded->Data->Entity->ZipCode,
+                ]
+            );
+
+        }catch (\GuzzleHttp\Exception\RequestException $e) {
+            // Log or handle the error response
+            if ($e->hasResponse()) {
+                $errorResponse = $e->getResponse();
+                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
+
+                dd($errorJson);
+
+                // Return the error JSON or handle it as needed
+                return [
+                    'error' => true,
+                    'status' => $errorResponse->getStatusCode(),
+                    'message' => $this->renderErrorMessage($errorJson),
+                ];
+            }
+
+            // If no response is available
+            return [
+                'error' => true,
+                'message' => $e->getMessage(),
+            ];
         }
-
-        $responseDecoded = json_decode($response->getBody()->getContents());
-
-        if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
-            $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
-            $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
-
-            return $builder->where('code', $code)->first();
-        }
-
-        return $builder->updateOrCreate(
-            [
-                'id_winmax4' => $responseDecoded->Data->Entity->ID,
-            ],
-            [
-                'id_winmax4' => $responseDecoded->Data->Entity->ID,
-                'name' => $responseDecoded->Data->Entity->Name,
-                'address' => $responseDecoded->Data->Entity->Address,
-                'code' => $responseDecoded->Data->Entity->Code,
-                'country_code' => $responseDecoded->Data->Entity->CountryCode,
-                'email' => $responseDecoded->Data->Entity->Email,
-                'entity_type' => $responseDecoded->Data->Entity->EntityType,
-                'fax' => $responseDecoded->Data->Entity->Fax,
-                'is_active' => $responseDecoded->Data->Entity->IsActive,
-                'location' => $responseDecoded->Data->Entity->Location,
-                'mobile_phone' => $responseDecoded->Data->Entity->MobilePhone,
-                'phone' => $responseDecoded->Data->Entity->Phone,
-                'tax_payer_id' => $responseDecoded->Data->Entity->TaxPayerID,
-                'zip_code' => $responseDecoded->Data->Entity->ZipCode,
-            ]
-        );
     }
 
     /**
@@ -357,6 +381,8 @@ class Winmax4EntityService extends Winmax4Service
 
             // If the result is not OK, we will disable the entity
             $entity = $this->putEntities($idWinmax4, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
+
+            $localEntity->delete();
 
             return $entity;
 
