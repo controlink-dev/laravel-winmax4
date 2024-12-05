@@ -395,4 +395,23 @@ class Winmax4EntityService extends Winmax4Service
             ]);
         }
     }
+
+    public function renderErrorMessage($errorJson){
+        switch ($errorJson['Results'][0]['Code']) {
+            case 'REQUIREDFIELDSAREMISSING':
+                $errorJson['Results'][0]['Message'] = 'Required fields are missing';
+                break;
+            case 'ENTITYCODEINUSE':
+                $errorJson['Results'][0]['Message'] = 'Entity code is already in use';
+                break;
+            case 'EXCEPTION':
+                $errorJson['Results'][0]['Message'] = 'An exception occurred';
+                break;
+            default:
+                $errorJson['Results'][0]['Message'] = 'An unknown error occurred';
+                break;
+        }
+
+        return $errorJson;
+    }
 }
