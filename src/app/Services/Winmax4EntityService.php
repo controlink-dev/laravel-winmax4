@@ -180,7 +180,7 @@ class Winmax4EntityService extends Winmax4Service
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
 
-                if($errorJson->Results[0]->Code == 'ENTITYCODEINUSE'){
+                if($errorJson['Results'][0]['Code'] == 'ENTITYCODEINUSE'){
                     $idWinmax4 = Winmax4Entity::where('code', $code)->first()->id_winmax4;
 
                     if($idWinmax4 && Winmax4Entity::where('code', $code)->first()->is_active == 0){
@@ -312,7 +312,7 @@ class Winmax4EntityService extends Winmax4Service
             'zip_code' => $entity->Data->Entity->ZipCode,
         ]);
 
-        return Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
+        return $entity->toArray();
     }
 
     /**
