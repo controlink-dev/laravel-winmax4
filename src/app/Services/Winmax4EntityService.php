@@ -178,10 +178,10 @@ class Winmax4EntityService extends Winmax4Service
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();
-                $errorJson = json_decode($errorResponse->getBody()->getContents());
+                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
 
-                // Check if the entity code is already in use and is inactive, then update it
-                if($errorJson->Results[0]->Code == 'ENTITYCODEINUSE'){
+                // Check if the article code is already in use and is inactive, then update it
+                if($errorJson['Results'][0]['Code'] == 'ENTITYCODEINUSE'){
                     $idWinmax4 = Winmax4Entity::where('code', $code)->first()->id_winmax4;
 
                     if($idWinmax4 && Winmax4Entity::where('code', $code)->first()->is_active == 0){

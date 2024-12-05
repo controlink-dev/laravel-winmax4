@@ -269,6 +269,29 @@ class Winmax4ArticleService extends Winmax4Service
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
 
+                // Check if the article code is already in use and is inactive, then update it
+                if($errorJson['Results'][0]['Code'] == 'ARTICLECODEINUSE'){
+                    $idWinmax4 = Winmax4Article::where('code', $code)->first()->id_winmax4;
+
+                    if($idWinmax4 && Winmax4Article::where('code', $code)->first()->is_active == 0){
+                        $this->putArticles(
+                            $idWinmax4,
+                            $code,
+                            $familyCode,
+                            $vatCode,
+                            $vatRate,
+                            $priceWithoutVat,
+                            $priceWithVat,
+                            $subFamilyCode,
+                            $subSubFamilyCode,
+                            $stock,
+                            $is_active
+                        );
+
+                        return Winmax4Article::where('code', $code)->first()->toArray();
+                    }
+                }
+
                 // Return the error JSON or handle it as needed
                 return [
                     'error' => true,
@@ -467,30 +490,7 @@ class Winmax4ArticleService extends Winmax4Service
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();
-                $errorJson = json_decode($errorResponse->getBody()->getContents());
-
-                // Check if the article code is already in use and is inactive, then update it
-                if($errorJson->Results[0]->Code == 'ARTICLECODEINUSE'){
-                    $idWinmax4 = Winmax4Article::where('code', $code)->first()->id_winmax4;
-
-                    if($idWinmax4 && Winmax4Article::where('code', $code)->first()->is_active == 0){
-                        $this->putArticles(
-                            $idWinmax4,
-                            $code,
-                            $familyCode,
-                            $vatCode,
-                            $vatRate,
-                            $priceWithoutVat,
-                            $priceWithVat,
-                            $subFamilyCode,
-                            $subSubFamilyCode,
-                            $stock,
-                            $is_active
-                        );
-
-                        return Winmax4Article::where('code', $code)->first()->toArray();
-                    }
-                }
+                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
 
                 // Return the error JSON or handle it as needed
                 return [
