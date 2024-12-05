@@ -312,7 +312,7 @@ class Winmax4EntityService extends Winmax4Service
             'zip_code' => $entity->Data->Entity->ZipCode,
         ]);
 
-        return $entity->toArray();
+        return Winmax4Entity::where('id_winmax4', $idWinmax4)->first()->toArray();
     }
 
     /**
