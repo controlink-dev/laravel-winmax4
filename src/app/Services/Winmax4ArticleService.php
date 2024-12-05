@@ -469,7 +469,7 @@ class Winmax4ArticleService extends Winmax4Service
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents());
 
-                // Check if the entity code is already in use and is inactive, then update it
+                // Check if the article code is already in use and is inactive, then update it
                 if($errorJson->Results[0]->Code == 'ARTICLECODEINUSE'){
                     $idWinmax4 = Winmax4Article::where('code', $code)->first()->id_winmax4;
 
