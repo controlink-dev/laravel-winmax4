@@ -152,13 +152,6 @@ class Winmax4EntityService extends Winmax4Service
 
             $responseDecoded = json_decode($response->getBody()->getContents());
 
-            if($responseDecoded->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
-                $idWinmax4 = $builder->where('code', $code)->first()->id_winmax4;
-                $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
-
-                return $builder->where('code', $code)->first();
-            }
-
             return $builder->updateOrCreate(
                 [
                     'id_winmax4' => $responseDecoded->Data->Entity->ID,
@@ -186,6 +179,16 @@ class Winmax4EntityService extends Winmax4Service
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
+
+                if($errorJson->Results[0]->Code == 'ENTITYCODEINUSE'){
+                    $idWinmax4 = Winmax4Entity::where('code', $code)->first()->id_winmax4;
+
+                    if($idWinmax4 && Winmax4Entity::where('code', $code)->first()->is_active == 0){
+                        $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
+
+                        return Winmax4Entity::where('code', $code)->first();
+                    }
+                }
 
                 // Return the error JSON or handle it as needed
                 return [
