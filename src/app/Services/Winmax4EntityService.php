@@ -187,8 +187,6 @@ class Winmax4EntityService extends Winmax4Service
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
 
-                dd($errorJson);
-
                 // Return the error JSON or handle it as needed
                 return [
                     'error' => true,
@@ -381,8 +379,6 @@ class Winmax4EntityService extends Winmax4Service
 
             // If the result is not OK, we will disable the entity
             $entity = $this->putEntities($idWinmax4, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
-
-            $localEntity->delete();
 
             return $entity;
 
