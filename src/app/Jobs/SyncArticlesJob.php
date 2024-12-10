@@ -53,9 +53,9 @@ class SyncArticlesJob implements ShouldQueue
                     'sub_sub_sub_family_code' => $this->article->SubSubSubFamilyCode ?? null,
                     'stock_unit_code' => $this->article->StockUnitCode ?? null,
                     'image_url' => $this->article->ImageUrl ?? null,
-                    'extras' => $this->article->Extras ?? null,
-                    'holds' => $this->article->Holds ?? null,
-                    'descriptives' => $this->article->Descriptives ?? null,
+                    'extras' => json_encode($this->article->Extras) ?? null,
+                    'holds' => json_encode($this->article->Holds) ?? null,
+                    'descriptives' => json_encode($this->article->Descriptives) ?? null,
                 ]
             );
         }else{
@@ -74,9 +74,9 @@ class SyncArticlesJob implements ShouldQueue
                     'sub_sub_sub_family_code' => $this->article->SubSubSubFamilyCode ?? null,
                     'stock_unit_code' => $this->article->StockUnitCode ?? null,
                     'image_url' => $this->article->ImageUrl ?? null,
-                    'extras' => $this->article->Extras ?? null,
-                    'holds' => $this->article->Holds ?? null,
-                    'descriptives' => $this->article->Descriptives ?? null,
+                    'extras' => json_encode($this->article->Extras) ?? null,
+                    'holds' => json_encode($this->article->Holds) ?? null,
+                    'descriptives' => json_encode($this->article->Descriptives) ?? null,
                 ]
             );
         }

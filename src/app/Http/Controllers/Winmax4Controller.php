@@ -142,7 +142,6 @@ class Winmax4Controller extends Controller
      */
     public function updateLastSyncedAt($model, $licence_id = null)
     {
-
         if (config('winmax4.use_license')) {
             Winmax4SyncStatus::updateOrCreate([
                 'model' => class_basename($model),
