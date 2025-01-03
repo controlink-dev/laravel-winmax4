@@ -6,6 +6,7 @@ use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class Winmax4Entity extends Model
 {
