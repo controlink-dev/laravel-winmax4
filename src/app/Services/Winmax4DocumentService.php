@@ -141,7 +141,7 @@ class Winmax4DocumentService extends Winmax4Service
             if($documentResponse->Results[0]->Code == "COULDNTCREATEDOCUMENT"){
                 return response()->json([
                     'status' => 'error',
-                    'message' => __('erros.winmax4.error_create_document'),
+                    'message' => $this->renderErrorMessage($documentResponse),
                 ], 404);
             }
 
@@ -217,7 +217,7 @@ class Winmax4DocumentService extends Winmax4Service
             }
 
             return $document;
-        }catch (GuzzleException $e){
+        }catch (\GuzzleHttp\Exception\RequestException $e){
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();
