@@ -8,6 +8,7 @@ return [
         'username' => 'Username',
         'password' => 'Password',
         'n_terminal' => 'Nº Terminal',
+        'warehouse_code' => 'Warehouse Code',
 
         'typeDocumentsForInvoice' => 'Type of Documents for Invoice',
         'typeDocForInvoiceReceipt' => 'Type of Document for Invoice/Receipt',

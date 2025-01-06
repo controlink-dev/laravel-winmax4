@@ -8,6 +8,7 @@ return [
         'username' => 'Nome de Utilizador',
         'password' => 'Palavra-passe',
         'n_terminal' => 'Nº Terminal',
+        'warehouse_code' => 'Código do Armazém',
 
         'typeDocumentsForInvoice' => 'Tipo de Documentos para Fatura',
         'typeDocForInvoiceReceipt' => 'Tipo de Documento para Fatura/Recibo',
