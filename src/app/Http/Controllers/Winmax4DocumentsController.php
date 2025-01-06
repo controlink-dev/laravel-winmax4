@@ -117,12 +117,19 @@ class Winmax4DocumentsController extends Controller
      * | `documentType`       | `string`  | Type of the document to be posted     |
      * | `entity`             | `string`  | Entity associated with the document   |
      * | `details`            | `array`   | Array of document details             |
+     * | `details.*.ArticleCode` | `string` | Code of the article in the document   |
+     * | `details.*.Quantity` | `int`     | Quantity of the article in the document |
+     * | `details.*.DiscountPercentage1` | `int` | Discount percentage 1 for the article |
+     * | `details.*.DiscountPercentage2` | `int` | Discount percentage 2 for the article |
+     * | `isNC`               | `bool`    | Whether the document is a credit note |
+     * | `documentNumberRelation` | `string` | Document number relation for credit notes |
      *
      * ### Example Request
      *
      * ```json
      * {
      *     "documentType": "invoice",
+     *    "warehouse": "A",
      *     "entity": "customer",
      *     "details": [
      *         {
@@ -131,7 +138,8 @@ class Winmax4DocumentsController extends Controller
      *             "DiscountPercentage1": 10,
      *             "DiscountPercentage2": 5
      *         }
-     *     ]
+     *     ],
+     *    "isNC": false,
      * }
      * ```
      *
@@ -160,6 +168,7 @@ class Winmax4DocumentsController extends Controller
     {
         $request->validate([
             'documentType' => 'required',
+            'warehouse' => 'required',
             'entity' => 'required',
             'details.*' => 'required|array',
             'details.*.ArticleCode' => 'required',
@@ -171,6 +180,7 @@ class Winmax4DocumentsController extends Controller
 
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType,
+            $request->warehouse,
             $request->entity,
             $request->details,
             $request->has('isNC') ? $request->isNC : false,
