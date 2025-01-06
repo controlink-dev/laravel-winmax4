@@ -623,10 +623,10 @@ class Winmax4ArticleService extends Winmax4Service
                 $errorJson['Results'][0]['Message'] = 'Duplicate article price currency';
                 break;
             case 'EXCEPTION':
-                $errorJson['Results'][0]['Message'] = 'An exception occurred';
+                $errorJson['Results'][0]['Message'] = 'An exception occurred! Please contact the administrator';
                 break;
             default:
-                $errorJson['Results'][0]['Message'] = 'An unknown error occurred';
+                $errorJson['Results'][0]['Message'] = 'An unknown error occurred! Please contact the administrator';
                 break;
         }
 

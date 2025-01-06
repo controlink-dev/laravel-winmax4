@@ -118,103 +118,219 @@ class Winmax4DocumentService extends Winmax4Service
      */
     public function postDocuments(Winmax4DocumentType $documentType, Winmax4Entity $entity, array $details): object|array|null
     {
-        $response = $this->client->post($this->url . '/Transactions/Documents', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'DocumentTypeCode' => $documentType->code,
-                'Entity' => [
-                    'Code' => $entity->code,
-                    'TaxPayerID' => $entity->tax_payer_id,
+        try {
+            $response = $this->client->post($this->url . '/Transactions/Documents', [
+                'verify' => $this->settings['verify_ssl_guzzle'],
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                    'Content-Type' => 'application/json',
                 ],
-                'Details' => $details,
-                'Format' => 'json',
-            ],
-        ]);
+                'json' => [
+                    'DocumentTypeCode' => $documentType->code,
+                    'Entity' => [
+                        'Code' => $entity->code,
+                        'TaxPayerID' => $entity->tax_payer_id,
+                    ],
+                    'Details' => $details,
+                    'Format' => 'json',
+                ],
+            ]);
 
-        $documentResponse = json_decode($response->getBody()->getContents());
+            $documentResponse = json_decode($response->getBody()->getContents());
 
-        if($documentResponse->Results[0]->Code == "COULDNTCREATEDOCUMENT"){
-            return response()->json([
-                'status' => 'error',
-                'message' => __('erros.winmax4.error_create_document'),
-            ], 404);
-        }
-
-        $document = new Winmax4Document();
-        $document->document_type_id = $documentType->id;
-        $document->document_number = $documentResponse->Data->DocumentNumber;
-        $document->serie = $documentResponse->Data->Serie;
-        $document->number = $documentResponse->Data->Number;
-        $document->date = $documentResponse->Data->Date;
-        $document->external_identification = $documentResponse->Data->ExternalIdentification ?? null;
-        $document->currency_code = $documentResponse->Data->CurrencyCode;
-        $document->is_deleted = $documentResponse->Data->IsDeleted;
-        $document->user_login = $documentResponse->Data->UserLogin;
-        $document->terminal_code = $documentResponse->Data->TerminalCode;
-        $document->source_warehouse_code = $documentResponse->Data->SourceWarehouseCode;
-        $document->target_warehouse_code = $documentResponse->Data->TargetWarehouseCode ?? null;
-        $document->entity_id = Winmax4Entity::where('code', $documentResponse->Data->Entity->Code)->first()->id;
-        $document->total_without_taxes = $documentResponse->Data->TotalWithoutTaxes;
-        $document->total_applied_taxes = $documentResponse->Data->TotalAppliedTaxes;
-        $document->total_with_taxes = $documentResponse->Data->TotalWithTaxes;
-        $document->total_liquidated = $documentResponse->Data->TotalLiquidated;
-        $document->load_address = $documentResponse->Data->LoadAddress;
-        $document->load_location = $documentResponse->Data->LoadLocation;
-        $document->load_zip_code = $documentResponse->Data->LoadZipCode;
-        $document->load_date_time = $documentResponse->Data->LoadDateTime;
-        $document->load_vehicle_license_plate = $documentResponse->Data->LoadVehicleLicensePlate ?? null;
-        $document->load_country_code = $documentResponse->Data->LoadCountryCode;
-        $document->unload_address = $documentResponse->Data->UnloadAddress;
-        $document->unload_location = $documentResponse->Data->UnloadLocation;
-        $document->unload_zip_code = $documentResponse->Data->UnloadZipCode;
-        $document->unload_date_time = $documentResponse->Data->UnloadDateTime;
-        $document->unload_country_code = $documentResponse->Data->UnloadCountryCode;
-        $document->hash_characters = $documentResponse->Data->HashCharacters;
-        $document->ta_doc_code_id = $documentResponse->Data->TADocCodeID ?? null;
-        $document->atcud = $documentResponse->Data->ATCUD ?? null;
-        $document->table_number = $documentResponse->Data->TableNumber ?? null;
-        $document->table_split_number = $documentResponse->Data->TableSplitNumber ?? null;
-        $document->sales_person_code = $documentResponse->Data->SalesPersonCode ?? null;
-        $document->remarks = $documentResponse->Data->Remarks ?? null;
-        $document->save();
-
-        foreach($documentResponse->Data->Details as $detail){
-            $documentDetail = new Winmax4DocumentDetail();
-            $documentDetail->document_id = $document->id;
-            $documentDetail->article_id = Winmax4Article::where('code', $detail->ArticleCode)->first()->id;
-            $documentDetail->unitary_price_without_taxes = $detail->UnitaryPriceWithoutTaxes;
-            $documentDetail->unitary_price_with_taxes = $detail->UnitaryPriceWithTaxes;
-            $documentDetail->discount_percentage_1 = $detail->DiscountPercentage1;
-            $documentDetail->quantity = $detail->Quantity;
-            $documentDetail->total_without_taxes = $detail->TotalWithoutTaxes;
-            $documentDetail->total_with_taxes = $detail->TotalWithTaxes;
-            $documentDetail->remarks = $detail->Remarks ?? null;
-            $documentDetail->save();
-
-            foreach ($detail->Taxes as $tax) {
-                $documentDetailTax = new Winmax4DocumentDetailTax();
-                $documentDetailTax->document_detail_id = $documentDetail->id;
-                $documentDetailTax->tax_fee_code = $tax->TaxFeeCode;
-                $documentDetailTax->percentage = $tax->Percentage;
-                $documentDetailTax->save();
+            if($documentResponse->Results[0]->Code == "COULDNTCREATEDOCUMENT"){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => __('erros.winmax4.error_create_document'),
+                ], 404);
             }
+
+            $document = new Winmax4Document();
+            $document->document_type_id = $documentType->id;
+            $document->document_number = $documentResponse->Data->DocumentNumber;
+            $document->serie = $documentResponse->Data->Serie;
+            $document->number = $documentResponse->Data->Number;
+            $document->date = $documentResponse->Data->Date;
+            $document->external_identification = $documentResponse->Data->ExternalIdentification ?? null;
+            $document->currency_code = $documentResponse->Data->CurrencyCode;
+            $document->is_deleted = $documentResponse->Data->IsDeleted;
+            $document->user_login = $documentResponse->Data->UserLogin;
+            $document->terminal_code = $documentResponse->Data->TerminalCode;
+            $document->source_warehouse_code = $documentResponse->Data->SourceWarehouseCode;
+            $document->target_warehouse_code = $documentResponse->Data->TargetWarehouseCode ?? null;
+            $document->entity_id = Winmax4Entity::where('code', $documentResponse->Data->Entity->Code)->first()->id;
+            $document->total_without_taxes = $documentResponse->Data->TotalWithoutTaxes;
+            $document->total_applied_taxes = $documentResponse->Data->TotalAppliedTaxes;
+            $document->total_with_taxes = $documentResponse->Data->TotalWithTaxes;
+            $document->total_liquidated = $documentResponse->Data->TotalLiquidated;
+            $document->load_address = $documentResponse->Data->LoadAddress;
+            $document->load_location = $documentResponse->Data->LoadLocation;
+            $document->load_zip_code = $documentResponse->Data->LoadZipCode;
+            $document->load_date_time = $documentResponse->Data->LoadDateTime;
+            $document->load_vehicle_license_plate = $documentResponse->Data->LoadVehicleLicensePlate ?? null;
+            $document->load_country_code = $documentResponse->Data->LoadCountryCode;
+            $document->unload_address = $documentResponse->Data->UnloadAddress;
+            $document->unload_location = $documentResponse->Data->UnloadLocation;
+            $document->unload_zip_code = $documentResponse->Data->UnloadZipCode;
+            $document->unload_date_time = $documentResponse->Data->UnloadDateTime;
+            $document->unload_country_code = $documentResponse->Data->UnloadCountryCode;
+            $document->hash_characters = $documentResponse->Data->HashCharacters;
+            $document->ta_doc_code_id = $documentResponse->Data->TADocCodeID ?? null;
+            $document->atcud = $documentResponse->Data->ATCUD ?? null;
+            $document->table_number = $documentResponse->Data->TableNumber ?? null;
+            $document->table_split_number = $documentResponse->Data->TableSplitNumber ?? null;
+            $document->sales_person_code = $documentResponse->Data->SalesPersonCode ?? null;
+            $document->remarks = $documentResponse->Data->Remarks ?? null;
+            $document->save();
+
+            foreach($documentResponse->Data->Details as $detail){
+                $documentDetail = new Winmax4DocumentDetail();
+                $documentDetail->document_id = $document->id;
+                $documentDetail->article_id = Winmax4Article::where('code', $detail->ArticleCode)->first()->id;
+                $documentDetail->unitary_price_without_taxes = $detail->UnitaryPriceWithoutTaxes;
+                $documentDetail->unitary_price_with_taxes = $detail->UnitaryPriceWithTaxes;
+                $documentDetail->discount_percentage_1 = $detail->DiscountPercentage1;
+                $documentDetail->quantity = $detail->Quantity;
+                $documentDetail->total_without_taxes = $detail->TotalWithoutTaxes;
+                $documentDetail->total_with_taxes = $detail->TotalWithTaxes;
+                $documentDetail->remarks = $detail->Remarks ?? null;
+                $documentDetail->save();
+
+                foreach ($detail->Taxes as $tax) {
+                    $documentDetailTax = new Winmax4DocumentDetailTax();
+                    $documentDetailTax->document_detail_id = $documentDetail->id;
+                    $documentDetailTax->tax_fee_code = $tax->TaxFeeCode;
+                    $documentDetailTax->percentage = $tax->Percentage;
+                    $documentDetailTax->save();
+                }
+            }
+
+            foreach ($documentResponse->Data->Taxes as $tax) {
+                $documentTax = new Winmax4DocumentTax();
+                $documentTax->document_id = $document->id;
+                $documentTax->tax_fee_code = $tax->TaxFeeCode;
+                $documentTax->percentage = $tax->Percentage;
+                $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
+                $documentTax->total_affected = $tax->TotalAffected;
+                $documentTax->total = $tax->Total;
+                $documentTax->save();
+            }
+
+            return $document;
+        }catch (GuzzleException $e){
+            // Log or handle the error response
+            if ($e->hasResponse()) {
+                $errorResponse = $e->getResponse();
+                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
+
+                // Return the error JSON or handle it as needed
+                If($errorJson['Results'][0]['Code'] == 'COULDNTCREATEDOCUMENT'){
+                    return [
+                        'error' => true,
+                        'status' => $errorResponse->getStatusCode(),
+                        'message' => $this->renderErrorMessage($errorJson),
+                    ];
+                }else{
+                    return [
+                        'error' => true,
+                        'status' => $errorResponse->getStatusCode(),
+                        'message' => 'The code is unknown:' . $errorJson['Results'][0]['Code'] . '<br> The message is:' . $errorJson['Results'][0]['Message'],
+                    ];
+                }
+            }
+
+            // If no response is available
+            return [
+                'error' => true,
+                'message' => $e->getMessage(),
+            ];
         }
 
-        foreach ($documentResponse->Data->Taxes as $tax) {
-            $documentTax = new Winmax4DocumentTax();
-            $documentTax->document_id = $document->id;
-            $documentTax->tax_fee_code = $tax->TaxFeeCode;
-            $documentTax->percentage = $tax->Percentage;
-            $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
-            $documentTax->total_affected = $tax->TotalAffected;
-            $documentTax->total = $tax->Total;
-            $documentTax->save();
+
+    }
+
+    public function renderErrorMessage($errorJson){
+        switch ($errorJson['Results'][0]['Fields'][0]) {
+            case 'InvalidArticleCode':
+                $errorJson['Results'][0]['Message'] = 'The article code is invalid';
+                break;
+            case 'ArticleIsNotActive':
+                $errorJson['Results'][0]['Message'] = 'The article is not active';
+                break;
+            case 'InvalidArticleType':
+                $errorJson['Results'][0]['Message'] = 'The article type is invalid';
+                break;
+            case 'InvalidUnit':
+                $errorJson['Results'][0]['Message'] = 'The unit is invalid';
+                break;
+            case 'InvalidTax':
+                $errorJson['Results'][0]['Message'] = 'The tax is invalid';
+                break;
+            case 'OutdatedBatch':
+                $errorJson['Results'][0]['Message'] = 'The batch is outdated';
+                break;
+            case 'InvalidBatch':
+                $errorJson['Results'][0]['Message'] = 'The batch is invalid';
+                break;
+            case 'ArticleWithSameSerialNumberInDocument':
+                $errorJson['Results'][0]['Message'] = 'The article with the same serial number is already in the document';
+                break;
+            case 'InvalidComposition':
+                $errorJson['Results'][0]['Message'] = 'The composition is invalid';
+                break;
+            case 'InvalidEntityCode':
+                $errorJson['Results'][0]['Message'] = 'The entity code is invalid';
+                break;
+            case 'ArticleNotAvailableForCurrentServiceZone':
+                $errorJson['Results'][0]['Message'] = 'The article is not available for the current service zone';
+                break;
+            case 'TotalIsNegative':
+                $errorJson['Results'][0]['Message'] = 'The total is negative';
+                break;
+            case 'UnitRequiresEDICode':
+                $errorJson['Results'][0]['Message'] = 'The unit requires an EDI code';
+                break;
+            case 'TaxRequiresEDICode':
+                $errorJson['Results'][0]['Message'] = 'The tax requires an EDI code';
+                break;
+            case 'AlreadyInDocument':
+                $errorJson['Results'][0]['Message'] = 'The article is already in the document';
+                break;
+            case 'InvalidTaxes':
+                $errorJson['Results'][0]['Message'] = 'The taxes are invalid';
+                break;
+            case 'NotEnoughStock':
+                $errorJson['Results'][0]['Message'] = 'There is not enough stock';
+                break;
+            case 'QuantityZero':
+                $errorJson['Results'][0]['Message'] = 'The quantity is zero';
+                break;
+            case 'SkipToNextDetail':
+                $errorJson['Results'][0]['Message'] = 'Skip to the next detail';
+                break;
+            case 'InvalidEntityInDetail':
+                $errorJson['Results'][0]['Message'] = 'The entity in the detail is invalid';
+                break;
+            case 'NoTaxesDefined':
+                $errorJson['Results'][0]['Message'] = 'No taxes are defined';
+                break;
+            case 'OnlyOnePercentageTaxAllowed':
+                $errorJson['Results'][0]['Message'] = 'Only one percentage tax is allowed';
+                break;
+            case 'NotAllowedOtherTaxesOverPercentageTax':
+                $errorJson['Results'][0]['Message'] = 'Not allowed other taxes over the percentage tax';
+                break;
+            case 'TaxRateDoesntHaveSAFTDesignation':
+                $errorJson['Results'][0]['Message'] = 'The tax rate does not have a SAFT designation';
+                break;
+            case 'EXCEPTION':
+                $errorJson['Results'][0]['Message'] = 'An exception occurred! Please contact the administrator';
+                break;
+            default:
+                $errorJson['Results'][0]['Message'] = 'An unknown error occurred! Please contact the administrator';
+                break;
         }
 
-        return $document;
+        return $errorJson;
     }
 }
