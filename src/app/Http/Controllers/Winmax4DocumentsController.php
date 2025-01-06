@@ -166,12 +166,17 @@ class Winmax4DocumentsController extends Controller
             'details.*.Quantity' => 'required',
             'details.*.DiscountPercentage1' => 'required',
             'details.*.DiscountPercentage2' => 'required',
+            'documentNumberRelation' => 'required_if:isNC,true',
         ]);
+
+
 
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType['invoice_receipt'],
             $request->entity,
-            $request->details
+            $request->details,
+            $request->has('isNC') ? $request->isNC : false,
+            $request->has('isNC') ? $request->isNC ? $request->documentNumberRelation : null : null
         ), 200);
     }
 }

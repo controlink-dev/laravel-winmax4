@@ -116,9 +116,23 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(Winmax4DocumentType $documentType, Winmax4Entity $entity, array $details): object|array|null
+    public function postDocuments(Winmax4DocumentType $documentType, Winmax4Entity $entity, array $details, bool $isNC = false, string $documentNumberRelation = null): object|array|null
     {
         try {
+            $ExternalDocumentsRelation = '';
+            if($isNC){
+                if(is_null($documentNumberRelation)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'The document number relation is required for credit notes',
+                    ], 404);
+                }
+
+                $ExternalDocumentsRelation = [
+                    'ExternalDocumentsRelation' => $documentNumberRelation,
+                ];
+            }
+
             $response = $this->client->post($this->url . '/Transactions/Documents', [
                 'verify' => $this->settings['verify_ssl_guzzle'],
                 'headers' => [
@@ -127,6 +141,7 @@ class Winmax4DocumentService extends Winmax4Service
                 ],
                 'json' => [
                     'DocumentTypeCode' => $documentType->code,
+                    $ExternalDocumentsRelation,
                     'Entity' => [
                         'Code' => $entity->code,
                         'TaxPayerID' => $entity->tax_payer_id,
