@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('winmax4_settings', function (Blueprint $table) {
-            $table->string('warehouse_code')->nullable()->after('n_terminal');
+            $table->foreignIdFor(\Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse::class, 'warehouse_id')->cascadeOnDelete()->nullable();
         });
     }
 
@@ -22,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('winmax4_settings', function (Blueprint $table) {
-            $table->dropColumn('warehouse_code');
+            $table->dropForeign(['warehouse_id']);
+            $table->dropColumn('warehouse_id');
         });
     }
 };
