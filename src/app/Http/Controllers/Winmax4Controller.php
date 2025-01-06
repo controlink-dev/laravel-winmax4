@@ -78,6 +78,8 @@ class Winmax4Controller extends Controller
         $password = $request->password;
         $n_terminal = $request->n_terminal;
 
+        $warehouse_id = $request->warehouse_id;
+
         $type_docs_invoice = $request->type_docs_invoice;
         $type_docs_invoice_receipt = $request->type_docs_invoice_receipt;
         $type_docs_credit_note = $request->type_docs_credit_note;
@@ -97,6 +99,8 @@ class Winmax4Controller extends Controller
                 $winmax4->password = $password;
                 $winmax4->n_terminal = $n_terminal;
 
+                $winmax4->warehouse_id = $warehouse_id;
+
                 $winmax4->type_docs_invoice = $type_docs_invoice;
                 $winmax4->type_docs_invoice_receipt = $type_docs_invoice_receipt;
                 $winmax4->type_docs_credit_note = $type_docs_credit_note;
@@ -108,6 +112,8 @@ class Winmax4Controller extends Controller
                 $winmax4->username = $username;
                 $winmax4->password = $password;
                 $winmax4->n_terminal = $n_terminal;
+
+                $winmax4->warehouse_id = $warehouse_id;
 
                 $winmax4->type_docs_invoice = $type_docs_invoice;
                 $winmax4->type_docs_invoice_receipt = $type_docs_invoice_receipt;
