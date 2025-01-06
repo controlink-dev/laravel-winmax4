@@ -172,7 +172,7 @@ class Winmax4DocumentsController extends Controller
 
 
         return response()->json($this->winmax4Service->postDocuments(
-            $request->documentType['invoice_receipt'],
+            $request->documentType,
             $request->entity,
             $request->details,
             $request->has('isNC') ? $request->isNC : false,
