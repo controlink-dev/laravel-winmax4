@@ -229,6 +229,17 @@ class Winmax4DocumentService extends Winmax4Service
                 $documentTax->save();
             }
 
+            //Split the document number to get the type document and the number of the documentNumberRelation (e.g. FR A2025/1 -> FR is the type and A2025/1 is the number)
+
+            if($isNC){
+                $documentNumberRelation = explode(' ', $documentNumberRelation);
+
+                $documentRelation = Winmax4Document::where('document_number', $documentNumberRelation[1])
+                    ->where('document_type_id', Winmax4DocumentType::where('code', $documentNumberRelation[0])->first()->id)
+                    ->first();
+                $documentRelation->delete();
+            }
+
             return $document;
         }catch (\GuzzleHttp\Exception\RequestException $e){
             // Log or handle the error response
