@@ -169,8 +169,6 @@ class Winmax4DocumentsController extends Controller
             'documentNumberRelation' => 'required_if:isNC,true',
         ]);
 
-
-
         return response()->json($this->winmax4Service->postDocuments(
             $request->documentType,
             $request->entity,

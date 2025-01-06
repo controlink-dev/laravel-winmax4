@@ -128,9 +128,7 @@ class Winmax4DocumentService extends Winmax4Service
                     ], 404);
                 }
 
-                $ExternalDocumentsRelation = [
-                    'ExternalDocumentsRelation' => $documentNumberRelation,
-                ];
+                $ExternalDocumentsRelation = $documentNumberRelation;
             }
 
             $response = $this->client->post($this->url . '/Transactions/Documents', [
@@ -141,7 +139,7 @@ class Winmax4DocumentService extends Winmax4Service
                 ],
                 'json' => [
                     'DocumentTypeCode' => $documentType->code,
-                    $ExternalDocumentsRelation,
+                    'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
                     'Entity' => [
                         'Code' => $entity->code,
                         'TaxPayerID' => $entity->tax_payer_id,
