@@ -16,6 +16,7 @@ class Winmax4Setting extends Model
         'username',
         'password',
         'n_terminal',
+        'warehouse_code',
         'type_docs_invoice',
         'type_docs_invoice_receipt',
         'type_docs_credit_note',
