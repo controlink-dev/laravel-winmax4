@@ -128,7 +128,7 @@ class Winmax4ArticlesController extends Controller
             $request->price_with_vat,
             $request->subFamilyCode,
             $request->subSubFamilyCode,
-            $request->stock,
+            0,
             $request->is_active ?? 1,
         );
 
