@@ -178,7 +178,7 @@ class Winmax4ArticleService extends Winmax4Service
             $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
             $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
 
-            $builder->updateOrCreate(
+            $article = $builder->updateOrCreate(
                 [
                     'id_winmax4' => $articleData->ID,
                 ],
@@ -261,7 +261,7 @@ class Winmax4ArticleService extends Winmax4Service
                 }
             }
 
-            return $builder->where('id_winmax4', $articleData->ID)->first()->toArray();
+            return $article->toArray();
 
         }catch (\GuzzleHttp\Exception\RequestException $e) {
             // Log or handle the error response
