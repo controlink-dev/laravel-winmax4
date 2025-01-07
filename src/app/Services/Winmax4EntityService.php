@@ -152,7 +152,7 @@ class Winmax4EntityService extends Winmax4Service
 
             $responseDecoded = json_decode($response->getBody()->getContents());
 
-            return $builder->updateOrCreate(
+            $builder->updateOrCreate(
                 [
                     'id_winmax4' => $responseDecoded->Data->Entity->ID,
                 ],
@@ -173,6 +173,8 @@ class Winmax4EntityService extends Winmax4Service
                     'zip_code' => $responseDecoded->Data->Entity->ZipCode,
                 ]
             );
+
+            return $builder->where('id_winmax4', $responseDecoded->Data->Entity->ID)->first()->toArray();
 
         }catch (\GuzzleHttp\Exception\RequestException $e) {
             // Log or handle the error response
