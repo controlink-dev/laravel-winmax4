@@ -68,7 +68,23 @@ class Winmax4ArticleService extends Winmax4Service
             ],
         ]);
 
-        return json_decode($response->getBody()->getContents());
+        $responseJSONDecoded = json_decode($response->getBody()->getContents());
+
+        if($responseJSONDecoded->Data->Filter->TotalPages > 1){
+            for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
+                $response = $this->client->get($url . '&PageNumber=' . $i, [
+                    'verify' => $this->settings['verify_ssl_guzzle'],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                        'Content-Type' => 'application/json',
+                    ],
+                ]);
+
+                $responseJSONDecoded->Data->Articles = array_merge($responseJSONDecoded->Data->Articles, json_decode($response->getBody()->getContents())->Data->Articles);
+            }
+        }
+
+        return json_decode($responseJSONDecoded);
     }
 
     /**

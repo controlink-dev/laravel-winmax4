@@ -55,7 +55,7 @@ class syncArticles extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            $this->info('Syncing entities  for ' . $winmax4Setting->company_code . '...');
+            $this->info('Syncing articles  for ' . $winmax4Setting->company_code . '...');
             $winmax4Service = new Winmax4ArticleService(
                 false,
                 $winmax4Setting->url,
@@ -68,18 +68,18 @@ class syncArticles extends Command
             if(config('winmax4.use_license')){
 
                 if(config('winmax4.use_soft_deletes')){
-                    //If the license_id option is set and soft deletes are enabled, get all entities including the deleted ones
+                    //If the license_id option is set and soft deletes are enabled, get all articles including the deleted ones
                     $localArticles = Winmax4Article::withTrashed()->where('license_id', $winmax4Setting->license_id)->get();
                 }else{
-                    //If the license_id option is set, get all entities by license_id
+                    //If the license_id option is set, get all articles by license_id
                     $localArticles = Winmax4Article::where('license_id', $winmax4Setting->license_id)->get();
                 }
             }else{
-                //If the license_id option is not set, get all entities
+                //If the license_id option is not set, get all articles
                 $localArticles = Winmax4Article::get();
             }
 
-            //If getEntities returns bad response, skip the sync
+            //If getArticles returns bad response, skip the sync
             if ($winmax4Service->getArticles() == null) {
                 foreach ($localArticles as $localArticle) {
                     if(config('winmax4.use_soft_deletes')){
@@ -94,7 +94,7 @@ class syncArticles extends Command
             }else {
                 $articles = $winmax4Service->getArticles()->Data->Articles;
 
-                //Delete all local entities that don't exist in Winmax4
+                //Delete all local articles that don't exist in Winmax4
                 foreach ($localArticles as $localArticle) {
                     $found = false;
                     foreach ($articles as $article) {
@@ -102,7 +102,7 @@ class syncArticles extends Command
                         if ($localArticle->id_winmax4 == $article->ID) {
                             $found = true;
 
-                            //Check if the entities is_active status has changed
+                            //Check if the articles is_active status has changed
                             if ($localArticle->is_active != $article->IsActive) {
 
                                 //If has changed, update the article
