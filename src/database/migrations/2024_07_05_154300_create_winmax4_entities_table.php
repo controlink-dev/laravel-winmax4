@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('code')->nullable()->unique();
             $table->bigInteger('entity_type')->nullable();
-            $table->integer('tax_payer_id')->nullable();
+            $table->string('tax_payer_id')->nullable();
             $table->string('address')->nullable();
             $table->string('zip_code')->nullable();
             $table->string('location')->nullable(); // Adicionado para 'locality'
