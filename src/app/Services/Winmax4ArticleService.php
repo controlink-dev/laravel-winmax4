@@ -84,7 +84,7 @@ class Winmax4ArticleService extends Winmax4Service
             }
         }
 
-        return json_decode($responseJSONDecoded);
+        return $responseJSONDecoded;
     }
 
     /**

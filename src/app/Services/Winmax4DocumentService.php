@@ -51,7 +51,7 @@ class Winmax4DocumentService extends Winmax4Service
      */
     public function getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null, $externalIdentification = null, $toDate = null, $entityCode = null, $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails', $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): object|array|null
     {
-        $response = $this->client->get($this->url . '/Transactions/Documents?DocumentTypeCode=' . $documentTypeCode .
+        $url = $this->url . '/Transactions/Documents?DocumentTypeCode=' . $documentTypeCode .
             '&DocumentNumber=' . $documentNumber .
             '&Serie=' . $serie .
             '&Number=' . $number .
@@ -65,7 +65,9 @@ class Winmax4DocumentService extends Winmax4Service
             '&IncludeCustomContent=' . $includeCustomContent .
             '&LiquidateStatus=' . $liquidateStatus .
             '&Order=' . $order .
-            '&Format=' . $format, [
+            '&Format=' . $format;
+
+        $response = $this->client->get($url, [
                 'verify' => $this->settings['verify_ssl_guzzle'],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
@@ -73,7 +75,23 @@ class Winmax4DocumentService extends Winmax4Service
             ],
         ]);
 
-        return json_decode($response->getBody()->getContents());
+        $responseJSONDecoded = json_decode($response->getBody()->getContents());
+
+        if($responseJSONDecoded->Data->Filter->TotalPages > 1){
+            for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
+                $response = $this->client->get($url . '&PageNumber=' . $i, [
+                    'verify' => $this->settings['verify_ssl_guzzle'],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                        'Content-Type' => 'application/json',
+                    ],
+                ]);
+
+                $responseJSONDecoded->Data->Documents = array_merge($responseJSONDecoded->Data->Documents, json_decode($response->getBody()->getContents())->Data->Documents);
+            }
+        }
+
+        return $responseJSONDecoded;
     }
 
     /**

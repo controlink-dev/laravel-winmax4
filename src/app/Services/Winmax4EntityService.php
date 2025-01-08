@@ -44,7 +44,9 @@ class Winmax4EntityService extends Winmax4Service
      */
     public function getEntities(): object|array|null
     {
-        $response = $this->client->get($this->url . '/Files/Entities', [
+        $url = $this->url . '/Files/Entities';
+
+        $response = $this->client->get($url, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
@@ -53,7 +55,23 @@ class Winmax4EntityService extends Winmax4Service
             'http_errors' => false,
         ]);
 
-        return json_decode($response->getBody()->getContents());
+        $responseJSONDecoded = json_decode($response->getBody()->getContents());
+
+        if($responseJSONDecoded->Data->Filter->TotalPages > 1){
+            for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
+                $response = $this->client->get($url . '&PageNumber=' . $i, [
+                    'verify' => $this->settings['verify_ssl_guzzle'],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                        'Content-Type' => 'application/json',
+                    ],
+                ]);
+
+                $responseJSONDecoded->Data->Entities = array_merge($responseJSONDecoded->Data->Entities, json_decode($response->getBody()->getContents())->Data->Entities);
+            }
+        }
+
+        return $responseJSONDecoded;
     }
 
     /**

@@ -44,7 +44,9 @@ class Winmax4FamilyService extends Winmax4Service
      */
     public function getFamilies(): object|array|null
     {
-        $response = $this->client->get($this->url . '/Files/Families?IncludeSubFamilies=true', [
+        $url = $this->url . '/Files/Families?IncludeSubFamilies=true';
+
+        $response = $this->client->get($url, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
@@ -52,6 +54,22 @@ class Winmax4FamilyService extends Winmax4Service
             ],
         ]);
 
-        return json_decode($response->getBody()->getContents());
+        $responseJSONDecoded = json_decode($response->getBody()->getContents());
+
+        if($responseJSONDecoded->Data->Filter->TotalPages > 1){
+            for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
+                $response = $this->client->get($url . '&PageNumber=' . $i, [
+                    'verify' => $this->settings['verify_ssl_guzzle'],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                        'Content-Type' => 'application/json',
+                    ],
+                ]);
+
+                $responseJSONDecoded->Data->Families = array_merge($responseJSONDecoded->Data->Families, json_decode($response->getBody()->getContents())->Data->Families);
+            }
+        }
+
+        return $responseJSONDecoded;
     }
 }
