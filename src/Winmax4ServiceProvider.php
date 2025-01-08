@@ -76,18 +76,5 @@ class Winmax4ServiceProvider extends ServiceProvider
     {
         // Load config file
         $this->mergeConfigFrom(__DIR__.'/../src/config/winmax4.php', 'winmax4');
-
-        // Schedule the command
-        $this->app->booted(function () {
-            $schedule = $this->app->make(Schedule::class);
-            $schedule->command('winmax4:sync-currencies')->daily();
-            $schedule->command('winmax4:sync-document-types')->daily();
-            $schedule->command('winmax4:sync-taxes')->daily();
-            $schedule->command('winmax4:sync-warehouses')->daily();
-            $schedule->command('winmax4:sync-families')->everyFifteenMinutes();
-            $schedule->command('winmax4:sync-articles')->everyMinute();
-            $schedule->command('winmax4:sync-entities')->everyMinute();
-            $schedule->command('winmax4:sync-documents')->everyFifteenMinutes();
-        });
     }
 }
