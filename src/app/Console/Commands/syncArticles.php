@@ -4,13 +4,9 @@ namespace Controlink\LaravelWinmax4\app\Console\Commands;
 
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Jobs\SyncArticlesJob;
-use Controlink\LaravelWinmax4\app\Jobs\SyncEntitiesJob;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
-use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
-use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4ArticleService;
-use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Bus\Batch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
@@ -59,7 +55,7 @@ class syncArticles extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            $this->info('Syncing articles  for ' . $winmax4Setting->company_code . '...');
+            $this->info('Syncing entities  for ' . $winmax4Setting->company_code . '...');
             $winmax4Service = new Winmax4ArticleService(
                 false,
                 $winmax4Setting->url,
@@ -72,79 +68,92 @@ class syncArticles extends Command
             if(config('winmax4.use_license')){
 
                 if(config('winmax4.use_soft_deletes')){
-                    //If the license_id option is set and soft deletes are enabled, get all articles including the deleted ones
+                    //If the license_id option is set and soft deletes are enabled, get all entities including the deleted ones
                     $localArticles = Winmax4Article::withTrashed()->where('license_id', $winmax4Setting->license_id)->get();
                 }else{
-                    //If the license_id option is set, get all articles by license_id
+                    //If the license_id option is set, get all entities by license_id
                     $localArticles = Winmax4Article::where('license_id', $winmax4Setting->license_id)->get();
                 }
             }else{
-                //If the license_id option is not set, get all articles
+                //If the license_id option is not set, get all entities
                 $localArticles = Winmax4Article::get();
             }
 
-            // Get all articles from Winmax4
-            $articles = $winmax4Service->getArticles()->Data->Articles;
-
-            //Delete all local articles that don't exist in Winmax4
-            foreach ($localArticles as $localArticle) {
-                $found = false;
-                foreach ($articles as $article) {
-
-                    if ($localArticle->id_winmax4 == $article->ID) {
-                        $found = true;
-
-                        //Check if the articles is_active status has changed
-                        if ($localArticle->is_active != $article->IsActive) {
-
-                            //If has changed, update the article
-                            $localArticle->is_active = $article->IsActive;
-                            $localArticle->save();
-                        }
-
-                        break;
-                    }
-                }
-
-                if (!$found) {
+            //If getEntities returns bad response, skip the sync
+            if ($winmax4Service->getArticles() == null) {
+                foreach ($localArticles as $localArticle) {
                     if(config('winmax4.use_soft_deletes')){
-
-                        //If the article is not found in Winmax4, deactivate it
                         $localArticle->is_active = false;
                         $localArticle->save();
 
                         $localArticle->delete();
                     }else{
-
-                        //If the article is not found in Winmax4, delete it
                         $localArticle->forceDelete();
                     }
                 }
-            }
+            }else {
+                $articles = $winmax4Service->getArticles()->Data->Articles;
 
-            $job = [];
-            foreach ($articles as $article) {
-                if(config('winmax4.use_license')){
-                    $job[] = new SyncArticlesJob($article, $winmax4Setting->license_id);
-                }else{
-                    $job[] = new SyncArticlesJob($article);
+                //Delete all local entities that don't exist in Winmax4
+                foreach ($localArticles as $localArticle) {
+                    $found = false;
+                    foreach ($articles as $article) {
+
+                        if ($localArticle->id_winmax4 == $article->ID) {
+                            $found = true;
+
+                            //Check if the entities is_active status has changed
+                            if ($localArticle->is_active != $article->IsActive) {
+
+                                //If has changed, update the article
+                                $localArticle->is_active = $article->IsActive;
+                                $localArticle->save();
+                            }
+
+                            break;
+                        }
+                    }
+
+                    if (!$found) {
+                        if(config('winmax4.use_soft_deletes')){
+
+                            //If the article is not found in Winmax4, deactivate it
+                            $localArticle->is_active = false;
+                            $localArticle->save();
+
+                            $localArticle->delete();
+                        }else{
+
+                            //If the article is not found in Winmax4, delete it
+                            $localArticle->forceDelete();
+                        }
+                    }
                 }
-            }
 
-            $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
-                if(config('winmax4.use_license')){
-                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id);
-                }else{
-                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class);
+                $job = [];
+                foreach ($articles as $article) {
+                    if(config('winmax4.use_license')){
+                        $job[] = new SyncArticlesJob($article, $winmax4Setting->license_id);
+                    }else{
+                        $job[] = new SyncArticlesJob($article);
+                    }
                 }
 
-                $batch->delete();
-            })->name('winmax4_articles')->onQueue(config('winmax4.queue'))->dispatch();
+                $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
+                    if(config('winmax4.use_license')){
+                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id);
+                    }else{
+                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class);
+                    }
 
-            $chunks = array_chunk($job, 100);
+                    $batch->delete();
+                })->name('winmax4_articles')->onQueue(config('winmax4.queue'))->dispatch();
 
-            foreach ($chunks as $chunk){
-                $batch->add($chunk);
+                $chunks = array_chunk($job, 100);
+
+                foreach ($chunks as $chunk){
+                    $batch->add($chunk);
+                }
             }
 
         }
