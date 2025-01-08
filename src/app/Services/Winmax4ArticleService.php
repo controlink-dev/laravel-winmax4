@@ -288,8 +288,6 @@ class Winmax4ArticleService extends Winmax4Service
                                 $stock,
                                 $is_active
                             );
-
-
                         }
 
                         return Winmax4Article::where('code', $code)->first()->toArray();

@@ -184,10 +184,26 @@ class Winmax4EntityService extends Winmax4Service
 
                 // Check if the article code is already in use and is inactive, then update it
                 if($errorJson['Results'][0]['Code'] == 'ENTITYCODEINUSE'){
-                    $idWinmax4 = Winmax4Entity::where('code', $code)->first()->id_winmax4;
+                    $idWinmax4 = Winmax4Entity::where('code', $code)->exist() ? Winmax4Entity::where('code', $code)->first()->id_winmax4 : null;
 
-                    if($idWinmax4 && Winmax4Entity::where('code', $code)->first()->is_active == 0){
-                        $this->putEntities($idWinmax4, $code, $name, $entityType, $taxPayerID, $address, $zipCode, $locality, 1, $phone, $fax, $mobilePhone, $email, $country);
+                    if($idWinmax4){
+                        if(Winmax4Entity::where('code', $code)->first()->is_active == 0){
+                            $this->putEntities($idWinmax4,
+                                $code,
+                                $name,
+                                $entityType,
+                                $taxPayerID,
+                                $address,
+                                $zipCode,
+                                $locality,
+                                1,
+                                $phone,
+                                $fax,
+                                $mobilePhone,
+                                $email,
+                                $country
+                            );
+                        }
 
                         return Winmax4Entity::where('code', $code)->first()->toArray();
                     }
