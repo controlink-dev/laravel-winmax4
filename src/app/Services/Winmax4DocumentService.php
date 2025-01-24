@@ -272,7 +272,6 @@ class Winmax4DocumentService extends Winmax4Service
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
 
-                dd($errorJson);
                 // Return the error JSON or handle it as needed
                 If($errorJson['Results'][0]['Code'] == 'COULDNTCREATEDOCUMENT'){
                     return [
