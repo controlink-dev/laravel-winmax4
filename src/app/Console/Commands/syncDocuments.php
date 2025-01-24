@@ -77,6 +77,7 @@ class syncDocuments extends Command
             }else{
                 $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Document::class);
             }
+
             $documents = $winmax4Service->getDocuments($fromDate = $lastSyncedAt->format('Y-m-d'))->Data->Documents;
 
             foreach ($documents as $document) {

@@ -74,57 +74,71 @@ class syncFamilies extends Command
                 $localFamilies = Winmax4Family::get();
             }
 
-            // Get all families from Winmax4
-            $families = $winmax4Service->getFamilies()->Data->Families;
-
-            //Check if the families is_active status has changed
-            foreach ($families as $family) {
+            //If getEntities returns bad response, skip the sync
+            if ($winmax4Service->getFamilies() == null) {
                 foreach ($localFamilies as $localFamily) {
-
-                    if ($localFamily->code == $family->Code) {
-
-                        //Check if the family is_active status has changed
-                        if ($localFamily->is_active != $family->IsActive) {
-
-                            //Update the local family
-                            $localFamily->is_active = $family->IsActive;
-                            $localFamily->save();
-                        }
-                    }else{
-
+                    if(config('winmax4.use_soft_deletes')){
                         $localFamily->is_active = false;
                         $localFamily->save();
-                        
+
+                        $localFamily->delete();
+                    }else{
+                        $localFamily->forceDelete();
                     }
                 }
-            }
+            }else {
 
-            $job = [];
-            foreach ($families as $family) {
-                if (config('winmax4.use_license')) {
-                    $job[] = new SyncFamiliesJob($family, $winmax4Setting->license_id);
-                }else{
-                    $job[] = new SyncFamiliesJob($family);
+                // Get all families from Winmax4
+                $families = $winmax4Service->getFamilies()->Data->Families;
+
+                //Check if the families is_active status has changed
+                foreach ($families as $family) {
+                    foreach ($localFamilies as $localFamily) {
+
+                        if ($localFamily->code == $family->Code) {
+
+                            //Check if the family is_active status has changed
+                            if ($localFamily->is_active != $family->IsActive) {
+
+                                //Update the local family
+                                $localFamily->is_active = $family->IsActive;
+                                $localFamily->save();
+                            }
+                        } else {
+
+                            $localFamily->is_active = false;
+                            $localFamily->save();
+
+                        }
+                    }
                 }
 
-            }
+                $job = [];
+                foreach ($families as $family) {
+                    if (config('winmax4.use_license')) {
+                        $job[] = new SyncFamiliesJob($family, $winmax4Setting->license_id);
+                    } else {
+                        $job[] = new SyncFamiliesJob($family);
+                    }
 
-            $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
-                if(config('winmax4.use_license')){
-                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Family::class, $winmax4Setting->license_id);
-                }else{
-                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Family::class);
                 }
 
-                $batch->delete();
-            })->name('winmax4_families')->onQueue(config('winmax4.queue'))->dispatch();
+                $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
+                    if (config('winmax4.use_license')) {
+                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Family::class, $winmax4Setting->license_id);
+                    } else {
+                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Family::class);
+                    }
 
-            $chunks = array_chunk($job, 100);
+                    $batch->delete();
+                })->name('winmax4_families')->onQueue(config('winmax4.queue'))->dispatch();
 
-            foreach ($chunks as $chunk){
-                $batch->add($chunk);
+                $chunks = array_chunk($job, 100);
+
+                foreach ($chunks as $chunk) {
+                    $batch->add($chunk);
+                }
             }
-
         }
     }
 }

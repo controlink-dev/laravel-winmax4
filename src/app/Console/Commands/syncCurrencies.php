@@ -71,81 +71,94 @@ class syncCurrencies extends Command
                 $localCurrencies = Winmax4Currency::get();
             }
 
-            // Get all currencies from Winmax4
-            $currencies = $winmax4Service->getCurrencies()->Data->Currencies;
-
-            //Check if the currencies is_active status has changed
-            foreach ($currencies as $currency) {
+            if ($winmax4Service->getCurrencies() == null) {
                 foreach ($localCurrencies as $localCurrency) {
+                    if(config('winmax4.use_soft_deletes')){
+                        $localCurrency->is_active = false;
+                        $localCurrency->save();
 
-                    if ($localCurrency->code == $currency->Code) {
+                        $localCurrency->delete();
+                    }else{
+                        $localCurrency->forceDelete();
+                    }
+                }
+            }else{
+                // Get all currencies from Winmax4
+                $currencies = $winmax4Service->getCurrencies()->Data->Currencies;
 
-                        //Check if the currency is_active status has changed
-                        if ($localCurrency->is_active != $currency->IsActive) {
+                //Check if the currencies is_active status has changed
+                foreach ($currencies as $currency) {
+                    foreach ($localCurrencies as $localCurrency) {
 
-                            //If has changed, update the currency
-                            $localCurrency->is_active = $currency->IsActive;
+                        if ($localCurrency->code == $currency->Code) {
+
+                            //Check if the currency is_active status has changed
+                            if ($localCurrency->is_active != $currency->IsActive) {
+
+                                //If has changed, update the currency
+                                $localCurrency->is_active = $currency->IsActive;
+                                $localCurrency->save();
+                            }
+                        }else{
+
+                            //If the currency is not found in Winmax4, deactivate it
+                            $localCurrency->is_active = false;
                             $localCurrency->save();
                         }
-                    }else{
+                    }
+                }
 
+                //Delete all local articles that don't exist in Winmax4
+                foreach ($localCurrencies as $localCurrency) {
+                    $found = false;
+                    foreach ($currencies as $currency) {
+                        if ($localCurrency->code == $currency->Code) {
+                            $found = true;
+                            break;
+                        }
+                    }
+
+                    if (!$found) {
                         //If the currency is not found in Winmax4, deactivate it
                         $localCurrency->is_active = false;
                         $localCurrency->save();
                     }
                 }
-            }
 
-            //Delete all local articles that don't exist in Winmax4
-            foreach ($localCurrencies as $localCurrency) {
-                $found = false;
                 foreach ($currencies as $currency) {
-                    if ($localCurrency->code == $currency->Code) {
-                        $found = true;
-                        break;
+                    if(config('winmax4.use_license')){
+                        Winmax4Currency::updateOrCreate(
+                            [
+                                'code' => $currency->Code,
+                                config('winmax4.license_column') => $winmax4Setting->license_id,
+                            ],
+                            [
+                                'designation' => $currency->Designation,
+                                'is_active' => $currency->IsActive,
+                                'article_decimals' => $currency->ArticleDecimals,
+                                'document_decimals' => $currency->DocumentDecimals,
+                            ]
+                        );
+                    }else{
+                        Winmax4Currency::updateOrCreate(
+                            [
+                                'code' => $currency->Code,
+                            ],
+                            [
+                                'designation' => $currency->Designation,
+                                'is_active' => $currency->IsActive,
+                                'article_decimals' => $currency->ArticleDecimals,
+                                'document_decimals' => $currency->DocumentDecimals,
+                            ]
+                        );
                     }
                 }
 
-                if (!$found) {
-                    //If the currency is not found in Winmax4, deactivate it
-                    $localCurrency->is_active = false;
-                    $localCurrency->save();
-                }
-            }
-
-            foreach ($currencies as $currency) {
                 if(config('winmax4.use_license')){
-                    Winmax4Currency::updateOrCreate(
-                        [
-                            'code' => $currency->Code,
-                            config('winmax4.license_column') => $winmax4Setting->license_id,
-                        ],
-                        [
-                            'designation' => $currency->Designation,
-                            'is_active' => $currency->IsActive,
-                            'article_decimals' => $currency->ArticleDecimals,
-                            'document_decimals' => $currency->DocumentDecimals,
-                        ]
-                    );
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Currency::class, $winmax4Setting->license_id);
                 }else{
-                    Winmax4Currency::updateOrCreate(
-                        [
-                            'code' => $currency->Code,
-                        ],
-                        [
-                            'designation' => $currency->Designation,
-                            'is_active' => $currency->IsActive,
-                            'article_decimals' => $currency->ArticleDecimals,
-                            'document_decimals' => $currency->DocumentDecimals,
-                        ]
-                    );
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Currency::class);
                 }
-            }
-
-            if(config('winmax4.use_license')){
-                (new Winmax4Controller())->updateLastSyncedAt(Winmax4Currency::class, $winmax4Setting->license_id);
-            }else{
-                (new Winmax4Controller())->updateLastSyncedAt(Winmax4Currency::class);
             }
         }
 

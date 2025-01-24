@@ -55,6 +55,10 @@ class Winmax4TaxService extends Winmax4Service
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
+        if(is_null($responseJSONDecoded)){
+            return null;
+        }
+
         if($responseJSONDecoded->Data->Filter->TotalPages > 1){
             for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
                 $response = $this->client->get($url . '&PageNumber=' . $i, [
