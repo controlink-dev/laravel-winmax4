@@ -608,6 +608,8 @@ class Winmax4ArticleService extends Winmax4Service
             );
         } else {
             $localArticle->is_active = 0;
+            $localArticle->save();
+
             $localArticle->delete();
         }
 
