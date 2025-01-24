@@ -57,6 +57,8 @@ class Winmax4EntityService extends Winmax4Service
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
+        dd($responseJSONDecoded);
+
         if($responseJSONDecoded->Data->Filter->TotalPages > 1){
             for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
                 $response = $this->client->get($url . '&PageNumber=' . $i, [
