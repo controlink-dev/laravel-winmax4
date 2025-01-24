@@ -91,6 +91,12 @@ class syncArticles extends Command
                         $localArticle->forceDelete();
                     }
                 }
+
+                if(config('winmax4.use_license')){
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id);
+                }else{
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class);
+                }
             }else {
                 $articles = $winmax4Service->getArticles()->Data->Articles;
 

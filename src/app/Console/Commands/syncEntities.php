@@ -94,6 +94,12 @@ class syncEntities extends Command
                         $localEntity->forceDelete();
                     }
                 }
+
+                if(config('winmax4.use_license')){
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class, $winmax4Setting->license_id);
+                }else{
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class);
+                }
             }else {
                 $entities = $winmax4Service->getEntities()->Data->Entities;
 
