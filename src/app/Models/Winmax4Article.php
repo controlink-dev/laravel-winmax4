@@ -14,6 +14,11 @@ class Winmax4Article extends Model
     const TYPE_PRODUCT = 1;
     const TYPE_SERVICE = 2;
 
+    const NAMES = [
+        self::TYPE_PRODUCT => 'Produto',
+        self::TYPE_SERVICE => 'Serviço',
+    ];
+
     protected $table = 'winmax4_articles';
 
     protected $fillable = [
