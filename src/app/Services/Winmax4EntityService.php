@@ -428,7 +428,7 @@ class Winmax4EntityService extends Winmax4Service
 
         }else {
 
-            $localEntity->forceDelete();
+            $localEntity->delete();
 
             return response()->json([
                 'message' => 'Entity deleted successfully',
