@@ -84,9 +84,9 @@ class syncArticles extends Command
                 foreach ($localArticles as $localArticle) {
                     if(config('winmax4.use_soft_deletes')){
                         $localArticle->is_active = false;
+                        $localArticle->deleted_at = now();
                         $localArticle->save();
 
-                        $localArticle->delete();
                     }else{
                         $localArticle->forceDelete();
                     }
@@ -125,9 +125,9 @@ class syncArticles extends Command
 
                             //If the article is not found in Winmax4, deactivate it
                             $localArticle->is_active = false;
+                            $localArticle->deleted_at = now();
                             $localArticle->save();
 
-                            $localArticle->delete();
                         }else{
 
                             //If the article is not found in Winmax4, delete it

@@ -75,9 +75,8 @@ class syncCurrencies extends Command
                 foreach ($localCurrencies as $localCurrency) {
                     if(config('winmax4.use_soft_deletes')){
                         $localCurrency->is_active = false;
+                        $localCurrency->deleted_at = now();
                         $localCurrency->save();
-
-                        $localCurrency->delete();
                     }else{
                         $localCurrency->forceDelete();
                     }

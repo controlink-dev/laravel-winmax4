@@ -79,9 +79,8 @@ class syncFamilies extends Command
                 foreach ($localFamilies as $localFamily) {
                     if(config('winmax4.use_soft_deletes')){
                         $localFamily->is_active = false;
+                        $localFamily->deleted_at = now();
                         $localFamily->save();
-
-                        $localFamily->delete();
                     }else{
                         $localFamily->forceDelete();
                     }

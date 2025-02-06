@@ -87,9 +87,9 @@ class syncEntities extends Command
                 foreach ($localEntities as $localEntity) {
                     if(config('winmax4.use_soft_deletes')){
                         $localEntity->is_active = false;
+                        $localEntity->deleted_at = now();
                         $localEntity->save();
 
-                        $localEntity->delete();
                     }else{
                         $localEntity->forceDelete();
                     }
@@ -128,9 +128,8 @@ class syncEntities extends Command
 
                             //If the entity is not found in Winmax4, deactivate it
                             $localEntity->is_active = false;
+                            $localEntity->deleted_at = now();
                             $localEntity->save();
-
-                            $localEntity->delete();
                         }else{
 
                             //If the entity is not found in Winmax4, delete it
