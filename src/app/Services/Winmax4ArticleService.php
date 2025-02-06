@@ -200,7 +200,7 @@ class Winmax4ArticleService extends Winmax4Service
 
             $article = $builder->updateOrCreate(
                 [
-                    'id_winmax4' => $articleData->ID,
+                    'code' => $articleData->Code,
                 ],
                 [
                     'id_winmax4' => $articleData->ID,
