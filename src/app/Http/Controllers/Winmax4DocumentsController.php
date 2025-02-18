@@ -168,6 +168,7 @@ class Winmax4DocumentsController extends Controller
             'documentType' => 'required',
             'warehouse' => 'required',
             'entity' => 'required',
+            'paymentType' => 'required',
             'details.*' => 'required|array',
             'details.*.ArticleCode' => 'required',
             'details.*.Quantity' => 'required',
@@ -180,7 +181,9 @@ class Winmax4DocumentsController extends Controller
             $request->documentType,
             $request->warehouse,
             $request->entity,
+            $request->paymentType,
             $request->details,
+            $request->valueInvoice,
             $request->has('isNC') ? $request->isNC : false,
             $request->has('isNC') ? $request->isNC ? $request->documentNumberRelation : null : null
         ), 200);

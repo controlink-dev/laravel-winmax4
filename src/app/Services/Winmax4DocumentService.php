@@ -9,6 +9,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentDetailTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use Controlink\LaravelWinmax4\app\Models\Winmax4PaymentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -110,7 +111,9 @@ class Winmax4DocumentService extends Winmax4Service
      * | `$documentType`  | `string`                | Type of the document to be posted                             | N/A     |
      * | `$warehouse`     | `string`                | Warehouse associated with the document                        | N/A     |
      * | `$entity`        | `string`                | Entity associated with the document                           | N/A     |
+     * | `$paymentType`   | `string`                | Payment type associated with the document                     | N/A     |
      * | `$details`       | `array`                 | Array of document details                                     | N/A     |
+     * | `$valueInvoice`  | `float`                 | Value of the invoice                                          | N/A     |
      * | `$isNC`          | `bool`                  | Indicates if the document is a credit note                    | false   |
      * | `$documentNumberRelation` | `string`      | Document number relation for credit notes                     | null    |
      *
@@ -143,7 +146,7 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, array $details, bool $isNC = false, string $documentNumberRelation = null): object|array|null
+    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, string $documentNumberRelation = null): object|array|null
     {
         try {
             $ExternalDocumentsRelation = '';
@@ -172,6 +175,11 @@ class Winmax4DocumentService extends Winmax4Service
                     'Entity' => [
                         'Code' => $entity->code,
                         'TaxPayerID' => $entity->tax_payer_id,
+                    ],
+                    'PaymentTypes' => [
+                        'ID' => $paymentType->id,
+                        'Designation' => $paymentType->designation,
+                        'Value' => $valueInvoice,
                     ],
                     'Details' => $details,
                     'Format' => 'json',
