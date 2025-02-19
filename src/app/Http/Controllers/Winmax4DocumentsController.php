@@ -181,11 +181,11 @@ class Winmax4DocumentsController extends Controller
             $request->documentType,
             $request->warehouse,
             $request->entity,
-            $request->paymentType,
             $request->details,
             $request->valueInvoice,
             $request->has('isNC') ? $request->isNC : false,
-            $request->has('isNC') ? $request->isNC ? $request->documentNumberRelation : null : null
+            $request->has('isNC') ? $request->isNC ? $request->documentNumberRelation : null : null,
+            $request->paymentType ?? null,
         ), 200);
     }
 }

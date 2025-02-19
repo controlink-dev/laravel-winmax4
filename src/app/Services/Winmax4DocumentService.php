@@ -147,7 +147,7 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, string $documentNumberRelation = null): object|array|null
+    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, array $details, float $valueInvoice, bool $isNC = false, string $documentNumberRelation = null, Winmax4PaymentType $paymentType = null): object|array|null
     {
         try {
             $ExternalDocumentsRelation = '';
@@ -162,29 +162,34 @@ class Winmax4DocumentService extends Winmax4Service
                 $ExternalDocumentsRelation = $documentNumberRelation;
             }
 
+            $jsonBody = [
+                'DocumentTypeCode' => $documentType->code,
+                'SourceWarehouseCode' => $warehouse->code,
+                'TargetWarehouseCode' => $warehouse->code,
+                'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
+                'Entity' => [
+                    'Code' => $entity->code,
+                    'TaxPayerID' => $entity->tax_payer_id,
+                ],
+                'Details' => $details,
+                'Format' => 'json',
+            ];
+
+            if ($paymentType) {
+                $jsonBody['PaymentTypes'] = [
+                    'ID' => $paymentType->id,
+                    'Designation' => $paymentType->designation,
+                    'Value' => $valueInvoice,
+                ];
+            }
+
             $response = $this->client->post($this->url . '/Transactions/Documents', [
                 'verify' => $this->settings['verify_ssl_guzzle'],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                     'Content-Type' => 'application/json',
                 ],
-                'json' => [
-                    'DocumentTypeCode' => $documentType->code,
-                    'SourceWarehouseCode' => $warehouse->code,
-                    'TargetWarehouseCode' => $warehouse->code,
-                    'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
-                    'Entity' => [
-                        'Code' => $entity->code,
-                        'TaxPayerID' => $entity->tax_payer_id,
-                    ],
-                    'PaymentTypes' => [
-                        'ID' => $paymentType->id,
-                        'Designation' => $paymentType->designation,
-                        'Value' => $valueInvoice,
-                    ],
-                    'Details' => $details,
-                    'Format' => 'json',
-                ],
+                'json' => $jsonBody,
             ]);
 
             $documentResponse = json_decode($response->getBody()->getContents());
