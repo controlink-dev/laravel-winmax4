@@ -233,6 +233,14 @@ class Winmax4DocumentService extends Winmax4Service
             $document->remarks = $documentResponse->Data->Remarks ?? null;
             $document->save();
 
+            // TODO: Get the $documentResponse and save the paymentsTypes with the returned values from the API
+            $document->paymentTypes()->create([
+                'document_id' => $document->id,
+                'payment_type_id' => $paymentType->id,
+                'designation' => $paymentType->designation,
+                'value' => $valueInvoice,
+            ]);
+
             foreach($documentResponse->Data->Details as $detail){
                 $documentDetail = new Winmax4DocumentDetail();
                 $documentDetail->document_id = $document->id;

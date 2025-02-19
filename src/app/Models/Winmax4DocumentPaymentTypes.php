@@ -24,7 +24,7 @@ class Winmax4DocumentPaymentTypes extends Model
         return $this->belongsTo(Winmax4Document::class, 'document_id');
     }
 
-    public function paymentType()
+    public function paymentTypes()
     {
         return $this->belongsTo(Winmax4PaymentType::class, 'payment_type_id');
     }
