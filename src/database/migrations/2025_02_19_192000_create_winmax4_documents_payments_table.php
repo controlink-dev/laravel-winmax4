@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('winmax4_document_payments', function (Blueprint $table){
             $table->id();
             $table->foreignId('document_id')->constrained('winmax4_documents')->onDelete('cascade');
-            $table->foreignId('payment_method_id')->constrained('winmax4_payment_types')->onDelete('cascade');
+            $table->foreignId('payment_type_id')->constrained('winmax4_payment_types')->onDelete('cascade');
             $table->string('designation');
             $table->float('value');
             $table->timestamps();
