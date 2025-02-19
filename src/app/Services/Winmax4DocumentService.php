@@ -162,7 +162,7 @@ class Winmax4DocumentService extends Winmax4Service
                 $ExternalDocumentsRelation = $documentNumberRelation;
             }
 
-            dd($paymentType);
+            dd($paymentType, $valueInvoice);
 
             $response = $this->client->post($this->url . '/Transactions/Documents', [
                 'verify' => $this->settings['verify_ssl_guzzle'],
