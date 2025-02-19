@@ -175,7 +175,7 @@ class Winmax4DocumentService extends Winmax4Service
                 'Format' => 'json',
             ];
 
-            if ($paymentType) {
+            if ($paymentType != null) {
                 $jsonBody['PaymentTypes'] = [
                     'ID' => $paymentType->id,
                     'Designation' => $paymentType->designation,
