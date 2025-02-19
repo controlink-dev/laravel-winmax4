@@ -162,7 +162,24 @@ class Winmax4DocumentService extends Winmax4Service
                 $ExternalDocumentsRelation = $documentNumberRelation;
             }
 
-            dd($paymentType, $valueInvoice);
+            $jsonBody = [
+                'DocumentTypeCode' => $documentType->code,
+                'SourceWarehouseCode' => $warehouse->code,
+                'TargetWarehouseCode' => $warehouse->code,
+                'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
+                'Entity' => [
+                    'Code' => $entity->code,
+                    'TaxPayerID' => $entity->tax_payer_id,
+                ],
+            ];
+
+            if($paymentType != null){
+                $jsonBody['PaymentTypes'] = [
+                    'ID' => $paymentType->id,
+                    'Designation' => $paymentType->designation,
+                    'Value' => $valueInvoice,
+                ];
+            }
 
             $response = $this->client->post($this->url . '/Transactions/Documents', [
                 'verify' => $this->settings['verify_ssl_guzzle'],
@@ -171,19 +188,7 @@ class Winmax4DocumentService extends Winmax4Service
                     'Content-Type' => 'application/json',
                 ],
                 'json' => [
-                    'DocumentTypeCode' => $documentType->code,
-                    'SourceWarehouseCode' => $warehouse->code,
-                    'TargetWarehouseCode' => $warehouse->code,
-                    'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
-                    'Entity' => [
-                        'Code' => $entity->code,
-                        'TaxPayerID' => $entity->tax_payer_id,
-                    ],
-                    'PaymentTypes' => [
-                        'ID' => $paymentType->id,
-                        'Designation' => $paymentType->designation,
-                        'Value' => $valueInvoice,
-                    ],
+                    $jsonBody,
                     'Details' => $details,
                     'Format' => 'json',
                 ],
