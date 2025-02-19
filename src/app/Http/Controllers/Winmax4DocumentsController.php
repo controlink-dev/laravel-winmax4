@@ -168,13 +168,13 @@ class Winmax4DocumentsController extends Controller
             'documentType' => 'required',
             'warehouse' => 'required',
             'entity' => 'required',
-            'paymentType' => 'required_if:isNC,false',
             'details.*' => 'required|array',
             'details.*.ArticleCode' => 'required',
             'details.*.Quantity' => 'required',
             'details.*.DiscountPercentage1' => 'required',
             'details.*.DiscountPercentage2' => 'required',
             'documentNumberRelation' => 'required_if:isNC,true',
+            'paymentType' => 'required_if:isNC,false',
         ]);
 
         return response()->json($this->winmax4Service->postDocuments(
