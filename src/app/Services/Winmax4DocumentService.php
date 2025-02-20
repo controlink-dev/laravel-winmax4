@@ -180,7 +180,6 @@ class Winmax4DocumentService extends Winmax4Service
                     ],
                     'PaymentTypes' => [
                         'ID' => $paymentType->id,
-                        'Designation' => $paymentType->designation,
                         'Value' => $valueInvoice,
                     ],
                     'Details' => $details,
