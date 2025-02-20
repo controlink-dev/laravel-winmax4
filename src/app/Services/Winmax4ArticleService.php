@@ -387,7 +387,6 @@ class Winmax4ArticleService extends Winmax4Service
                     'Content-Type' => 'application/json',
                 ],
                 'json' => [
-                    'Code' => $code,
                     'FamilyCode' => $familyCode,
                     'SubFamilyCode' => $subFamilyCode,
                     'SubSubFamilyCode' => $subSubFamilyCode,
