@@ -170,6 +170,7 @@ class Winmax4DocumentService extends Winmax4Service
                 ],
                 'json' => [
                     'DocumentTypeCode' => $documentType->code,
+                    'IsPOS' => true,
                     'SourceWarehouseCode' => $warehouse->code,
                     'TargetWarehouseCode' => $warehouse->code,
                     'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
