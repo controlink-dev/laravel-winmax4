@@ -162,8 +162,10 @@ class Winmax4ArticleService extends Winmax4Service
                     'Code' => $code,
                     'Designation' => $designation,
                     'FamilyCode' => $familyCode,
-                    'SubFamilyCode' => $subFamilyCode,
-                    'SubSubFamilyCode' => $subSubFamilyCode,
+                    'SubFamilies' => [
+                        'SubFamilyCode' => $subFamilyCode,
+                        'SubSubFamilyCode' => $subSubFamilyCode,
+                    ],
                     'IsActive' => $is_active,
                     'ArticlePrices' => [
                         [
@@ -388,8 +390,10 @@ class Winmax4ArticleService extends Winmax4Service
                 ],
                 'json' => [
                     'FamilyCode' => $familyCode,
-                    'SubFamilyCode' => $subFamilyCode,
-                    'SubSubFamilyCode' => $subSubFamilyCode,
+                    'SubFamilies' => [
+                        'SubFamilyCode' => $subFamilyCode,
+                        'SubSubFamilyCode' => $subSubFamilyCode,
+                    ],
                     'IsActive' => $is_active,
                     'ArticlePrices' => [
                         [
