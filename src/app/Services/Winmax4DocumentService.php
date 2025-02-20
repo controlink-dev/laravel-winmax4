@@ -179,11 +179,13 @@ class Winmax4DocumentService extends Winmax4Service
                         'TaxPayerID' => $entity->tax_payer_id,
                     ],
                     'PaymentTypes' => [
-                        'ID' => $paymentType->id,
-                        'Value' => $valueInvoice,
+                        [
+                            'ID' => $paymentType->id,
+                            'Value' => $valueInvoice,
+                        ],
                     ],
                     'Details' => $details,
-                    'Format' => 'json',
+                    'Format' => 0,
                 ],
             ]);
 
