@@ -236,7 +236,9 @@ class Winmax4DocumentService extends Winmax4Service
             $document->remarks = $documentResponse->Data->Remarks ?? null;
             $document->save();
 
-            // TODO: Get the $documentResponse and save the paymentsTypes with the returned values from the API
+            /** TODO: Get the $documentResponse and save the paymentsTypes with the returned values from the API
+            * The API does not return the payment types, so we need to save the payment types that we sent to the API
+            */
             if(!$isNC){
                 $documentPaymentType = new Winmax4DocumentPaymentTypes();
                 $documentPaymentType->document_id = $document->id;
