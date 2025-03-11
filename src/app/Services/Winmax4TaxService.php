@@ -61,7 +61,7 @@ class Winmax4TaxService extends Winmax4Service
 
         if($responseJSONDecoded->Data->Filter->TotalPages > 1){
             for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
-                $response = $this->client->get($url . '&PageNumber=' . $i, [
+                $response = $this->client->get($url . '?PageNumber=' . $i, [
                     'verify' => $this->settings['verify_ssl_guzzle'],
                     'headers' => [
                         'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
