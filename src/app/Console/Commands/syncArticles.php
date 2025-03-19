@@ -162,12 +162,6 @@ class syncArticles extends Command
                 }
 
                 $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
-                    if(config('winmax4.use_license')){
-                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id);
-                    }else{
-                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class);
-                    }
-
                     $batch->delete();
                 })->name('winmax4_articles')->onQueue(config('winmax4.queue'))->dispatch();
 
@@ -175,6 +169,12 @@ class syncArticles extends Command
 
                 foreach ($chunks as $chunk){
                     $batch->add($chunk);
+                }
+
+                if(config('winmax4.use_license')){
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id);
+                }else{
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class);
                 }
             }
 
