@@ -55,7 +55,10 @@ class syncArticles extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            dd($winmax4Setting->tenant);
+            if($winmax4Setting->tenant->deleted_at != null){
+                continue;
+            }
+
             $this->info('Syncing articles  for ' . $winmax4Setting->company_code . '...');
             $winmax4Service = new Winmax4ArticleService(
                 false,

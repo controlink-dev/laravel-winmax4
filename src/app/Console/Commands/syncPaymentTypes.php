@@ -57,6 +57,10 @@ class syncPaymentTypes extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
+            if($winmax4Setting->tenant->deleted_at != null){
+                continue;
+            }
+
             $this->info('Syncing warehouses for ' . $winmax4Setting->company_code . '...');
             $winmax4Service = new Winmax4PaymentTypeService(
                 false,
