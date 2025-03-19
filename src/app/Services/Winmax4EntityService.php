@@ -151,22 +151,6 @@ class Winmax4EntityService extends Winmax4Service
                 ];
             }
 
-            dd([
-                'Code' => $code,
-                'Name' => $name,
-                'IsActive' => $isActive,
-                'EntityType' => $entityType,
-                'TaxPayerID' => $taxPayerID,
-                'Address' => $address,
-                'ZipCode' => $zipCode,
-                'Phone' => $phone,
-                'Fax' => $fax,
-                'MobilePhone' => $mobilePhone,
-                'Email' => $email,
-                'Location' => $locality,
-                'Country' => $country,
-                ...$gdpr,
-            ]);
             $response = $this->client->post($this->url . '/files/entities', [
                 'verify' => $this->settings['verify_ssl_guzzle'],
                 'headers' => [
@@ -188,7 +172,7 @@ class Winmax4EntityService extends Winmax4Service
                     'Email' => $email,
                     'Location' => $locality,
                     'Country' => $country,
-                    $gdpr,
+                    ...$gdpr,
                 ],
             ]);
 
@@ -368,7 +352,7 @@ class Winmax4EntityService extends Winmax4Service
                 'Email' => $email,
                 'Location' => $locality,
                 'Country' => $country,
-                $gdpr,
+                ...$gdpr,
             ],
         ]);
 
