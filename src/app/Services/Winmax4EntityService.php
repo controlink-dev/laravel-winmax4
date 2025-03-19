@@ -46,7 +46,6 @@ class Winmax4EntityService extends Winmax4Service
     {
         $url = $this->url . '/Files/Entities';
 
-        dd($lastChangeDateAfter);
         if($lastChangeDateAfter){
             $url .= "?LastChangeDateAfter=". $lastChangeDateAfter;
         }
