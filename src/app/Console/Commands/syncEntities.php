@@ -98,9 +98,8 @@ class syncEntities extends Command
             }
 
             $apiEntities = $winmax4Service->getEntities($lastSyncedAt);
-            dump($apiEntities);
             if ($apiEntities == null || is_array($apiEntities) && isset($apiEntities['error'])) {
-                if(!$apiEntities['error'] && $apiEntities['status'] != 404){
+                if($apiEntities != null && !$apiEntities['error'] && $apiEntities['status'] != 404){
                     $this->error('An error occurred while syncing articles for ' . $winmax4Setting->company_code. '.');
                     return;
                 }

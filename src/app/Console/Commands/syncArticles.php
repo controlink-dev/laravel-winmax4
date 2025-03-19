@@ -98,7 +98,7 @@ class syncArticles extends Command
 
             //$apiArticles can be a collection or an array, check if has 'error' key on array
             if ($apiArticles == null || is_array($apiArticles) && isset($apiArticles['error'])) {
-                if(!$apiArticles['error'] && $apiArticles['status'] != 404){
+                if($apiArticles != null && !$apiArticles['error'] && $apiArticles['status'] != 404){
                     $this->error('An error occurred while syncing articles for ' . $winmax4Setting->company_code. '.');
                     return;
                 }
