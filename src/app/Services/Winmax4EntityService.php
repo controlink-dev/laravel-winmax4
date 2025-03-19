@@ -142,6 +142,15 @@ class Winmax4EntityService extends Winmax4Service
     public function postEntities(string $name, string $code = null, int $entityType = null, string $taxPayerID = null, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): array
     {
         try{
+            //Check if  taxPayerID do not start with 5 or 6
+            $gdpr = [];
+            if($taxPayerID && !in_array(substr($taxPayerID, 0, 1), ['5', '6'])){
+                $gdpr = [
+                    'GDPRAllowAccessToPersonalInformation' => true,
+                    'GDPRPersonalInformationAccessExpirationDate' => '2099-12-31',
+                ];
+            }
+
             $response = $this->client->post($this->url . '/files/entities', [
                 'verify' => $this->settings['verify_ssl_guzzle'],
                 'headers' => [
@@ -163,6 +172,7 @@ class Winmax4EntityService extends Winmax4Service
                     'Email' => $email,
                     'Location' => $locality,
                     'Country' => $country,
+                    $gdpr,
                 ],
             ]);
 
@@ -312,6 +322,15 @@ class Winmax4EntityService extends Winmax4Service
      */
     public function putEntities(int $idWinmax4, string $code, string $name, int $entityType, string $taxPayerID, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): Winmax4Entity
     {
+        //Check if  taxPayerID do not start with 5 or 6
+        $gdpr = [];
+        if($taxPayerID && !in_array(substr($taxPayerID, 0, 1), ['5', '6'])){
+            $gdpr = [
+                'GDPRAllowAccessToPersonalInformation' => true,
+                'GDPRPersonalInformationAccessExpirationDate' => '2099-12-31',
+            ];
+        }
+
         $response = $this->client->put($this->url . '/Files/Entities/?id='.$idWinmax4, [
             'verify' => $this->settings['verify_ssl_guzzle'],
             'headers' => [
@@ -333,6 +352,7 @@ class Winmax4EntityService extends Winmax4Service
                 'Email' => $email,
                 'Location' => $locality,
                 'Country' => $country,
+                $gdpr,
             ],
         ]);
 
