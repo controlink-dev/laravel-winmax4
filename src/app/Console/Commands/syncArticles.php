@@ -96,7 +96,12 @@ class syncArticles extends Command
 
             $apiArticles = $winmax4Service->getArticles($lastSyncedAt);
 
-            if ($apiArticles == null || isset($apiArticles['error']) && $apiArticles['error'] && $apiArticles['status'] == 404) {
+            if ($apiArticles == null || isset($apiArticles['error'])) {
+                if(!$apiArticles['error'] && $apiArticles['status'] != 404){
+                    $this->error('An error occurred while syncing articles for ' . $winmax4Setting->company_code. '.');
+                    return;
+                }
+
                 if(config('winmax4.use_license')){
                     (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id);
                 }else{
