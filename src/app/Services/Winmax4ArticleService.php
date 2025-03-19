@@ -64,36 +64,58 @@ class Winmax4ArticleService extends Winmax4Service
             $url .= "&StockWarehouseCode=". $warehouse->code;
         }
 
-        $response = $this->client->get($url, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-                'http_errors' => false,
-            ],
-        ]);
+        try {
+            $response = $this->client->get($url, [
+                'verify' => $this->settings['verify_ssl_guzzle'],
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                    'Content-Type' => 'application/json',
+                    'http_errors' => false,
+                ],
+            ]);
 
-        $responseJSONDecoded = json_decode($response->getBody()->getContents());
+            $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
-        if(is_null($responseJSONDecoded)){
-            return null;
-        }
-
-        if($responseJSONDecoded->Data->Filter->TotalPages > 1){
-            for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
-                $response = $this->client->get($url . '&PageNumber=' . $i, [
-                    'verify' => $this->settings['verify_ssl_guzzle'],
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                        'Content-Type' => 'application/json',
-                    ],
-                ]);
-
-                $responseJSONDecoded->Data->Articles = array_merge($responseJSONDecoded->Data->Articles, json_decode($response->getBody()->getContents())->Data->Articles);
+            if(is_null($responseJSONDecoded)){
+                return null;
             }
-        }
 
-        return $responseJSONDecoded;
+            if($responseJSONDecoded->Data->Filter->TotalPages > 1){
+                for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
+                    $response = $this->client->get($url . '&PageNumber=' . $i, [
+                        'verify' => $this->settings['verify_ssl_guzzle'],
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                            'Content-Type' => 'application/json',
+                        ],
+                    ]);
+
+                    $responseJSONDecoded->Data->Articles = array_merge($responseJSONDecoded->Data->Articles, json_decode($response->getBody()->getContents())->Data->Articles);
+                }
+            }
+
+            return $responseJSONDecoded;
+
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            // Log or handle the error response
+            if ($e->hasResponse()) {
+                $errorResponse = $e->getResponse();
+                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
+
+                // Return the error JSON or handle it as needed
+                return [
+                    'error' => true,
+                    'status' => $errorResponse->getStatusCode(),
+                    'message' => $this->renderErrorMessage($errorJson),
+                ];
+            }
+
+            // If no response is available
+            return [
+                'error' => true,
+                'message' => $e->getMessage(),
+            ];
+        }
     }
 
     /**
