@@ -19,6 +19,7 @@ return [
     'license_is_uuid' => env('WINMAX4_LICENSE_IS_UUID', false),
     'license_column' => env('WINMAX4_LICENSE_COLUMN', 'license_id'),
     'licenses_table' => env('WINMAX4_LICENSES_TABLE', 'licenses'),
+    'licenses_model' => env('WINMAX4_LICENSES_MODEL', 'App\Models\License'),
     'use_soft_deletes' => env('WINMAX4_USE_SOFT_DELETES', false),
 
 

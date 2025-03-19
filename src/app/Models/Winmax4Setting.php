@@ -46,14 +46,6 @@ class Winmax4Setting extends Model
 
     public function tenant()
     {
-        $table_name = config('winmax4.licenses_table', 'licenses');
-
-        // Create an instance of an anonymous class extending Model.
-        $relatedModel = new class extends \Illuminate\Database\Eloquent\Model {};
-
-        // Set the table name dynamically.
-        $relatedModel->setTable($table_name);
-
-        return $this->belongsTo($relatedModel, config('winmax4.license_column'));
+        return $this->belongsTo(config('winmax4.licenses_model'), config('winmax4.license_column'));
     }
 }
