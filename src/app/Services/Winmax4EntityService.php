@@ -165,7 +165,7 @@ class Winmax4EntityService extends Winmax4Service
                 'Email' => $email,
                 'Location' => $locality,
                 'Country' => $country,
-                $gdpr[0]
+                ...$gdpr,
             ]);
             $response = $this->client->post($this->url . '/files/entities', [
                 'verify' => $this->settings['verify_ssl_guzzle'],
