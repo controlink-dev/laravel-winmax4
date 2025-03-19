@@ -87,7 +87,11 @@ class syncArticles extends Command
             //If getArticles returns bad response, skip the sync
             $lastSyncedAt = null;
             if(!$this->option('fullSync')){
-                $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Article::class)->format('Y-m-d');
+                if(config('winmax4.use_license')){
+                    $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id)->format('Y-m-d');
+                }else{
+                    $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Article::class)->format('Y-m-d');
+                }
             }
 
             $apiArticles = $winmax4Service->getArticles($lastSyncedAt);
