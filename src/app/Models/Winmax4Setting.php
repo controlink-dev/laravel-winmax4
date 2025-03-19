@@ -43,4 +43,19 @@ class Winmax4Setting extends Model
             'receipt' => Winmax4DocumentType::find($this->type_docs_receipt),
         ];
     }
+
+    public function tenant()
+    {
+        $table_name = config('winmax4.licenses_table', 'licenses');
+
+        return $this->belongsTo(new class($table_name) extends \Illuminate\Database\Eloquent\Model {
+            protected $table;
+
+            public function __construct($table_name)
+            {
+                parent::__construct();
+                $this->table = $table_name;
+            }
+        });
+    }
 }
