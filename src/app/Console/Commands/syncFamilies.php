@@ -56,7 +56,7 @@ class syncFamilies extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            if($winmax4Setting->tenant->deleted_at != null){
+            if(!$winmax4Setting->tenant){
                 continue;
             }
 
