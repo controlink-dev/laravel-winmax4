@@ -91,6 +91,7 @@ class syncArticles extends Command
             }
 
             $apiArticles = $winmax4Service->getArticles($lastSyncedAt);
+            dd($apiArticles, $lastSyncedAt);
 
             if ($apiArticles == null) {
                 if(config('winmax4.use_license')){
