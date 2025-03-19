@@ -96,13 +96,16 @@ class syncArticles extends Command
 
             $apiArticles = $winmax4Service->getArticles($lastSyncedAt);
 
-            if ($apiArticles == null) {
+            if ($apiArticles == null || isset($apiArticles->error) && $apiArticles->error && $apiArticles->status == 404) {
                 if(config('winmax4.use_license')){
                     (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id);
                 }else{
                     (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class);
                 }
-            }else {
+            }else if($apiArticles != null && isset($apiArticles->error) && $apiArticles->error) {
+                $this->error($apiArticles->error);
+                return;
+            } else {
                 $articles = $apiArticles->Data->Articles;
 
                 //Delete all local articles that don't exist in Winmax4
