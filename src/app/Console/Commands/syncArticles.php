@@ -19,7 +19,8 @@ class syncArticles extends Command
      * @var string
      */
     protected $signature = 'winmax4:sync-articles
-                            {--license_id= : If you want to sync articles for a specific license, specify the license id.}';
+                            {--license_id= : If you want to sync articles for a specific license, specify the license id.}
+                            {--fullSync : If you want to do a full sync, specify this option.}';
 
     /**
      * The console command description.
@@ -85,24 +86,13 @@ class syncArticles extends Command
 
             //If getArticles returns bad response, skip the sync
             $lastSyncedAt = null;
-            if($license_id == null){
+            if(!$this->option('fullSync')){
                 $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Article::class)->format('Y-m-d');
             }
 
             $apiArticles = $winmax4Service->getArticles($lastSyncedAt);
 
             if ($apiArticles == null) {
-                foreach ($localArticles as $localArticle) {
-                    if(config('winmax4.use_soft_deletes')){
-                        $localArticle->is_active = false;
-                        $localArticle->deleted_at = now();
-                        $localArticle->save();
-
-                    }else{
-                        $localArticle->forceDelete();
-                    }
-                }
-
                 if(config('winmax4.use_license')){
                     (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class, $winmax4Setting->license_id);
                 }else{
@@ -112,37 +102,39 @@ class syncArticles extends Command
                 $articles = $apiArticles->Data->Articles;
 
                 //Delete all local articles that don't exist in Winmax4
-                foreach ($localArticles as $localArticle) {
-                    $found = false;
-                    foreach ($articles as $article) {
+                if($this->option('fullSync')){
+                    foreach ($localArticles as $localArticle) {
+                        $found = false;
+                        foreach ($articles as $article) {
 
-                        if ($localArticle->id_winmax4 == $article->ID) {
-                            $found = true;
+                            if ($localArticle->id_winmax4 == $article->ID) {
+                                $found = true;
 
-                            //Check if the articles is_active status has changed
-                            if ($localArticle->is_active != $article->IsActive) {
+                                //Check if the articles is_active status has changed
+                                if ($localArticle->is_active != $article->IsActive) {
 
-                                //If has changed, update the article
-                                $localArticle->is_active = $article->IsActive;
-                                $localArticle->save();
+                                    //If has changed, update the article
+                                    $localArticle->is_active = $article->IsActive;
+                                    $localArticle->save();
+                                }
+
+                                break;
                             }
-
-                            break;
                         }
-                    }
 
-                    if (!$found) {
-                        if(config('winmax4.use_soft_deletes')){
+                        if (!$found) {
+                            if(config('winmax4.use_soft_deletes')){
 
-                            //If the article is not found in Winmax4, deactivate it
-                            $localArticle->is_active = false;
-                            $localArticle->deleted_at = now();
-                            $localArticle->save();
+                                //If the article is not found in Winmax4, deactivate it
+                                $localArticle->is_active = false;
+                                $localArticle->deleted_at = now();
+                                $localArticle->save();
 
-                        }else{
+                            }else{
 
-                            //If the article is not found in Winmax4, delete it
-                            $localArticle->forceDelete();
+                                //If the article is not found in Winmax4, delete it
+                                $localArticle->forceDelete();
+                            }
                         }
                     }
                 }
