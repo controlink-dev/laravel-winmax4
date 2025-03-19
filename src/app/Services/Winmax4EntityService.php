@@ -144,6 +144,7 @@ class Winmax4EntityService extends Winmax4Service
         try{
             //Check if  taxPayerID do not start with 5 or 6
             $gdpr = [];
+            dd(!in_array(substr($taxPayerID, 0, 1), ['5', '6']));
             if($taxPayerID && !in_array(substr($taxPayerID, 0, 1), ['5', '6'])){
                 $gdpr = [
                     'GDPRAllowAccessToPersonalInformation' => true,
