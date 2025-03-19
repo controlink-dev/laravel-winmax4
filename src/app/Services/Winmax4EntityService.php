@@ -144,7 +144,6 @@ class Winmax4EntityService extends Winmax4Service
         try{
             //Check if  taxPayerID do not start with 5 or 6
             $gdpr = [];
-            dd(!in_array(substr($taxPayerID, 0, 1), ['5', '6']));
             if($taxPayerID && !in_array(substr($taxPayerID, 0, 1), ['5', '6'])){
                 $gdpr = [
                     'GDPRAllowAccessToPersonalInformation' => true,
@@ -152,6 +151,22 @@ class Winmax4EntityService extends Winmax4Service
                 ];
             }
 
+            dd([
+                'Code' => $code,
+                'Name' => $name,
+                'IsActive' => $isActive,
+                'EntityType' => $entityType,
+                'TaxPayerID' => $taxPayerID,
+                'Address' => $address,
+                'ZipCode' => $zipCode,
+                'Phone' => $phone,
+                'Fax' => $fax,
+                'MobilePhone' => $mobilePhone,
+                'Email' => $email,
+                'Location' => $locality,
+                'Country' => $country,
+                $gdpr,
+            ]);
             $response = $this->client->post($this->url . '/files/entities', [
                 'verify' => $this->settings['verify_ssl_guzzle'],
                 'headers' => [
