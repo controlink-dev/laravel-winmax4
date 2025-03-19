@@ -69,6 +69,7 @@ class Winmax4ArticleService extends Winmax4Service
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 'Content-Type' => 'application/json',
+                'http_errors' => false,
             ],
         ]);
 
