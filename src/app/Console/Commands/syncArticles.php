@@ -87,6 +87,8 @@ class syncArticles extends Command
             $lastSyncedAt = null;
             if($license_id == null){
                 $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Article::class);
+
+                dd($lastSyncedAt);
             }
 
             if ($winmax4Service->getArticles($lastSyncedAt) == null) {
@@ -107,7 +109,7 @@ class syncArticles extends Command
                     (new Winmax4Controller())->updateLastSyncedAt(Winmax4Article::class);
                 }
             }else {
-                $articles = $winmax4Service->getArticles()->Data->Articles;
+                $articles = $winmax4Service->getArticles($lastSyncedAt)->Data->Articles;
 
                 //Delete all local articles that don't exist in Winmax4
                 foreach ($localArticles as $localArticle) {
