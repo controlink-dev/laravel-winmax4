@@ -42,9 +42,13 @@ class Winmax4EntityService extends Winmax4Service
      * @return object|array|null Returns the decoded JSON response.
      * @throws GuzzleException
      */
-    public function getEntities(): object|array|null
+    public function getEntities($lastChangeDateAfter = null): object|array|null
     {
         $url = $this->url . '/Files/Entities';
+
+        if($lastChangeDateAfter){
+            $url .= "?LastChangeDateAfter=". $lastChangeDateAfter;
+        }
 
         $response = $this->client->get($url, [
             'verify' => $this->settings['verify_ssl_guzzle'],

@@ -48,9 +48,13 @@ class Winmax4ArticleService extends Winmax4Service
      * @return object|array|null Returns the decoded JSON response.
      * @throws GuzzleException
      */
-    public function getArticles(): object|array|null
+    public function getArticles($lastChangeDateAfter = null): object|array|null
     {
         $url = $this->url . '/Files/Articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
+
+        if($lastChangeDateAfter){
+            $url .= "&LastChangeDateAfter=". $lastChangeDateAfter;
+        }
 
         foreach (Winmax4Currency::all() as $currency) {
             $url .= "&PriceCurrencyCode=". $currency->code;

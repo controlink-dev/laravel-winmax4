@@ -84,7 +84,12 @@ class syncArticles extends Command
             }
 
             //If getArticles returns bad response, skip the sync
-            if ($winmax4Service->getArticles() == null) {
+            $lastSyncedAt = null;
+            if($license_id == null){
+                $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Article::class);
+            }
+
+            if ($winmax4Service->getArticles($lastSyncedAt) == null) {
                 foreach ($localArticles as $localArticle) {
                     if(config('winmax4.use_soft_deletes')){
                         $localArticle->is_active = false;
