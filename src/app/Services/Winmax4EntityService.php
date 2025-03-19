@@ -57,16 +57,12 @@ class Winmax4EntityService extends Winmax4Service
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                     'Content-Type' => 'application/json',
                 ],
-                'http_errors' => false,
             ]);
 
             $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
             if(is_null($responseJSONDecoded)){
-                $errorMessage = isset($responseDecoded->Results[0])
-                    ? json_encode($responseDecoded->Results[0])
-                    : 'Unknown error: Data not found in response.';
-                throw new \Exception($errorMessage);
+                return null;
             }
 
             if($responseJSONDecoded->Data->Filter->TotalPages > 1){
