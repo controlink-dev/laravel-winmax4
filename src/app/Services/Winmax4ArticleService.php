@@ -646,6 +646,10 @@ class Winmax4ArticleService extends Winmax4Service
     }
 
     public function renderErrorMessage($errorJson){
+        if($errorJson == null){
+            return 'Articles not found';
+        }
+
         switch ($errorJson['Results'][0]['Code']) {
             case 'REQUIREDFIELDSAREMISSING':
                 $errorJson['Results'][0]['Message'] = 'Required fields are missing';
