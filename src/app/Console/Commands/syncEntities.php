@@ -21,7 +21,8 @@ class syncEntities extends Command
      * @var string
      */
     protected $signature = 'winmax4:sync-entities
-                            {--license_id= : If you want to sync entities for a specific license, specify the license id.}';
+                            {--license_id= : If you want to sync entities for a specific license, specify the license id.}
+                            {--fullSync : If you want to do a full sync, specify this option.}';
 
 
     /**
@@ -88,22 +89,19 @@ class syncEntities extends Command
 
             //If getEntities returns bad response, skip the sync
             $lastSyncedAt = null;
-            if($license_id == null){
-                $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Entity::class)->format('Y-m-d');
+            if(!$this->option('fullSync')){
+                if(config('winmax4.use_license')){
+                    $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Entity::class, $winmax4Setting->license_id)->format('Y-m-d');
+                }else{
+                    $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Entity::class)->format('Y-m-d');
+                }
             }
 
             $apiEntities = $winmax4Service->getEntities($lastSyncedAt);
-
-            if ($apiEntities == null) {
-                foreach ($localEntities as $localEntity) {
-                    if(config('winmax4.use_soft_deletes')){
-                        $localEntity->is_active = false;
-                        $localEntity->deleted_at = now();
-                        $localEntity->save();
-
-                    }else{
-                        $localEntity->forceDelete();
-                    }
+            if ($apiEntities == null || is_array($apiEntities) && isset($apiEntities['error'])) {
+                if(!$apiEntities['error'] && $apiEntities['status'] != 404){
+                    $this->error('An error occurred while syncing articles for ' . $winmax4Setting->company_code. '.');
+                    return;
                 }
 
                 if(config('winmax4.use_license')){
@@ -111,11 +109,15 @@ class syncEntities extends Command
                 }else{
                     (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class);
                 }
-            }else {
+            }else if($apiEntities != null && isset($apiEntities->error) && $apiEntities->error) {
+                $this->error($apiEntities->error);
+                return;
+            } else {
                 $entities = $apiEntities->Data->Entities;
 
                 //Delete all local entities that don't exist in Winmax4
-                foreach ($localEntities as $localEntity) {
+                if($this->option('fullSync')){
+                    foreach ($localEntities as $localEntity) {
                     $found = false;
                     foreach ($entities as $entity) {
 
@@ -148,6 +150,7 @@ class syncEntities extends Command
                         }
                     }
                 }
+                }
 
                 $job = [];
                 foreach ($entities as $entity) {
@@ -159,12 +162,6 @@ class syncEntities extends Command
                 }
 
                 $batch = Bus::batch([])->then(function (Batch $batch) use ($winmax4Setting) {
-                    if(config('winmax4.use_license')){
-                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class, $winmax4Setting->license_id);
-                    }else{
-                        (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class);
-                    }
-
                     $batch->delete();
                 })->name('winmax4_entities')->onQueue(config('winmax4.queue'))->dispatch();
 
@@ -172,6 +169,12 @@ class syncEntities extends Command
 
                 foreach ($chunks as $chunk){
                     $batch->add($chunk);
+                }
+
+                if(config('winmax4.use_license')){
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class, $winmax4Setting->license_id);
+                }else{
+                    (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class);
                 }
             }
 
