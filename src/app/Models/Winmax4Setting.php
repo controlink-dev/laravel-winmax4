@@ -48,14 +48,12 @@ class Winmax4Setting extends Model
     {
         $table_name = config('winmax4.licenses_table', 'licenses');
 
-        return $this->belongsTo(new class($table_name) extends \Illuminate\Database\Eloquent\Model {
-            protected $table;
+        // Create an instance of an anonymous class extending Model.
+        $relatedModel = new class extends \Illuminate\Database\Eloquent\Model {};
 
-            public function __construct($table_name)
-            {
-                parent::__construct();
-                $this->table = $table_name;
-            }
-        });
+        // Set the table name dynamically.
+        $relatedModel->setTable($table_name);
+
+        return $this->belongsTo($relatedModel, config('winmax4.license_column'));
     }
 }
