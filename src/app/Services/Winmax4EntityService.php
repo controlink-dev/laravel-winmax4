@@ -63,7 +63,10 @@ class Winmax4EntityService extends Winmax4Service
             $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
             if(is_null($responseJSONDecoded)){
-                return null;
+                $errorMessage = isset($responseDecoded->Results[0])
+                    ? json_encode($responseDecoded->Results[0])
+                    : 'Unknown error: Data not found in response.';
+                throw new \Exception($errorMessage);
             }
 
             if($responseJSONDecoded->Data->Filter->TotalPages > 1){
