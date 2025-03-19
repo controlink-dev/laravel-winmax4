@@ -89,9 +89,12 @@ class syncEntities extends Command
             //If getEntities returns bad response, skip the sync
             $lastSyncedAt = null;
             if($license_id == null){
-                $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Entity::class);
+                $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Entity::class)->format('Y-m-d');
             }
-            if ($winmax4Service->getEntities($lastSyncedAt) == null) {
+
+            $apiEntities = $winmax4Service->getEntities($lastSyncedAt);
+
+            if ($apiEntities == null) {
                 foreach ($localEntities as $localEntity) {
                     if(config('winmax4.use_soft_deletes')){
                         $localEntity->is_active = false;
@@ -109,7 +112,7 @@ class syncEntities extends Command
                     (new Winmax4Controller())->updateLastSyncedAt(Winmax4Entity::class);
                 }
             }else {
-                $entities = $winmax4Service->getEntities()->Data->Entities;
+                $entities = $apiEntities->Data->Entities;
 
                 //Delete all local entities that don't exist in Winmax4
                 foreach ($localEntities as $localEntity) {

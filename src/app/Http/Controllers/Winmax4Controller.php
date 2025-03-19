@@ -173,7 +173,7 @@ class Winmax4Controller extends Controller
      * @param int $licence_id The licence id to get the last synced at timestamp for.
      * @return string|null The last synced at timestamp for the given model.
      */
-    public function getLastSyncedAt($model, $licence_id = null){
+    public function getLastSyncedAt($model, $licence_id = null): Carbon\Carbon{
         if (config('winmax4.use_license')) {
             $winmax4SyncStatus = Winmax4SyncStatus::where('model', class_basename($model))
                 ->where(config('winmax4.license_column'), $licence_id)
