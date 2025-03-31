@@ -403,7 +403,7 @@ class Winmax4DocumentService extends Winmax4Service
                 $errorJson->Results[0]->Message = 'An exception occurred! Please contact the administrator';
                 break;
             default:
-                $errorJson->Results[0]->Message = 'An unknown error occurred! Please contact the administrator';
+                $errorJson->Results[0]->Message = 'An unknown error occurred! Please contact the administrator <br> The unknown code is :' . $errorJson->Results[0]->Code . '<br> The message is:' . $errorJson->Results[0]->Message;
                 break;
         }
 
