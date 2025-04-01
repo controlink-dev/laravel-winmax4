@@ -73,6 +73,7 @@ class syncPaymentTypes extends Command
 
             $paymentTypes = $winmax4Service->getPaymentTypes()->Data->PaymentTypes;
 
+            dd($paymentTypes);
             foreach ($paymentTypes as $paymentType) {
                  if(config('winmax4.use_license')){
                      Winmax4PaymentType::updateOrCreate(
