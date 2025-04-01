@@ -77,12 +77,13 @@ class syncPaymentTypes extends Command
                  if(config('winmax4.use_license')){
                      Winmax4PaymentType::updateOrCreate(
                          [
-                             'designation' => $paymentType->Designation,
-                             config('winmax4.license_column') => $winmax4Setting->license_id,
+                            'designation' => $paymentType->Designation,
+                            config('winmax4.license_column') => $winmax4Setting->license_id,
                          ],
                          [
-                             'designation' => $paymentType->Designation,
-                             'is_active' => $paymentType->IsActive,
+                            'designation' => $paymentType->Designation,
+                            'is_active' => $paymentType->IsActive,
+                            'id_winmax4' => $paymentType->Id,
                          ]
                      );
                  }else{
@@ -93,6 +94,7 @@ class syncPaymentTypes extends Command
                          [
                              'designation' => $paymentType->Designation,
                              'is_active' => $paymentType->IsActive,
+                             'id_winmax4' => $paymentType->Id,
                          ]
                      );
                  }

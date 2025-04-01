@@ -16,6 +16,7 @@ class Winmax4PaymentType extends Model
         'license_id',
         'designation',
         'is_active',
+        'id_winmax4',
     ];
 
     protected static function booted()
