@@ -84,7 +84,7 @@ class syncPaymentTypes extends Command
                          [
                             'designation' => $paymentType->Designation,
                             'is_active' => $paymentType->IsActive,
-                            'id_winmax4' => $paymentType->Id,
+                            'id_winmax4' => $paymentType->ID,
                          ]
                      );
                  }else{
@@ -95,7 +95,7 @@ class syncPaymentTypes extends Command
                          [
                              'designation' => $paymentType->Designation,
                              'is_active' => $paymentType->IsActive,
-                             'id_winmax4' => $paymentType->Id,
+                             'id_winmax4' => $paymentType->ID
                          ]
                      );
                  }
