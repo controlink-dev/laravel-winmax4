@@ -70,6 +70,7 @@ class Winmax4Controller extends Controller
             'username' => 'required',
             'password' => 'required',
             'n_terminal' => 'required',
+            'warehouse_id' => 'required',
         ]);
 
         $url = $request->url;
