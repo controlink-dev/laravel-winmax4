@@ -81,6 +81,7 @@ class Winmax4EntityService extends Winmax4Service
 
             return $responseJSONDecoded;
         }catch (\GuzzleHttp\Exception\RequestException $e) {
+
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();

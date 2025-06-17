@@ -96,6 +96,7 @@ class Winmax4ArticleService extends Winmax4Service
             return $responseJSONDecoded;
 
         } catch (\GuzzleHttp\Exception\RequestException $e) {
+
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();
@@ -514,6 +515,7 @@ class Winmax4ArticleService extends Winmax4Service
             return $article->toArray();
 
         } catch (\GuzzleHttp\Exception\RequestException $e) {
+
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();

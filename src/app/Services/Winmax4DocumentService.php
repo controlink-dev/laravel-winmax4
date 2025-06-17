@@ -294,25 +294,18 @@ class Winmax4DocumentService extends Winmax4Service
 
             return $document;
         }catch (\GuzzleHttp\Exception\RequestException $e){
+
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
 
                 // Return the error JSON or handle it as needed
-                If($errorJson['Results'][0]['Code'] == 'COULDNTCREATEDOCUMENT'){
-                    return [
-                        'error' => true,
-                        'status' => $errorResponse->getStatusCode(),
-                        'message' => $this->renderErrorMessage($errorJson),
-                    ];
-                }else{
-                    return [
-                        'error' => true,
-                        'status' => $errorResponse->getStatusCode(),
-                        'message' => 'The code is unknown:' . $errorJson['Results'][0]['Code'] . '<br> The message is:' . $errorJson['Results'][0]['Message'],
-                    ];
-                }
+                return [
+                    'error' => true,
+                    'status' => $errorResponse->getStatusCode(),
+                    'message' => $this->renderErrorMessage($errorJson),
+                ];
             }
 
             // If no response is available
@@ -322,11 +315,13 @@ class Winmax4DocumentService extends Winmax4Service
             ];
         }
 
-
     }
 
     public function renderErrorMessage($errorJson){
         switch ($errorJson->Results[0]->Fields[0]) {
+            case 'COULDNTCREATEDOCUMENT':
+                $errorJson->Results[0]->Message = 'Could not create the document';
+                break;
             case 'InvalidArticleCode':
                 $errorJson->Results[0]->Message = 'The article code is invalid';
                 break;
