@@ -233,37 +233,11 @@ class Winmax4EntityService extends Winmax4Service
             return $builder->where('id_winmax4', $responseDecoded->Data->Entity->ID)->first()->toArray();
 
         }catch (\GuzzleHttp\Exception\RequestException $e) {
+
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
-
-                // Check if the article code is already in use and is inactive, then update it
-                if($errorJson['Results'][0]['Code'] == 'ENTITYCODEINUSE'){
-                    $idWinmax4 = Winmax4Entity::where('code', $code)->value('id_winmax4');
-
-                    if($idWinmax4){
-                        if(Winmax4Entity::where('code', $code)->first()->is_active == 0){
-                            $this->putEntities($idWinmax4,
-                                $code,
-                                $name,
-                                $entityType,
-                                $taxPayerID,
-                                $address,
-                                $zipCode,
-                                $locality,
-                                1,
-                                $phone,
-                                $fax,
-                                $mobilePhone,
-                                $email,
-                                $country
-                            );
-                        }
-
-                        return Winmax4Entity::where('code', $code)->first()->toArray();
-                    }
-                }
 
                 // Return the error JSON or handle it as needed
                 return [

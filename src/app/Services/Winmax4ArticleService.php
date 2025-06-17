@@ -312,34 +312,11 @@ class Winmax4ArticleService extends Winmax4Service
             return $article->toArray();
 
         }catch (\GuzzleHttp\Exception\RequestException $e) {
+
             // Log or handle the error response
             if ($e->hasResponse()) {
                 $errorResponse = $e->getResponse();
                 $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
-
-                // Check if the article code is already in use and is inactive, then update it
-                if($errorJson['Results'][0]['Code'] == 'ARTICLECODEINUSE'){
-                    $idWinmax4 = Winmax4Article::where('code', $code)->value('id_winmax4');
-
-                    if($idWinmax4){
-                        if(Winmax4Article::where('code', $code)->first()->is_active == 0){
-                            $this->putArticles(
-                                $idWinmax4,
-                                $code,
-                                $familyCode,
-                                $vatCode,
-                                $vatRate,
-                                $priceWithoutVat,
-                                $priceWithVat,
-                                $subFamilyCode,
-                                $subSubFamilyCode,
-                                $stock,
-                                $is_active
-                            );
-                        }
-                        return Winmax4Article::where('code', $code)->first()->toArray();
-                    }
-                }
 
                 // Return the error JSON or handle it as needed
                 return [
@@ -650,11 +627,11 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         switch ($errorJson['Results'][0]['Code']) {
-            case 'REQUIREDFIELDSAREMISSING':
-                $errorJson['Results'][0]['Message'] = 'Required fields are missing';
-                break;
             case 'ARTICLECODEINUSE':
                 $errorJson['Results'][0]['Message'] = 'Article code is already in use';
+                break;
+            case 'REQUIREDFIELDSAREMISSING':
+                $errorJson['Results'][0]['Message'] = 'Required fields are missing';
                 break;
             case 'ARTICLEDESIGNATIONCANTBECHANGED':
                 $errorJson['Results'][0]['Message'] = 'Article designation cannot be changed';
