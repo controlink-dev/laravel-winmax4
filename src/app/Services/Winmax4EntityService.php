@@ -341,18 +341,19 @@ class Winmax4EntityService extends Winmax4Service
      * @param string|null $fax Entity fax, default is null
      * @param string|null $mobilePhone Entity mobile phone, default is null
      * @param string|null $email Entity email, default is null
+     * @param string|null $expirationDate Entity expiration date, default is null
      * @param string|null $country Entity country, default is 'PT'
      * @return Winmax4Entity Returns the entity object
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function putEntities(int $idWinmax4, string $code, string $name, int $entityType, string $taxPayerID, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): Winmax4Entity
+    public function putEntities(int $idWinmax4, string $code, string $name, int $entityType, string $taxPayerID, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, string $expirationDate = null, ?string $country = 'PT'): Winmax4Entity
     {
         //Check if  taxPayerID do not start with 5 or 6
         $gdpr = [];
         if($taxPayerID && !in_array(substr($taxPayerID, 0, 1), ['5', '6'])){
             $gdpr = [
                 'GDPRAllowAccessToPersonalInformation' => true,
-                'GDPRPersonalInformationAccessExpirationDate' => '2099-12-31',
+                'GDPRPersonalInformationAccessExpirationDate' => $expirationDate ?: '2099-12-31',
             ];
         }
 

@@ -231,6 +231,7 @@ class Winmax4EntitiesController extends Controller
             'fax' => 'nullable|string|max:20',
             'mobilePhone' => 'nullable|string|max:20',
             'email' => 'nullable|string|email|max:255',
+            'expirationDate' => 'nullable|date_format:Y-m-d',
             'country' => 'nullable|string|size:2|in:PT',
         ]);
 
@@ -248,6 +249,7 @@ class Winmax4EntitiesController extends Controller
             $request->fax,
             $request->mobilePhone,
             $request->email,
+            $request->expirationDate,
             $request->country
         ), 200);
     }
