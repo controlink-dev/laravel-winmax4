@@ -117,20 +117,31 @@ class syncEntities extends Command
 
                 //Delete all local entities that don't exist in Winmax4
                 if($this->option('fullSync')){
-                    dump(count($entities), count($localEntities));
                     foreach ($localEntities as $localEntity) {
                         $found = false;
                         foreach ($entities as $entity) {
-
+                            // Check if the local entity's id_winmax4 matches the entity's ID from Winmax4
                             if ($localEntity->id_winmax4 == $entity->ID) {
                                 $found = true;
 
                                 //Check if the entities is_active status has changed
                                 if ($localEntity->is_active != $entity->IsActive) {
 
-                                    //If has changed, update the entity
-                                    $localEntity->is_active = $entity->IsActive;
-                                    $localEntity->save();
+                                    //Check if the entity has taxPayerID like 999999999, if so, set is_anonimous to true
+                                    if(isset($entity->TaxPayerID) && $entity->TaxPayerID == '999999999'){
+                                        if(config('winmax4.use_soft_deletes')){
+                                            $localEntity->is_anonymized = true;
+                                            $localEntity->is_active = false;
+                                            $localEntity->deleted_at = now();
+                                            $localEntity->save();
+                                        }else{
+                                            $localEntity->forceDelete();
+                                        }
+                                    }else {
+                                        //If has changed, update the entity
+                                        $localEntity->is_active = $entity->IsActive;
+                                        $localEntity->save();
+                                    }
                                 }
 
                                 break;
@@ -139,7 +150,7 @@ class syncEntities extends Command
 
                         if (!$found) {
                             if(config('winmax4.use_soft_deletes')){
-                                //If the entity is not found in Winmax4, deactivate it
+                                // If the entity is not found in Winmax4, set it as inactive and delete it
                                 $localEntity->is_active = false;
                                 $localEntity->deleted_at = now();
                                 $localEntity->save();
