@@ -62,7 +62,7 @@ class Winmax4ServiceProvider extends ServiceProvider
         }
 
         // Register the command
-        $this->commands([
+        /*$this->commands([
             updateNamespace::class,
             syncCurrencies::class,
             syncDocumentsTypes::class,
@@ -73,7 +73,7 @@ class Winmax4ServiceProvider extends ServiceProvider
             syncArticles::class,
             syncEntities::class,
             syncDocuments::class,
-        ]);
+        ]);*/
 
         // Load routes
         $this->loadRoutesFrom(__DIR__.'/routes/web.php');
