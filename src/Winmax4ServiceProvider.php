@@ -52,8 +52,13 @@ class Winmax4ServiceProvider extends ServiceProvider
 
             // Publish the commands
             $this->publishes([
-                __DIR__.'/../src/app/Console/Commands' => app_path('Console/Commands'),
+                __DIR__.'/../src/app/Console/Commands' => app_path('Console/Commands/Winmax4'),
             ], 'winmax4-commands');
+
+            // Publish the jobs
+            $this->publishes([
+                __DIR__.'/../src/app/Jobs' => app_path('Jobs/Winmax4'),
+            ], 'winmax4-jobs');
         }
 
         // Register the command
