@@ -49,6 +49,11 @@ class Winmax4ServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../src/resources/lang' => resource_path('lang'),
             ], 'winmax4-lang');
+
+            // Publish the commands
+            $this->publishes([
+                __DIR__.'/../src/app/Console/Commands' => app_path('Console/Commands'),
+            ], 'winmax4-commands');
         }
 
         // Register the command
