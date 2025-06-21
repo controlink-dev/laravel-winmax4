@@ -32,9 +32,11 @@ class SyncEntitiesJob implements ShouldQueue
     public function handle(): void
     {
         $isAnonymized = false;
-        if($this->entity->TaxPayerID === '999999999'){
+        if($this->entity->TaxPayerID == '999999999'){
             $isAnonymized = true;
         }
+
+        dump("Syncing entity: {$this->entity->ID} - {$this->entity->Name} - Vat: {$this->entity->TaxPayerID} - Is Anonymized: {$isAnonymized}");
 
         if(config('winmax4.use_license')){
             Winmax4Entity::updateOrCreate(
