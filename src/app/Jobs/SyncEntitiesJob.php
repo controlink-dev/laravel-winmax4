@@ -31,13 +31,6 @@ class SyncEntitiesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $isAnonymized = false;
-        if($this->entity->TaxPayerID == '999999999'){
-            $isAnonymized = true;
-        }
-
-        dump("Syncing entity: {$this->entity->ID} - {$this->entity->Name} - Vat: {$this->entity->TaxPayerID} - Is Anonymized: {$isAnonymized}");
-
         if(config('winmax4.use_license')){
             Winmax4Entity::updateOrCreate(
                 [
@@ -59,7 +52,6 @@ class SyncEntitiesJob implements ShouldQueue
                     'phone' => $this->entity->Phone,
                     'tax_payer_id' => $this->entity->TaxPayerID,
                     'zip_code' => $this->entity->ZipCode,
-                    'is_anonymized' => $isAnonymized,
                 ]
             );
         }else{
@@ -82,7 +74,6 @@ class SyncEntitiesJob implements ShouldQueue
                     'phone' => $this->entity->Phone,
                     'tax_payer_id' => $this->entity->TaxPayerID,
                     'zip_code' => $this->entity->ZipCode,
-                    'is_anonymized' => $isAnonymized,
                 ]
             );
         }
