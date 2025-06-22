@@ -533,8 +533,6 @@ class Winmax4ArticleService extends Winmax4Service
             $response = $this->client->delete('/Files/Articles/?id=' . $idWinmax4, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                    'Content-Type' => 'application/json',
-                    'http_errors' => false,
                 ],
             ]);
         } catch (ConnectException $e) {

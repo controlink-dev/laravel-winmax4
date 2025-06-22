@@ -65,6 +65,7 @@ class Winmax4Service
     public function generateToken(string $company_code, string $username, string $password, string $n_terminal)
     {
         try {
+            dd($this->client->getConfig('base_uri'));
             $response = $this->client->post('/Account/GenerateToken', [
                 'json' => [
                     'Company' => $company_code,
