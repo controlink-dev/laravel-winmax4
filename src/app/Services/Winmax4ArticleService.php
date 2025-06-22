@@ -51,7 +51,7 @@ class Winmax4ArticleService extends Winmax4Service
      */
     public function getArticles($lastChangeDateAfter = null): object|array|null
     {
-        $url = '/Files/Articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
+        $url = 'Files/Articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
 
         if($lastChangeDateAfter){
             $url .= "&LastChangeDateAfter=". $lastChangeDateAfter;
@@ -159,7 +159,7 @@ class Winmax4ArticleService extends Winmax4Service
     public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
         try {
-            $response = $this->client->post('/Files/Articles', [
+            $response = $this->client->post('Files/Articles', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 ],
@@ -346,7 +346,7 @@ class Winmax4ArticleService extends Winmax4Service
     public function putArticles(int $idWinmax4, string $code, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): array
     {
         try {
-            $response = $this->client->put('/Files/Articles/?id=' . $idWinmax4, [
+            $response = $this->client->put('Files/Articles/?id=' . $idWinmax4, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 ],
@@ -530,7 +530,7 @@ class Winmax4ArticleService extends Winmax4Service
         $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
 
         try{
-            $response = $this->client->delete('/Files/Articles/?id=' . $idWinmax4, [
+            $response = $this->client->delete('Files/Articles/?id=' . $idWinmax4, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 ],

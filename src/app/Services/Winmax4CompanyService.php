@@ -45,7 +45,7 @@ class Winmax4CompanyService extends Winmax4Service
     public function getCompanies(): object|array|null
     {
         try{
-            $response = $this->client->get('/Settings/Company', [
+            $response = $this->client->get('Settings/Company', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                     'Content-Type' => 'application/json',

@@ -44,7 +44,7 @@ class Winmax4TaxService extends Winmax4Service
      */
     public function getTaxes(): object|array|null
     {
-        $url = '/Files/Taxes';
+        $url = 'Files/Taxes';
 
         try{
             $response = $this->client->get($url, [

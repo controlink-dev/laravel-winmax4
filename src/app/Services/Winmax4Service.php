@@ -34,6 +34,11 @@ class Winmax4Service
             };
         });
 
+        //Check if $url ends with a / if not add one
+        if (!empty($url) && !str_ends_with($url, '/')) {
+            $url .= '/';
+        }
+
         $this->client = new Client([
             'base_uri' => $url,
             'timeout' => config('winmax4.timeout_guzzle', 30),
@@ -65,8 +70,7 @@ class Winmax4Service
     public function generateToken(string $company_code, string $username, string $password, string $n_terminal)
     {
         try {
-            dd($this->client->getConfig('base_uri'));
-            $response = $this->client->post('/Account/GenerateToken', [
+            $response = $this->client->post('Account/GenerateToken', [
                 'json' => [
                     'Company' => $company_code,
                     'UserLogin' => $username,

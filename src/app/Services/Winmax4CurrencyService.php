@@ -44,7 +44,7 @@ class Winmax4CurrencyService extends Winmax4Service
      */
     public function getCurrencies(): object|array|null
     {
-        $url = '/Files/Currencies';
+        $url = 'Files/Currencies';
 
         try{
             $response = $this->client->get($url, [

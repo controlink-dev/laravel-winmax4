@@ -44,7 +44,7 @@ class Winmax4PaymentTypeService extends Winmax4Service
      */
     public function getPaymentTypes(): object|array|null
     {
-        $url = '/Files/PaymentTypes';
+        $url = 'Files/PaymentTypes';
 
         try{
             $response = $this->client->get($url, [

@@ -43,7 +43,7 @@ class Winmax4DocumentTypeService extends Winmax4Service
      */
     public function getDocumentTypes(): object|array|null
     {
-        $url ='/Files/DocumentTypes';
+        $url ='Files/DocumentTypes';
 
         try{
             $response = $this->client->get($url, [

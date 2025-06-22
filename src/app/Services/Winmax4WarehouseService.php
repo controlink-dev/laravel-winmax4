@@ -44,7 +44,7 @@ class Winmax4WarehouseService extends Winmax4Service
      */
     public function getWarehouses(): object|array|null
     {
-        $url = '/Files/Warehouses';
+        $url = 'Files/Warehouses';
 
         try{
             $response = $this->client->get($url, [

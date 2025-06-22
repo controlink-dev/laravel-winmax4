@@ -54,7 +54,7 @@ class Winmax4DocumentService extends Winmax4Service
      */
     public function getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null, $externalIdentification = null, $toDate = null, $entityCode = null, $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails', $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): object|array|null
     {
-        $url = '/Transactions/Documents?DocumentTypeCode=' . $documentTypeCode .
+        $url = 'Transactions/Documents?DocumentTypeCode=' . $documentTypeCode .
             '&DocumentNumber=' . $documentNumber .
             '&Serie=' . $serie .
             '&Number=' . $number .
@@ -170,7 +170,7 @@ class Winmax4DocumentService extends Winmax4Service
         }
 
         try{
-            $response = $this->client->post('/Transactions/Documents', [
+            $response = $this->client->post('Transactions/Documents', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 ],

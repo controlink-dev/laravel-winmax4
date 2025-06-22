@@ -45,7 +45,7 @@ class Winmax4EntityService extends Winmax4Service
      */
     public function getEntities($lastChangeDateAfter = null): object|array|null
     {
-        $url ='/Files/Entities';
+        $url ='Files/Entities';
 
         if($lastChangeDateAfter){
             $url .= "?LastChangeDateAfter=". $lastChangeDateAfter;
@@ -161,7 +161,7 @@ class Winmax4EntityService extends Winmax4Service
             }
 
             try{
-                $response = $this->client->post('/Files/Entities', [
+                $response = $this->client->post('Files/Entities', [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                     ],
@@ -297,7 +297,7 @@ class Winmax4EntityService extends Winmax4Service
         }
 
         try{
-            $response = $this->client->put('/Files/Entities/?id='.$idWinmax4, [
+            $response = $this->client->put('Files/Entities/?id='.$idWinmax4, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 ],
@@ -397,7 +397,7 @@ class Winmax4EntityService extends Winmax4Service
         $localEntity = Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
 
         try{
-            $response = $this->client->delete('/Files/Entities/?id='.$idWinmax4, [
+            $response = $this->client->delete('Files/Entities/?id='.$idWinmax4, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 ],

@@ -45,7 +45,7 @@ class Winmax4FamilyService extends Winmax4Service
      */
     public function getFamilies(): object|array|null
     {
-        $url = '/Files/Families?IncludeSubFamilies=true';
+        $url = 'Files/Families?IncludeSubFamilies=true';
 
         try{
             $response = $this->client->get($url, [
