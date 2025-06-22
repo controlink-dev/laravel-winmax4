@@ -94,10 +94,15 @@ class Winmax4Service
         $statusCode = $response->getStatusCode();
         $body = $response->getBody()->getContents();
 
-
-
         if ($statusCode == 401) {
             $errorMsg = 'Unauthorized access to Winmax4 API. Please check your credentials.';
+            Winmax4SyncErrors::create([
+                'message' => $errorMsg,
+                config('winmax4.license_column') => session('licenseID')
+            ]);
+        }
+        if($statusCode == 404){
+            $errorMsg = 'Data not found.';
             Winmax4SyncErrors::create([
                 'message' => $errorMsg,
                 config('winmax4.license_column') => session('licenseID')
