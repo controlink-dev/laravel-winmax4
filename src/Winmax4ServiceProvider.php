@@ -2,11 +2,16 @@
 
 namespace Controlink\LaravelWinmax4;
 
+use Controlink\LaravelWinmax4\app\Console\Commands\syncArticles;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncCurrencies;
+use Controlink\LaravelWinmax4\app\Console\Commands\syncDocuments;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncDocumentsTypes;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncEntities;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncFamilies;
+use Controlink\LaravelWinmax4\app\Console\Commands\syncPaymentTypes;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncTaxes;
+use Controlink\LaravelWinmax4\app\Console\Commands\syncWarehouses;
+use Controlink\LaravelWinmax4\app\Console\Commands\updateNamespace;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,8 +27,15 @@ class Winmax4ServiceProvider extends ServiceProvider
         // Load migrations
         $this->loadMigrationsFrom(__DIR__.'/../src/database/migrations');
 
+        // Load translations
+        $this->loadTranslationsFrom(__DIR__.'/../src/resources/lang', 'laravel-winmax4');
+
         // Publish migrations if running in console
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../src/app/Models' => app_path('Models/Winmax4'),
+            ], 'winmax4-models');
+
             $this->publishes([
                 __DIR__.'/../src/database/migrations' => database_path('migrations'),
             ], 'winmax4-migrations');
@@ -32,16 +44,36 @@ class Winmax4ServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../src/config/winmax4.php' => config_path('winmax4.php'),
             ], 'winmax4-config');
+
+            // Publish the language files
+            $this->publishes([
+                __DIR__.'/../src/resources/lang' => resource_path('lang'),
+            ], 'winmax4-lang');
+
+            // Publish the commands
+            $this->publishes([
+                __DIR__.'/../src/app/Console/Commands' => app_path('Console/Commands/Winmax4'),
+            ], 'winmax4-commands');
+
+            // Publish the jobs
+            $this->publishes([
+                __DIR__.'/../src/app/Jobs' => app_path('Jobs/Winmax4'),
+            ], 'winmax4-jobs');
         }
 
         // Register the command
-        $this->commands([
+        /*$this->commands([
+            updateNamespace::class,
             syncCurrencies::class,
             syncDocumentsTypes::class,
-            syncFamilies::class,
             syncTaxes::class,
+            syncWarehouses::class,
+            syncPaymentTypes::class,
+            syncFamilies::class,
+            syncArticles::class,
             syncEntities::class,
-        ]);
+            syncDocuments::class,
+        ]);*/
 
         // Load routes
         $this->loadRoutesFrom(__DIR__.'/routes/web.php');
@@ -56,15 +88,5 @@ class Winmax4ServiceProvider extends ServiceProvider
     {
         // Load config file
         $this->mergeConfigFrom(__DIR__.'/../src/config/winmax4.php', 'winmax4');
-
-        // Schedule the command
-        $this->app->booted(function () {
-            $schedule = $this->app->make(Schedule::class);
-            $schedule->command('winmax4:sync-currencies')->daily();
-            $schedule->command('winmax4:sync-document-types')->daily();
-            $schedule->command('winmax4:sync-families')->everyFifteenMinutes();
-            $schedule->command('winmax4:sync-taxes')->daily();
-            $schedule->command('winmax4:sync-entities')->everyMinute();
-        });
     }
 }

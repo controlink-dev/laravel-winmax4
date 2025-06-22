@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('winmax4_entities', function (Blueprint $table) {
-            $table->date('birthdate')->nullable();
-            $table->text('observations')->nullable();
-            $table->boolean('newsletter')->default(false);
+            if(config('winmax4.use_soft_deletes')){
+                $table->softDeletes();
+            }
         });
     }
 
@@ -24,9 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('winmax4_entities', function (Blueprint $table) {
-            $table->dropColumn('birthdate');
-            $table->dropColumn('observations');
-            $table->dropColumn('newsletter');
+            if(config('winmax4.use_soft_deletes')){
+                $table->dropSoftDeletes();
+            }
         });
     }
 };

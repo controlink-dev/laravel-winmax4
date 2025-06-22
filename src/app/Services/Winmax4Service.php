@@ -4,6 +4,7 @@ namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4SyncErrors;
+use Dflydev\DotAccessData\Data;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -14,6 +15,9 @@ class Winmax4Service
 {
     protected $client;
     protected $token;
+
+    const WINMAX4_RESPONSE_OK = 'OK';
+    const WINMAX4_RESPONSE_EXCEPTION = 'EXCEPTION';
 
     public function __construct($saveMode = false, $url = '', $company_code = '', $username = '', $password = '', $n_terminal = '')
     {

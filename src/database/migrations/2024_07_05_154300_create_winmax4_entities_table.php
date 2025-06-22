@@ -14,18 +14,18 @@ return new class extends Migration
         Schema::create('winmax4_entities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('address');
-            $table->integer('code');
-            $table->string('country_code', 2);
-            $table->string('email');
-            $table->bigInteger('entity_type');
+            $table->integer('code')->nullable()->unique();
+            $table->bigInteger('entity_type')->nullable();
+            $table->string('tax_payer_id')->nullable();
+            $table->string('address')->nullable();
+            $table->string('zip_code')->nullable();
+            $table->string('location')->nullable(); // Adicionado para 'locality'
+            $table->boolean('is_active')->default(true); // Valor padrão de 1
+            $table->string('phone')->nullable();
             $table->string('fax')->nullable();
-            $table->boolean('is_active');
-            $table->string('location');
             $table->string('mobile_phone')->nullable();
-            $table->string('phone');
-            $table->integer('tax_payer_id');
-            $table->string('zip_code');
+            $table->string('email')->nullable();
+            $table->string('country_code', 2)->default('PT'); // Valor padrão 'PT'
 
             if(config('winmax4.use_license')){
                 if(config('winmax4.license_is_uuid')){

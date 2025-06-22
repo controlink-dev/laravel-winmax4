@@ -3,9 +3,6 @@
 namespace Controlink\LaravelWinmax4\app\Jobs;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
-use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
-use Controlink\LaravelWinmax4\app\Models\Winmax4SubFamily;
-use Controlink\LaravelWinmax4\app\Models\Winmax4SubSubFamily;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,12 +34,12 @@ class SyncEntitiesJob implements ShouldQueue
         if(config('winmax4.use_license')){
             Winmax4Entity::updateOrCreate(
                 [
-                    'code' => $this->entity->Code,
-                    'tax_payer_id' => $this->entity->TaxPayerID,
+                    'id_winmax4' => $this->entity->ID,
                     config('winmax4.license_column') => $this->license_id,
                 ],
                 [
                     'id_winmax4' => $this->entity->ID,
+                    'code' => $this->entity->Code,
                     'name' => $this->entity->Name,
                     'address' => $this->entity->Address,
                     'country_code' => $this->entity->CountryCode,
@@ -60,11 +57,11 @@ class SyncEntitiesJob implements ShouldQueue
         }else{
             Winmax4Entity::updateOrCreate(
                 [
-                    'code' => $this->entity->Code,
-                    'tax_payer_id' => $this->entity->TaxPayerID,
+                    'id_winmax4' => $this->entity->ID,
                 ],
                 [
                     'id_winmax4' => $this->entity->ID,
+                    'code' => $this->entity->Code,
                     'name' => $this->entity->Name,
                     'address' => $this->entity->Address,
                     'country_code' => $this->entity->CountryCode,

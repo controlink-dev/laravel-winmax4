@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
+use Carbon\Carbon;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4SyncStatus;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
@@ -17,7 +18,7 @@ class Winmax4Controller extends Controller
      */
     public function __construct()
     {
-        $winmaxSettings = Winmax4Setting::where(config('winmax4.license_column'), session('licenseID'))->first();
+        $winmaxSettings = Winmax4Setting::where(config('winmax4.license_column'), session(config('winmax4.license_session_key')))->first();
 
         if(!$winmaxSettings) {
             $this->winmax4Service = new Winmax4Service(true);
@@ -39,7 +40,7 @@ class Winmax4Controller extends Controller
      */
     public function getWinmax4Settings()
     {
-        $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), session('licenseID'))->first();
+        $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), session(config('winmax4.license_session_key')))->first();
 
         if (!$winmax4) {
             return response()->json([
@@ -69,6 +70,7 @@ class Winmax4Controller extends Controller
             'username' => 'required',
             'password' => 'required',
             'n_terminal' => 'required',
+            'warehouse_id' => 'required',
         ]);
 
         $url = $request->url;
@@ -76,6 +78,8 @@ class Winmax4Controller extends Controller
         $username = $request->username;
         $password = $request->password;
         $n_terminal = $request->n_terminal;
+
+        $warehouse_id = $request->warehouse_id;
 
         $type_docs_invoice = $request->type_docs_invoice;
         $type_docs_invoice_receipt = $request->type_docs_invoice_receipt;
@@ -87,12 +91,16 @@ class Winmax4Controller extends Controller
         if ($response->Results[0]->Code === 'OK') {
             $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), $request->sessionID)->first();
 
+            $exists = $winmax4 ? true : false;
+
             if($winmax4) {
                 $winmax4->url = $url;
                 $winmax4->company_code = $company_code;
                 $winmax4->username = $username;
                 $winmax4->password = $password;
                 $winmax4->n_terminal = $n_terminal;
+
+                $winmax4->warehouse_id = $warehouse_id;
 
                 $winmax4->type_docs_invoice = $type_docs_invoice;
                 $winmax4->type_docs_invoice_receipt = $type_docs_invoice_receipt;
@@ -105,6 +113,8 @@ class Winmax4Controller extends Controller
                 $winmax4->username = $username;
                 $winmax4->password = $password;
                 $winmax4->n_terminal = $n_terminal;
+
+                $winmax4->warehouse_id = $warehouse_id;
 
                 $winmax4->type_docs_invoice = $type_docs_invoice;
                 $winmax4->type_docs_invoice_receipt = $type_docs_invoice_receipt;
@@ -121,6 +131,7 @@ class Winmax4Controller extends Controller
             return response()->json([
                 'message' => 'Success',
                 'data' => $response->Results[0]->Message,
+                'first_time' => !$exists,
             ], 201);
         } else {
             return response()->json([
@@ -138,7 +149,6 @@ class Winmax4Controller extends Controller
      */
     public function updateLastSyncedAt($model, $licence_id = null)
     {
-
         if (config('winmax4.use_license')) {
             Winmax4SyncStatus::updateOrCreate([
                 'model' => class_basename($model),
@@ -155,6 +165,25 @@ class Winmax4Controller extends Controller
                 'last_synced_at' => now(),
             ]);
         }
+    }
+
+    /**
+     * Get the last synced at timestamp for the given model.
+     *
+     * @param string $model The model to get the last synced at timestamp for.
+     * @param int $licence_id The licence id to get the last synced at timestamp for.
+     * @return string|null The last synced at timestamp for the given model.
+     */
+    public function getLastSyncedAt($model, $licence_id = null): Carbon {
+        if (config('winmax4.use_license')) {
+            $winmax4SyncStatus = Winmax4SyncStatus::where('model', class_basename($model))
+                ->where(config('winmax4.license_column'), $licence_id)
+                ->first();
+        } else {
+            $winmax4SyncStatus = Winmax4SyncStatus::where('model', class_basename($model))->first();
+        }
+
+        return $winmax4SyncStatus ? $winmax4SyncStatus->last_synced_at : Carbon::parse('2000-01-01 00:00:00');
     }
 
     /**
@@ -177,5 +206,4 @@ class Winmax4Controller extends Controller
             'winmax4SyncStatus' => $winmax4SyncStatus,
         ], 200);
     }
-
 }

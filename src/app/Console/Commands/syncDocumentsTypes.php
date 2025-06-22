@@ -6,6 +6,7 @@ use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
+use Controlink\LaravelWinmax4\app\Services\Winmax4DocumentTypeService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
 use Illuminate\Console\Command;
 
@@ -17,7 +18,7 @@ class syncDocumentsTypes extends Command
      * @var string
      */
     protected $signature = 'winmax4:sync-document-types
-                            {--license_id=? : If you want to sync document types for a specific license, specify the license id.}';
+                            {--license_id= : If you want to sync document types for a specific license, specify the license id.}';
 
     /**
      * The console command description.
@@ -53,8 +54,12 @@ class syncDocumentsTypes extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
+            if(!$winmax4Setting->tenant){
+                continue;
+            }
+
             $this->info('Syncing document types for ' . $winmax4Setting->company_code . '...');
-            $winmax4Service = new Winmax4Service(
+            $winmax4Service = new Winmax4DocumentTypeService(
                 false,
                 $winmax4Setting->url,
                 $winmax4Setting->company_code,
