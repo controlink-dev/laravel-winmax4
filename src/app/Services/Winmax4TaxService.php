@@ -60,6 +60,10 @@ class Winmax4TaxService extends Winmax4Service
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
+        if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
+            return $responseJSONDecoded;
+        }
+
         if(is_null($responseJSONDecoded)){
             return null;
         }

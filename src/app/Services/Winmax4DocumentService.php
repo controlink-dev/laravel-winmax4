@@ -84,6 +84,10 @@ class Winmax4DocumentService extends Winmax4Service
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
+        if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
+            return $responseJSONDecoded;
+        }
+
         if(is_null($responseJSONDecoded)){
             return null;
         }
@@ -200,6 +204,10 @@ class Winmax4DocumentService extends Winmax4Service
         }
 
         $documentResponse = json_decode($response->getBody()->getContents());
+
+        if (is_array($documentResponse) && $documentResponse['error'] === true) {
+            return $documentResponse;
+        }
 
         $document = new Winmax4Document();
         $document->document_type_id = $documentType->id;

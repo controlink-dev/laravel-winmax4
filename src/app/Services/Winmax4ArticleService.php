@@ -74,6 +74,10 @@ class Winmax4ArticleService extends Winmax4Service
 
             $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
+            if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
+                return $responseJSONDecoded;
+            }
+
             if(is_null($responseJSONDecoded)){
                 return null;
             }
@@ -203,6 +207,10 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         $responseDecoded = json_decode($response->getBody()->getContents());
+
+        if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+            return $responseDecoded;
+        }
 
         $articleData = $responseDecoded->Data->Article;
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
@@ -383,6 +391,10 @@ class Winmax4ArticleService extends Winmax4Service
 
         $responseDecoded = json_decode($response->getBody()->getContents());
 
+        if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+            return $responseDecoded;
+        }
+
         if (!isset($responseDecoded->Data)) {
             $errorMessage = isset($responseDecoded->Results[0])
                 ? json_encode($responseDecoded->Results[0])
@@ -542,6 +554,11 @@ class Winmax4ArticleService extends Winmax4Service
 
 
         $article = json_decode($response->getBody()->getContents(), true);
+
+        if (is_array($article) && $article['error'] === true) {
+            return $article;
+        }
+
 
         if ($article['Results'][0]['Code'] !== self::WINMAX4_RESPONSE_OK) {
             $article = $this->putArticles(

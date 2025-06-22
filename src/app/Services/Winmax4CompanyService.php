@@ -56,6 +56,12 @@ class Winmax4CompanyService extends Winmax4Service
             return $this->handleConnectionError($e);
         }
 
-        return json_decode($response->getBody()->getContents());
+        $responseDecoded = json_decode($response->getBody()->getContents());
+
+        if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+            return $responseDecoded;
+        }
+
+        return $responseDecoded;
     }
 }

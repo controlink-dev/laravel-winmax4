@@ -64,6 +64,10 @@ class Winmax4EntityService extends Winmax4Service
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
+        if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
+            return $responseJSONDecoded;
+        }
+
         if(is_null($responseJSONDecoded)){
             return null;
         }
@@ -196,6 +200,10 @@ class Winmax4EntityService extends Winmax4Service
 
             $responseDecoded = json_decode($response->getBody()->getContents());
 
+            if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+                return $responseDecoded;
+            }
+
             $builder->updateOrCreate(
                 [
                     'id_winmax4' => $responseDecoded->Data->Entity->ID,
@@ -325,6 +333,10 @@ class Winmax4EntityService extends Winmax4Service
 
 
         $entity = json_decode($response->getBody()->getContents());
+
+        if (is_array($entity) && $entity['error'] === true) {
+            return $entity;
+        }
 
         Winmax4Entity::where('id_winmax4', $idWinmax4)->update([
             'name' => $entity->Data->Entity->Name,
