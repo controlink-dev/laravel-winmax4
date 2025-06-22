@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Services;
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Winmax4CurrencyService extends Winmax4Service
@@ -43,15 +44,19 @@ class Winmax4CurrencyService extends Winmax4Service
      */
     public function getCurrencies(): object|array|null
     {
-        $url = $this->url . '/Files/Currencies';
+        $url = '/Files/Currencies';
 
-        $response = $this->client->get($url, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get($url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
+
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
@@ -59,15 +64,18 @@ class Winmax4CurrencyService extends Winmax4Service
             return null;
         }
 
-        if($responseJSONDecoded->Data->Filter->TotalPages > 1){
+        if($responseJSONDecoded->Data->Filter->TotalPages > 1) {
             for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
-                $response = $this->client->get($url . '?PageNumber=' . $i, [
-                    'verify' => $this->settings['verify_ssl_guzzle'],
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                        'Content-Type' => 'application/json',
-                    ],
-                ]);
+                try{
+                    $response = $this->client->get($url . '?PageNumber=' . $i, [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                        ],
+                    ]);
+                } catch (ConnectException $e) {
+                    // Handle timeouts, connection failures, DNS errors, etc.
+                    return $this->handleConnectionError($e);
+                }
 
                 $responseJSONDecoded->Data->Currencies = array_merge($responseJSONDecoded->Data->Currencies, json_decode($response->getBody()->getContents())->Data->Currencies);
             }

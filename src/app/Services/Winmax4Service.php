@@ -4,12 +4,10 @@ namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4SyncErrors;
-use Dflydev\DotAccessData\Data;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Request;
 
 class Winmax4Service
 {
@@ -62,7 +60,7 @@ class Winmax4Service
      * @param string $username
      * @param string $password
      * @param string $n_terminal
-     * @return object
+     * @return object | array
      */
     public function generateToken(string $company_code, string $username, string $password, string $n_terminal)
     {
@@ -77,276 +75,19 @@ class Winmax4Service
             ]);
         } catch (ConnectException $e) {
             // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
+            return $this->handleConnectionError($e);
         }
 
         return json_decode($response->getBody()->getContents());
-    }
-
-    /**
-     * Get currencies from Winmax4 API
-     *
-     * @return object
-     * @throws GuzzleException
-     */
-    public function getCurrencies()
-    {
-        try {
-            $response = $this->client->get('/Files/Currencies', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
-        }
-
-        return json_decode($response->getBody()->getContents());
-    }
-
-    /**
-     * Get document types from Winmax4 API
-     *
-     * @return object
-     * @throws GuzzleException
-     */
-    public function getDocumentTypes()
-    {
-        try{
-            $response = $this->client->get('/Files/DocumentTypes', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
-        }
-
-        return json_decode($response->getBody()->getContents());
-    }
-
-    /**
-     * Get families from Winmax4 API
-     *
-     * @return object
-     * @throws GuzzleException
-     */
-    public function getFamilies()
-    {
-        try{
-            $response = $this->client->get('/Files/Families?IncludeSubFamilies=true', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
-        }
-
-        return json_decode($response->getBody()->getContents());
-    }
-
-    /**
-     * Get sub families from Winmax4 API
-     *
-     * @param $family_id
-     * @return object
-     * @throws GuzzleException
-     */
-    public function getTaxes()
-    {
-        try{
-            $response = $this->client->get('/Files/Taxes', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                ],
-            ]);
-
-        } catch (ConnectException $e) {
-            // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
-        }
-
-        return json_decode($response->getBody()->getContents());
-    }
-
-    /**
-     * Get articles from Winmax4 API
-     *
-     * @return object
-     * @throws GuzzleException
-     */
-    public function getArticles()
-    {
-        try{
-            $response = $this->client->get('/Files/Articles?IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
-        }
-
-        return json_decode($response->getBody()->getContents());
-    }
-
-    /**
-     * Get entities from Winmax4 API
-     *
-     * @return object
-     * @throws GuzzleException
-     */
-    public function getEntities()
-    {
-        try{
-            $response = $this->client->get('/Files/Entities', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
-        }
-
-        return json_decode($response->getBody()->getContents());
-    }
-
-    /**
-     * Post entities to Winmax4 API
-     *
-     * @param $values
-     * @return object
-     * @throws GuzzleException
-     */
-    public function postEntities($values)
-    {
-        try{
-            $response = $this->client->post('/Files/Entities', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                ],
-                'json' => [
-                    'Code' => $values['code'],
-                    'Name' => $values['name'],
-                    'IsActive' => 1,
-                    'EntityType' => 0,
-                    'TaxPayerID' => $values['nif'],
-                    'Address' => $values['address'],
-                    'ZipCode' => $values['zipCode'],
-                    'Phone' => $values['phone'],
-                    'Fax' => null,
-                    'MobilePhone' => null,
-                    'Email' => $values['email'],
-                    'Location' => $values['locality'],
-                    'Country' => 'PT',
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
-        }
-
-
-        $entity = json_decode($response->getBody()->getContents());
-
-        Winmax4Entity::create([
-            'license_id' => session('licenseID'),
-            'id_winmax4' => $entity->Data->Entity->ID,
-            'name' => $entity->Data->Entity->Name,
-            'address' => $entity->Data->Entity->Address,
-            'code' => $entity->Data->Entity->Code,
-            'country_code' => $entity->Data->Entity->CountryCode,
-            'email' => $entity->Data->Entity->Email,
-            'entity_type' => $entity->Data->Entity->EntityType,
-            'fax' => $entity->Data->Entity->Fax,
-            'is_active' => $entity->Data->Entity->IsActive,
-            'location' => $entity->Data->Entity->Location,
-            'mobile_phone' => $entity->Data->Entity->MobilePhone,
-            'phone' => $entity->Data->Entity->Phone,
-            'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
-            'zip_code' => $entity->Data->Entity->ZipCode,
-        ]);
-
-        return $entity->Data->Entity;
-    }
-
-    /**
-     * Update entities to Winmax4 API
-     *
-     * @param $values
-     * @return object
-     * @throws GuzzleException
-     */
-    public function putEntities($values)
-    {
-        try{
-            $response = $this->client->post('/Files/Entities/?id='.$values['id_winmax4'], [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                ],
-                'json' => [
-                    'Code' => $values['code'],
-                    'Name' => $values['name'],
-                    'IsActive' => 1,
-                    'EntityType' => 0,
-                    'TaxPayerID' => $values['nif'],
-                    'Address' => $values['address'],
-                    'ZipCode' => $values['zipCode'],
-                    'Phone' => $values['phone'],
-                    'Fax' => null,
-                    'MobilePhone' => null,
-                    'Email' => $values['email'],
-                    'Location' => $values['locality'],
-                    'Country' => 'PT',
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            // Handle timeouts, connection failures, DNS errors, etc.
-            $this->handleConnectionError($e);
-            return null;
-        }
-
-        $entity = json_decode($response->getBody()->getContents());
-
-        Winmax4Entity::where('code', $values['code'])->update([
-            'license_id' => session('licenseID'),
-            'name' => $entity->Data->Entity->Name,
-            'address' => $entity->Data->Entity->Address,
-            'country_code' => $entity->Data->Entity->CountryCode,
-            'email' => $entity->Data->Entity->Email,
-            'entity_type' => $entity->Data->Entity->EntityType,
-            'fax' => $entity->Data->Entity->Fax,
-            'is_active' => $entity->Data->Entity->IsActive,
-            'location' => $entity->Data->Entity->Location,
-            'mobile_phone' => $entity->Data->Entity->MobilePhone,
-            'phone' => $entity->Data->Entity->Phone,
-            'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
-            'zip_code' => $entity->Data->Entity->ZipCode,
-        ]);
-
-        return $entity->Data->Entity;
     }
 
     /**
      * Handle non-200 responses from the Winmax4 API
      *
      * @param $response
+     * @return array
      */
-    private function handleNon200Response($response)
+    private function handleNon200Response($response): array
     {
         // Handle the non-200 response here
         // For example, you can log the error or throw an exception
@@ -356,31 +97,172 @@ class Winmax4Service
 
 
         if ($statusCode == 401) {
+            $errorMsg = 'Unauthorized access to Winmax4 API. Please check your credentials.';
             Winmax4SyncErrors::create([
-                'message' => 'Unauthorized access to Winmax4 API. Please check your credentials.',
+                'message' => $errorMsg,
                 config('winmax4.license_column') => session('licenseID')
             ]);
         }
         else
         {
+            $errorMsg = $this->renderErrorMessage($body);
             Winmax4SyncErrors::create([
-                'message' => "Error {$statusCode} while accessing Winmax4 API: {$body->Results['Code']} {$body->Results['Message']}",
+                'message' => "Error {$statusCode} while accessing Winmax4 API: {$body->Results['Code']} - {$errorMsg}",
                 config('winmax4.license_column') => session('licenseID')
             ]);
         }
+
+        return [
+            'error' => true,
+            'status' => $body?->Results['Code'] ?? 'API_ERROR',
+            'message' => $errorMsg,
+        ];
     }
 
     /**
      * Handle connection errors
      *
      * @param $exception
+     * @return array
      */
-    private function handleConnectionError($exception)
+    protected function handleConnectionError($exception): array
     {
         // Handle connection errors here
         Winmax4SyncErrors::create([
             'message' => 'Connection error: ' . $exception->getMessage(),
             config('winmax4.license_column') => session('licenseID')
         ]);
+
+        return [
+            'error' => true,
+            'status' => 'CONNECTION_ERROR',
+            'message' => 'Connection error: ' . $exception->getMessage(),
+        ];
+    }
+
+    /**
+     * Render an error message more user-friendly
+     *
+     * @param string $errorJson
+     * @return string
+     */
+    private function renderErrorMessage($errorJson): string
+    {
+        if($errorJson == null){
+            return 'Data not found';
+        }
+
+        switch ($errorJson['Results'][0]['Code']) {
+            case 'ARTICLECODEINUSE':
+                $errorJson['Results'][0]['Message'] = 'Article code is already in use';
+                break;
+            case 'ENTITYCODEINUSE':
+                $errorJson['Results'][0]['Message'] = 'Entity code is already in use';
+                break;
+            case 'REQUIREDFIELDSAREMISSING':
+                $errorJson['Results'][0]['Message'] = 'Required fields are missing';
+                break;
+            case 'ARTICLEDESIGNATIONCANTBECHANGED':
+                $errorJson['Results'][0]['Message'] = 'Article designation cannot be changed';
+                break;
+            case 'DUPLICATEARTICLESALETAXFEES':
+                $errorJson['Results'][0]['Message'] = 'Duplicate article sale tax fees';
+                break;
+            case 'DUPLICATEARTICLEPURCHASETAXFEES':
+                $errorJson['Results'][0]['Message'] = 'Duplicate article purchase tax fees';
+                break;
+            case 'TAXFEECODENOTFOUND':
+                $errorJson['Results'][0]['Message'] = 'Tax fee code not found';
+                break;
+            case 'CURRENCYNOTFOUND':
+                $errorJson['Results'][0]['Message'] = 'Currency not found';
+                break;
+            case 'DUPLICATEARTICLEPRICECURRENCY':
+                $errorJson['Results'][0]['Message'] = 'Duplicate article price currency';
+                break;
+            case 'COULDNTCREATEDOCUMENT':
+                $errorJson['Results'][0]['Message'] = 'Could not create the document';
+                break;
+            case 'InvalidArticleCode':
+                $errorJson['Results'][0]['Message'] = 'The article code is invalid';
+                break;
+            case 'ArticleIsNotActive':
+                $errorJson['Results'][0]['Message'] = 'The article is not active';
+                break;
+            case 'InvalidArticleType':
+                $errorJson['Results'][0]['Message'] = 'The article type is invalid';
+                break;
+            case 'InvalidUnit':
+                $errorJson['Results'][0]['Message'] = 'The unit is invalid';
+                break;
+            case 'InvalidTax':
+                $errorJson['Results'][0]['Message'] = 'The tax is invalid';
+                break;
+            case 'OutdatedBatch':
+                $errorJson['Results'][0]['Message'] = 'The batch is outdated';
+                break;
+            case 'InvalidBatch':
+                $errorJson['Results'][0]['Message'] = 'The batch is invalid';
+                break;
+            case 'ArticleWithSameSerialNumberInDocument':
+                $errorJson['Results'][0]['Message'] = 'The article with the same serial number is already in the document';
+                break;
+            case 'InvalidComposition':
+                $errorJson['Results'][0]['Message'] = 'The composition is invalid';
+                break;
+            case 'InvalidEntityCode':
+                $errorJson['Results'][0]['Message'] = 'The entity code is invalid';
+                break;
+            case 'ArticleNotAvailableForCurrentServiceZone':
+                $errorJson['Results'][0]['Message'] = 'The article is not available for the current service zone';
+                break;
+            case 'TotalIsNegative':
+                $errorJson['Results'][0]['Message'] = 'The total is negative';
+                break;
+            case 'UnitRequiresEDICode':
+                $errorJson['Results'][0]['Message'] = 'The unit requires an EDI code';
+                break;
+            case 'TaxRequiresEDICode':
+                $errorJson['Results'][0]['Message'] = 'The tax requires an EDI code';
+                break;
+            case 'AlreadyInDocument':
+                $errorJson['Results'][0]['Message'] = 'The article is already in the document';
+                break;
+            case 'InvalidTaxes':
+                $errorJson['Results'][0]['Message'] = 'The taxes are invalid';
+                break;
+            case 'NotEnoughStock':
+                $errorJson['Results'][0]['Message'] = 'There is not enough stock';
+                break;
+            case 'QuantityZero':
+                $errorJson['Results'][0]['Message'] = 'The quantity is zero';
+                break;
+            case 'SkipToNextDetail':
+                $errorJson['Results'][0]['Message'] = 'Skip to the next detail';
+                break;
+            case 'InvalidEntityInDetail':
+                $errorJson['Results'][0]['Message'] = 'The entity in the detail is invalid';
+                break;
+            case 'NoTaxesDefined':
+                $errorJson['Results'][0]['Message'] = 'No taxes are defined';
+                break;
+            case 'OnlyOnePercentageTaxAllowed':
+                $errorJson['Results'][0]['Message'] = 'Only one percentage tax is allowed';
+                break;
+            case 'NotAllowedOtherTaxesOverPercentageTax':
+                $errorJson['Results'][0]['Message'] = 'Not allowed other taxes over the percentage tax';
+                break;
+            case 'TaxRateDoesntHaveSAFTDesignation':
+                $errorJson['Results'][0]['Message'] = 'The tax rate does not have a SAFT designation';
+                break;
+            case 'EXCEPTION':
+                $errorJson['Results'][0]['Message'] = 'An exception occurred! Please contact the administrator';
+                break;
+            default:
+                $errorJson['Results'][0]['Message'] = 'An unknown error occurred! Please contact the administrator';
+                break;
+        }
+
+        return $errorJson['Results'][0]['Message'];
     }
 }

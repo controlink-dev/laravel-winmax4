@@ -3,6 +3,7 @@
 namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 
@@ -44,63 +45,47 @@ class Winmax4EntityService extends Winmax4Service
      */
     public function getEntities($lastChangeDateAfter = null): object|array|null
     {
-        $url = $this->url . '/Files/Entities';
+        $url ='/Files/Entities';
 
         if($lastChangeDateAfter){
             $url .= "?LastChangeDateAfter=". $lastChangeDateAfter;
         }
 
-        try{
+        try {
             $response = $this->client->get($url, [
-                'verify' => $this->settings['verify_ssl_guzzle'],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                    'Content-Type' => 'application/json',
                 ],
             ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
 
-            $responseJSONDecoded = json_decode($response->getBody()->getContents());
+        $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
-            if(is_null($responseJSONDecoded)){
-                return null;
-            }
+        if(is_null($responseJSONDecoded)){
+            return null;
+        }
 
-            if($responseJSONDecoded->Data->Filter->TotalPages > 1){
-                for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
+        if($responseJSONDecoded->Data->Filter->TotalPages > 1){
+            for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
+                try{
                     $response = $this->client->get($url . '?PageNumber=' . $i, [
-                        'verify' => $this->settings['verify_ssl_guzzle'],
                         'headers' => [
                             'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                            'Content-Type' => 'application/json',
                         ],
                     ]);
-
-                    $responseJSONDecoded->Data->Entities = array_merge($responseJSONDecoded->Data->Entities, json_decode($response->getBody()->getContents())->Data->Entities);
+                } catch (ConnectException $e) {
+                    // Handle timeouts, connection failures, DNS errors, etc.
+                    return $this->handleConnectionError($e);
                 }
+
+                $responseJSONDecoded->Data->Entities = array_merge($responseJSONDecoded->Data->Entities, json_decode($response->getBody()->getContents())->Data->Entities);
             }
-
-            return $responseJSONDecoded;
-        }catch (\GuzzleHttp\Exception\RequestException $e) {
-
-            // Log or handle the error response
-            if ($e->hasResponse()) {
-                $errorResponse = $e->getResponse();
-                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
-
-                // Return the error JSON or handle it as needed
-                return [
-                    'error' => true,
-                    'status' => $errorResponse->getStatusCode(),
-                    'message' => $this->renderErrorMessage($errorJson),
-                ];
-            }
-
-            // If no response is available
-            return [
-                'error' => true,
-                'message' => $e->getMessage(),
-            ];
         }
+
+        return $responseJSONDecoded;
     }
 
     /**
@@ -166,8 +151,7 @@ class Winmax4EntityService extends Winmax4Service
      */
     public function postEntities(string $name, string $code = null, int $entityType = null, string $taxPayerID = null, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): array
     {
-        try{
-            //Check if  taxPayerID do not start with 5 or 6
+            //Check if taxPayerID do not start with 5 or 6
             $gdpr = [];
             if($taxPayerID && !in_array(substr($taxPayerID, 0, 1), ['5', '6'])){
                 $gdpr = [
@@ -176,30 +160,33 @@ class Winmax4EntityService extends Winmax4Service
                 ];
             }
 
-            $response = $this->client->post($this->url . '/files/entities', [
-                'verify' => $this->settings['verify_ssl_guzzle'],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                    'Content-Type' => 'application/json',
-                    'http_errors' => false,
-                ],
-                'json' => [
-                    'Code' => $code,
-                    'Name' => $name,
-                    'IsActive' => $isActive,
-                    'EntityType' => $entityType,
-                    'TaxPayerID' => $taxPayerID,
-                    'Address' => $address,
-                    'ZipCode' => $zipCode,
-                    'Phone' => $phone,
-                    'Fax' => $fax,
-                    'MobilePhone' => $mobilePhone,
-                    'Email' => $email,
-                    'Location' => $locality,
-                    'Country' => $country,
-                    ...$gdpr,
-                ],
-            ]);
+            try{
+                $response = $this->client->post('/Files/Entities', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                    ],
+                    'json' => [
+                        'Code' => $code,
+                        'Name' => $name,
+                        'IsActive' => $isActive,
+                        'EntityType' => $entityType,
+                        'TaxPayerID' => $taxPayerID,
+                        'Address' => $address,
+                        'ZipCode' => $zipCode,
+                        'Phone' => $phone,
+                        'Fax' => $fax,
+                        'MobilePhone' => $mobilePhone,
+                        'Email' => $email,
+                        'Location' => $locality,
+                        'Country' => $country,
+                        ...$gdpr,
+                    ],
+                ]);
+            }catch (ConnectException $e) {
+                // Handle timeouts, connection failures, DNS errors, etc.
+                return $this->handleConnectionError($e);
+            }
+
 
             if(config('winmax4.use_soft_deletes')) {
                 $builder = Winmax4Entity::withTrashed();
@@ -232,54 +219,6 @@ class Winmax4EntityService extends Winmax4Service
             );
 
             return $builder->where('id_winmax4', $responseDecoded->Data->Entity->ID)->first()->toArray();
-
-        }catch (\GuzzleHttp\Exception\RequestException $e) {
-
-            // Log or handle the error response
-            if ($e->hasResponse()) {
-                $errorResponse = $e->getResponse();
-                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
-
-                if($errorJson['Results'][0]['Code'] == 'ENTITYCODEINUSE'){
-                    $idWinmax4 = Winmax4Entity::where('code', $code)->value('id_winmax4');
-
-                    if($idWinmax4){
-                        if(Winmax4Entity::where('code', $code)->first()->is_active == 0){
-                            $this->putEntities($idWinmax4,
-                                $code,
-                                $name,
-                                $entityType,
-                                $taxPayerID,
-                                $address,
-                                $zipCode,
-                                $locality,
-                                1,
-                                $phone,
-                                $fax,
-                                $mobilePhone,
-                                $email,
-                                $country
-                            );
-
-                            return Winmax4Entity::where('code', $code)->first()->toArray();
-                        }
-                    }
-                }
-
-                // Return the error JSON or handle it as needed
-                return [
-                    'error' => true,
-                    'status' => $errorResponse->getStatusCode(),
-                    'message' => $this->renderErrorMessage($errorJson),
-                ];
-            }
-
-            // If no response is available
-            return [
-                'error' => true,
-                'message' => $e->getMessage(),
-            ];
-        }
     }
 
     /**
@@ -343,10 +282,10 @@ class Winmax4EntityService extends Winmax4Service
      * @param string|null $email Entity email, default is null
      * @param string|null $expirationDate Entity expiration date, default is null
      * @param string|null $country Entity country, default is 'PT'
-     * @return Winmax4Entity Returns the entity object
+     * @return array Returns the entity object
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function putEntities(int $idWinmax4, string $code, string $name, int $entityType, string $taxPayerID, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, string $expirationDate = null, ?string $country = 'PT'): Winmax4Entity
+    public function putEntities(int $idWinmax4, string $code, string $name, int $entityType, string $taxPayerID, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, string $expirationDate = null, ?string $country = 'PT'): array
     {
         //Check if  taxPayerID do not start with 5 or 6
         $gdpr = [];
@@ -357,30 +296,33 @@ class Winmax4EntityService extends Winmax4Service
             ];
         }
 
-        $response = $this->client->put($this->url . '/Files/Entities/?id='.$idWinmax4, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-                'http_errors' => false,
-            ],
-            'json' => [
-                'Code' => $code,
-                'Name' => $name,
-                'IsActive' => $isActive,
-                'EntityType' => $entityType,
-                'TaxPayerID' => $taxPayerID,
-                'Address' => $address,
-                'ZipCode' => $zipCode,
-                'Phone' => $phone,
-                'Fax' => $fax,
-                'MobilePhone' => $mobilePhone,
-                'Email' => $email,
-                'Location' => $locality,
-                'Country' => $country,
-                ...$gdpr,
-            ],
-        ]);
+        try{
+            $response = $this->client->put('/Files/Entities/?id='.$idWinmax4, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+                'json' => [
+                    'Code' => $code,
+                    'Name' => $name,
+                    'IsActive' => $isActive,
+                    'EntityType' => $entityType,
+                    'TaxPayerID' => $taxPayerID,
+                    'Address' => $address,
+                    'ZipCode' => $zipCode,
+                    'Phone' => $phone,
+                    'Fax' => $fax,
+                    'MobilePhone' => $mobilePhone,
+                    'Email' => $email,
+                    'Location' => $locality,
+                    'Country' => $country,
+                    ...$gdpr,
+                ],
+            ]);
+        }catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
+
 
         $entity = json_decode($response->getBody()->getContents());
 
@@ -447,63 +389,30 @@ class Winmax4EntityService extends Winmax4Service
      * | `GuzzleHttp\Exception\GuzzleException`     | Throws when there is an HTTP client error during the DELETE request. |
      *
      * @param int $idWinmax4 The ID of the Winmax4 entity to delete.
-     * @return JsonResponse|Winmax4Entity JSON response or deleted entity object.
+     * @return array | JsonResponse JSON response or deleted entity object.
      * @throws GuzzleException
      */
-    public function deleteEntities(int $idWinmax4): Winmax4Entity|JsonResponse
+    public function deleteEntities(int $idWinmax4): array
     {
         $localEntity = Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
 
-        $response = $this->client->delete($this->url . '/Files/Entities/?id='.$idWinmax4, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-                'http_errors' => false,
-            ],
-        ]);
-
-        $entity = json_decode($response->getBody()->getContents());
-
-        if($entity->Results[0]->Code !== self::WINMAX4_RESPONSE_OK){
-
-            // If the result is not OK, we will disable the entity
-            $entity = $this->putEntities($idWinmax4, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
-
-            return $entity;
-
-        }else {
-
-            $localEntity->is_active = 0;
-            $localEntity->deleted_at = now();
-            $localEntity->save();
-
-            return response()->json([
-                'message' => 'Entity deleted successfully',
+        try{
+            $response = $this->client->delete('/Files/Entities/?id='.$idWinmax4, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
             ]);
-        }
-    }
-
-    public function renderErrorMessage($errorJson){
-        if($errorJson == null){
-            return 'Entities not found';
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
         }
 
-        switch ($errorJson['Results'][0]['Code']) {
-            case 'REQUIREDFIELDSAREMISSING':
-                $errorJson['Results'][0]['Message'] = 'Required fields are missing';
-                break;
-            case 'ENTITYCODEINUSE':
-                $errorJson['Results'][0]['Message'] = 'Entity code is already in use';
-                break;
-            case 'EXCEPTION':
-                $errorJson['Results'][0]['Message'] = 'An exception occurred';
-                break;
-            default:
-                $errorJson['Results'][0]['Message'] = 'An unknown error occurred';
-                break;
-        }
+        $localEntity->is_active = 0;
+        $localEntity->deleted_at = now();
+        $localEntity->save();
 
-        return $errorJson;
+        return response()->json([
+            'message' => 'Entity deleted successfully',
+        ]);
     }
 }

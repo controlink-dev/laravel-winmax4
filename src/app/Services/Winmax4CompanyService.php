@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Services;
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Winmax4CompanyService extends Winmax4Service
@@ -43,13 +44,17 @@ class Winmax4CompanyService extends Winmax4Service
      */
     public function getCompanies(): object|array|null
     {
-        $response = $this->client->get($this->url . '/Settings/Company', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get('/Settings/Company', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                    'Content-Type' => 'application/json',
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
 
         return json_decode($response->getBody()->getContents());
     }

@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Services;
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Winmax4PaymentTypeService extends Winmax4Service
@@ -43,15 +44,18 @@ class Winmax4PaymentTypeService extends Winmax4Service
      */
     public function getPaymentTypes(): object|array|null
     {
-        $url = $this->url . '/Files/PaymentTypes';
+        $url = '/Files/PaymentTypes';
 
-        $response = $this->client->get($url, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get($url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        }catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
@@ -61,13 +65,16 @@ class Winmax4PaymentTypeService extends Winmax4Service
 
         if($responseJSONDecoded->Data->Filter->TotalPages > 1){
             for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
-                $response = $this->client->get($url . '?PageNumber=' . $i, [
-                    'verify' => $this->settings['verify_ssl_guzzle'],
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                        'Content-Type' => 'application/json',
-                    ],
-                ]);
+                try{
+                    $response = $this->client->get($url . '?PageNumber=' . $i, [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                        ],
+                    ]);
+                } catch (ConnectException $e) {
+                    // Handle timeouts, connection failures, DNS errors, etc.
+                    return $this->handleConnectionError($e);
+                }
 
                 $responseJSONDecoded->Data->PaymentTypes = array_merge($responseJSONDecoded->Data->PaymentTypes, json_decode($response->getBody()->getContents())->Data->PaymentTypes);
             }

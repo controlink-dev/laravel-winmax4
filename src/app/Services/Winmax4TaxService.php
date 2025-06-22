@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Services;
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Winmax4TaxService extends Winmax4Service
@@ -43,15 +44,19 @@ class Winmax4TaxService extends Winmax4Service
      */
     public function getTaxes(): object|array|null
     {
-        $url = $this->url . '/Files/Taxes';
+        $url = '/Files/Taxes';
 
-        $response = $this->client->get($url, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get($url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
+
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
@@ -61,13 +66,17 @@ class Winmax4TaxService extends Winmax4Service
 
         if($responseJSONDecoded->Data->Filter->TotalPages > 1){
             for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
-                $response = $this->client->get($url . '?PageNumber=' . $i, [
-                    'verify' => $this->settings['verify_ssl_guzzle'],
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                        'Content-Type' => 'application/json',
-                    ],
-                ]);
+                try{
+                    $response = $this->client->get($url . '?PageNumber=' . $i, [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                        ],
+                    ]);
+                } catch (ConnectException $e) {
+                    // Handle timeouts, connection failures, DNS errors, etc.
+                    return $this->handleConnectionError($e);
+                }
+
 
                 $responseJSONDecoded->Data->Taxes = array_merge($responseJSONDecoded->Data->Taxes, json_decode($response->getBody()->getContents())->Data->Taxes);
             }
