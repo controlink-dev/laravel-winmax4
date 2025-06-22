@@ -66,7 +66,8 @@ class syncWarehouses extends Command
                 $winmax4Setting->company_code,
                 $winmax4Setting->username,
                 $winmax4Setting->password,
-                $winmax4Setting->n_terminal
+                $winmax4Setting->n_terminal,
+                $winmax4Setting->license_id
             );
 
             $warehouses = $winmax4Service->getWarehouses()->Data->Warehouses;

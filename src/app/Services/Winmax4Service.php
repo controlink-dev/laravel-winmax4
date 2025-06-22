@@ -17,16 +17,16 @@ class Winmax4Service
     const WINMAX4_RESPONSE_OK = 'OK';
     const WINMAX4_RESPONSE_EXCEPTION = 'EXCEPTION';
 
-    public function __construct($saveMode = false, $url = '', $company_code = '', $username = '', $password = '', $n_terminal = '')
+    public function __construct($saveMode = false, $url = '', $company_code = '', $username = '', $password = '', $n_terminal = '', $license_id = '')
     {
         $stack = HandlerStack::create();
-        $stack->push(function (callable $handler){
-            return function ($request, array $options) use ($handler) {
+        $stack->push(function (callable $handler) use ($license_id) {
+            return function ($request, array $options) use ($license_id, $handler) {
                 return $handler($request, $options)->then(
-                    function ($response) {
+                    function ($response) use ($license_id) {
                         if ($response->getStatusCode() !== 200) {
                             // Call your custom handler
-                            $this->handleNon200Response($response);
+                            $this->handleNon200Response($response, $license_id);
                         }
                         return $response;
                     }
@@ -92,9 +92,9 @@ class Winmax4Service
      * @param $response
      * @return array
      */
-    private function handleNon200Response($response): array
+    private function handleNon200Response($response, $license_id): array
     {
-        // Handle the non-200 response here
+        // Handle the non-200 response here,
         // For example, you can log the error or throw an exception
         $statusCode = $response->getStatusCode();
         $body = $response->getBody()->getContents();
@@ -103,14 +103,14 @@ class Winmax4Service
             $errorMsg = 'Unauthorized access to Winmax4 API. Please check your credentials.';
             Winmax4SyncErrors::create([
                 'message' => $errorMsg,
-                config('winmax4.license_column') => session('licenseID')
+                config('winmax4.license_column') => session('licenseID') ?? $license_id,
             ]);
         }
         if($statusCode == 404){
             $errorMsg = 'Data not found.';
             Winmax4SyncErrors::create([
                 'message' => $errorMsg,
-                config('winmax4.license_column') => session('licenseID')
+                config('winmax4.license_column') => session('licenseID')  ?? $license_id,
             ]);
         }
         else
