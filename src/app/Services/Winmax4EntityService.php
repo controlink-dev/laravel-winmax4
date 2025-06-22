@@ -295,7 +295,7 @@ class Winmax4EntityService extends Winmax4Service
      */
     public function putEntities(int $idWinmax4, string $code, string $name, int $entityType, string $taxPayerID, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, string $expirationDate = null, ?string $country = 'PT'): array
     {
-        //Check if  taxPayerID do not start with 5 or 6
+        //Check if taxPayerID do not start with 5 or 6
         $gdpr = [];
         if($taxPayerID && !in_array(substr($taxPayerID, 0, 1), ['5', '6'])){
             $gdpr = [
@@ -353,7 +353,7 @@ class Winmax4EntityService extends Winmax4Service
             'zip_code' => $entity->Data->Entity->ZipCode,
         ]);
 
-        return Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
+        return Winmax4Entity::where('id_winmax4', $idWinmax4)->first()->toArray();
     }
 
     /**
