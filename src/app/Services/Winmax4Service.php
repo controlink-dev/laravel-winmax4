@@ -3,25 +3,50 @@
 namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use Controlink\LaravelWinmax4\app\Models\Winmax4SyncErrors;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 
 class Winmax4Service
 {
     protected $client;
-    protected $url;
-    protected $settings;
     protected $token;
 
     public function __construct($saveMode = false, $url = '', $company_code = '', $username = '', $password = '', $n_terminal = '')
     {
-        $this->client = new Client();
-        $this->settings = config('winmax4');
-        $this->url = $url;
+        $stack = HandlerStack::create();
+        $stack->push(function (callable $handler){
+            return function ($request, array $options) use ($handler) {
+                return $handler($request, $options)->then(
+                    function ($response) {
+                        if ($response->getStatusCode() !== 200) {
+                            // Call your custom handler
+                            $this->handleNon200Response($response);
+                        }
+                        return $response;
+                    }
+                );
+            };
+        });
+
+        $this->client = new Client([
+            'base_uri' => $url,
+            'timeout' => config('winmax4.timeout_guzzle', 30),
+            'connect_timeout' => config('winmax4.connect_timeout_guzzle', 30),
+            'http_errors' => false,
+            'handler' => $stack,
+            'verify' => config('winmax4.verify_ssl_guzzle', true),
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ],
+        ]);
 
         if (!$saveMode) {
-            $this->token = $this->generateToken($url, $company_code, $username, $password, $n_terminal);
+            $this->token = $this->generateToken($company_code, $username, $password, $n_terminal);
         }
 
     }
@@ -29,25 +54,28 @@ class Winmax4Service
     /**
      * Authenticate to Winmax4 API
      *
-     * @param string $url
      * @param string $company_code
      * @param string $username
      * @param string $password
      * @param string $n_terminal
      * @return object
-     * @throws GuzzleException
      */
-    public function generateToken($url, $company_code, $username, $password, $n_terminal)
+    public function generateToken(string $company_code, string $username, string $password, string $n_terminal)
     {
-        $response = $this->client->post($url . '/Account/GenerateToken', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'json' => [
-                'Company' => $company_code,
-                'UserLogin' => $username,
-                'Password' => $password,
-                'TerminalCode' => $n_terminal,
-            ],
-        ]);
+        try {
+            $response = $this->client->post('/Account/GenerateToken', [
+                'json' => [
+                    'Company' => $company_code,
+                    'UserLogin' => $username,
+                    'Password' => $password,
+                    'TerminalCode' => $n_terminal,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
 
         return json_decode($response->getBody()->getContents());
     }
@@ -60,13 +88,17 @@ class Winmax4Service
      */
     public function getCurrencies()
     {
-        $response = $this->client->get($this->url . '/Files/Currencies', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try {
+            $response = $this->client->get('/Files/Currencies', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
 
         return json_decode($response->getBody()->getContents());
     }
@@ -79,13 +111,17 @@ class Winmax4Service
      */
     public function getDocumentTypes()
     {
-        $response = $this->client->get($this->url . '/Files/DocumentTypes', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get('/Files/DocumentTypes', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
 
         return json_decode($response->getBody()->getContents());
     }
@@ -98,13 +134,17 @@ class Winmax4Service
      */
     public function getFamilies()
     {
-        $response = $this->client->get($this->url . '/Files/Families?IncludeSubFamilies=true', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get('/Files/Families?IncludeSubFamilies=true', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
 
         return json_decode($response->getBody()->getContents());
     }
@@ -118,13 +158,18 @@ class Winmax4Service
      */
     public function getTaxes()
     {
-        $response = $this->client->get($this->url . '/Files/Taxes', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get('/Files/Taxes', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
 
         return json_decode($response->getBody()->getContents());
     }
@@ -137,13 +182,17 @@ class Winmax4Service
      */
     public function getArticles()
     {
-        $response = $this->client->get($this->url . '/Files/Articles?IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get('/Files/Articles?IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
 
         return json_decode($response->getBody()->getContents());
     }
@@ -156,13 +205,17 @@ class Winmax4Service
      */
     public function getEntities()
     {
-        $response = $this->client->get($this->url . '/Files/Entities', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-        ]);
+        try{
+            $response = $this->client->get('/Files/Entities', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
 
         return json_decode($response->getBody()->getContents());
     }
@@ -176,28 +229,33 @@ class Winmax4Service
      */
     public function postEntities($values)
     {
-        $response = $this->client->post($this->url . '/Files/Entities', [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'Code' => $values['code'],
-                'Name' => $values['name'],
-                'IsActive' => 1,
-                'EntityType' => 0,
-                'TaxPayerID' => $values['nif'],
-                'Address' => $values['address'],
-                'ZipCode' => $values['zipCode'],
-                'Phone' => $values['phone'],
-                'Fax' => null,
-                'MobilePhone' => null,
-                'Email' => $values['email'],
-                'Location' => $values['locality'],
-                'Country' => 'PT',
-            ],
-        ]);
+        try{
+            $response = $this->client->post('/Files/Entities', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+                'json' => [
+                    'Code' => $values['code'],
+                    'Name' => $values['name'],
+                    'IsActive' => 1,
+                    'EntityType' => 0,
+                    'TaxPayerID' => $values['nif'],
+                    'Address' => $values['address'],
+                    'ZipCode' => $values['zipCode'],
+                    'Phone' => $values['phone'],
+                    'Fax' => null,
+                    'MobilePhone' => null,
+                    'Email' => $values['email'],
+                    'Location' => $values['locality'],
+                    'Country' => 'PT',
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
+
 
         $entity = json_decode($response->getBody()->getContents());
 
@@ -231,28 +289,32 @@ class Winmax4Service
      */
     public function putEntities($values)
     {
-        $response = $this->client->post($this->url . '/Files/Entities/?id='.$values['id_winmax4'], [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'Code' => $values['code'],
-                'Name' => $values['name'],
-                'IsActive' => 1,
-                'EntityType' => 0,
-                'TaxPayerID' => $values['nif'],
-                'Address' => $values['address'],
-                'ZipCode' => $values['zipCode'],
-                'Phone' => $values['phone'],
-                'Fax' => null,
-                'MobilePhone' => null,
-                'Email' => $values['email'],
-                'Location' => $values['locality'],
-                'Country' => 'PT',
-            ],
-        ]);
+        try{
+            $response = $this->client->post('/Files/Entities/?id='.$values['id_winmax4'], [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+                'json' => [
+                    'Code' => $values['code'],
+                    'Name' => $values['name'],
+                    'IsActive' => 1,
+                    'EntityType' => 0,
+                    'TaxPayerID' => $values['nif'],
+                    'Address' => $values['address'],
+                    'ZipCode' => $values['zipCode'],
+                    'Phone' => $values['phone'],
+                    'Fax' => null,
+                    'MobilePhone' => null,
+                    'Email' => $values['email'],
+                    'Location' => $values['locality'],
+                    'Country' => 'PT',
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            $this->handleConnectionError($e);
+            return null;
+        }
 
         $entity = json_decode($response->getBody()->getContents());
 
@@ -273,5 +335,48 @@ class Winmax4Service
         ]);
 
         return $entity->Data->Entity;
+    }
+
+    /**
+     * Handle non-200 responses from the Winmax4 API
+     *
+     * @param $response
+     */
+    private function handleNon200Response($response)
+    {
+        // Handle the non-200 response here
+        // For example, you can log the error or throw an exception
+        $statusCode = $response->getStatusCode();
+        $body = $response->getBody()->getContents();
+
+
+
+        if ($statusCode == 401) {
+            Winmax4SyncErrors::create([
+                'message' => 'Unauthorized access to Winmax4 API. Please check your credentials.',
+                config('winmax4.license_column') => session('licenseID')
+            ]);
+        }
+        else
+        {
+            Winmax4SyncErrors::create([
+                'message' => "Error {$statusCode} while accessing Winmax4 API: {$body->Results['Code']} {$body->Results['Message']}",
+                config('winmax4.license_column') => session('licenseID')
+            ]);
+        }
+    }
+
+    /**
+     * Handle connection errors
+     *
+     * @param $exception
+     */
+    private function handleConnectionError($exception)
+    {
+        // Handle connection errors here
+        Winmax4SyncErrors::create([
+            'message' => 'Connection error: ' . $exception->getMessage(),
+            config('winmax4.license_column') => session('licenseID')
+        ]);
     }
 }
