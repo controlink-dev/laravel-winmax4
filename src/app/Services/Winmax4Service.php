@@ -26,7 +26,7 @@ class Winmax4Service
                     function ($response) use ($license_id) {
                         if ($response->getStatusCode() !== 200) {
                             // Call your custom handler
-                            $this->handleNon200Response($response, $license_id);
+                            return $this->handleNon200Response($response, $license_id);
                         }
                         return $response;
                     }

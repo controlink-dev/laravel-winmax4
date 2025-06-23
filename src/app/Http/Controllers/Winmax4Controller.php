@@ -135,7 +135,7 @@ class Winmax4Controller extends Controller
         } else {
             return response()->json([
                 'message' => 'Error',
-                'error' => $response->Results[0]->Message,
+                'error' => $response['message'],
             ], 400);
         }
     }
