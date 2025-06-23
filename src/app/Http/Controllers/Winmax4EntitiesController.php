@@ -160,7 +160,7 @@ class Winmax4EntitiesController extends Controller
             'country' => 'string|size:2|in:PT',
         ]);
 
-        $response = response()->json($this->winmax4Service->postEntities(
+        $response = $this->winmax4Service->postEntities(
             $request->name,
             $request->code,
             $request->entityType,
@@ -174,7 +174,7 @@ class Winmax4EntitiesController extends Controller
             $request->mobilePhone,
             $request->email,
             $request->country,
-        ), 200);
+        );
 
         if($response['error'] && $response['status'] === 'ENTITYCODEINUSE') {
             $idWinmax4 = Winmax4Entity::where('code', $request->code)->value('id_winmax4');
