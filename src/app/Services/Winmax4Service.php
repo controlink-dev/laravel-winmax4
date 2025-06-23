@@ -162,119 +162,119 @@ class Winmax4Service
             return 'Data not found';
         }
 
-        $errorJson = json_decode($errorJson, true);
+        $errorJsonArray = json_decode($errorJson, true);
 
-        switch ($errorJson['Results'][0]['Code']) {
+        switch ($errorJsonArray['Results'][0]['Code']) {
             case 'ARTICLECODEINUSE':
-                $errorJson['Results'][0]['Message'] = 'Article code is already in use';
+                $errorJsonArray['Results'][0]['Message'] = 'Article code is already in use';
                 break;
             case 'ENTITYCODEINUSE':
-                $errorJson['Results'][0]['Message'] = 'Entity code is already in use';
+                $errorJsonArray['Results'][0]['Message'] = 'Entity code is already in use';
                 break;
             case 'REQUIREDFIELDSAREMISSING':
-                $errorJson['Results'][0]['Message'] = 'Required fields are missing';
+                $errorJsonArray['Results'][0]['Message'] = 'Required fields are missing';
                 break;
             case 'ARTICLEDESIGNATIONCANTBECHANGED':
-                $errorJson['Results'][0]['Message'] = 'Article designation cannot be changed';
+                $errorJsonArray['Results'][0]['Message'] = 'Article designation cannot be changed';
                 break;
             case 'DUPLICATEARTICLESALETAXFEES':
-                $errorJson['Results'][0]['Message'] = 'Duplicate article sale tax fees';
+                $errorJsonArray['Results'][0]['Message'] = 'Duplicate article sale tax fees';
                 break;
             case 'DUPLICATEARTICLEPURCHASETAXFEES':
-                $errorJson['Results'][0]['Message'] = 'Duplicate article purchase tax fees';
+                $errorJsonArray['Results'][0]['Message'] = 'Duplicate article purchase tax fees';
                 break;
             case 'TAXFEECODENOTFOUND':
-                $errorJson['Results'][0]['Message'] = 'Tax fee code not found';
+                $errorJsonArray['Results'][0]['Message'] = 'Tax fee code not found';
                 break;
             case 'CURRENCYNOTFOUND':
-                $errorJson['Results'][0]['Message'] = 'Currency not found';
+                $errorJsonArray['Results'][0]['Message'] = 'Currency not found';
                 break;
             case 'DUPLICATEARTICLEPRICECURRENCY':
-                $errorJson['Results'][0]['Message'] = 'Duplicate article price currency';
+                $errorJsonArray['Results'][0]['Message'] = 'Duplicate article price currency';
                 break;
             case 'COULDNTCREATEDOCUMENT':
-                $errorJson['Results'][0]['Message'] = 'Could not create the document';
+                $errorJsonArray['Results'][0]['Message'] = 'Could not create the document';
                 break;
             case 'InvalidArticleCode':
-                $errorJson['Results'][0]['Message'] = 'The article code is invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The article code is invalid';
                 break;
             case 'ArticleIsNotActive':
-                $errorJson['Results'][0]['Message'] = 'The article is not active';
+                $errorJsonArray['Results'][0]['Message'] = 'The article is not active';
                 break;
             case 'InvalidArticleType':
-                $errorJson['Results'][0]['Message'] = 'The article type is invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The article type is invalid';
                 break;
             case 'InvalidUnit':
-                $errorJson['Results'][0]['Message'] = 'The unit is invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The unit is invalid';
                 break;
             case 'InvalidTax':
-                $errorJson['Results'][0]['Message'] = 'The tax is invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The tax is invalid';
                 break;
             case 'OutdatedBatch':
-                $errorJson['Results'][0]['Message'] = 'The batch is outdated';
+                $errorJsonArray['Results'][0]['Message'] = 'The batch is outdated';
                 break;
             case 'InvalidBatch':
-                $errorJson['Results'][0]['Message'] = 'The batch is invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The batch is invalid';
                 break;
             case 'ArticleWithSameSerialNumberInDocument':
-                $errorJson['Results'][0]['Message'] = 'The article with the same serial number is already in the document';
+                $errorJsonArray['Results'][0]['Message'] = 'The article with the same serial number is already in the document';
                 break;
             case 'InvalidComposition':
-                $errorJson['Results'][0]['Message'] = 'The composition is invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The composition is invalid';
                 break;
             case 'InvalidEntityCode':
-                $errorJson['Results'][0]['Message'] = 'The entity code is invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The entity code is invalid';
                 break;
             case 'ArticleNotAvailableForCurrentServiceZone':
-                $errorJson['Results'][0]['Message'] = 'The article is not available for the current service zone';
+                $errorJsonArray['Results'][0]['Message'] = 'The article is not available for the current service zone';
                 break;
             case 'TotalIsNegative':
-                $errorJson['Results'][0]['Message'] = 'The total is negative';
+                $errorJsonArray['Results'][0]['Message'] = 'The total is negative';
                 break;
             case 'UnitRequiresEDICode':
-                $errorJson['Results'][0]['Message'] = 'The unit requires an EDI code';
+                $errorJsonArray['Results'][0]['Message'] = 'The unit requires an EDI code';
                 break;
             case 'TaxRequiresEDICode':
-                $errorJson['Results'][0]['Message'] = 'The tax requires an EDI code';
+                $errorJsonArray['Results'][0]['Message'] = 'The tax requires an EDI code';
                 break;
             case 'AlreadyInDocument':
-                $errorJson['Results'][0]['Message'] = 'The article is already in the document';
+                $errorJsonArray['Results'][0]['Message'] = 'The article is already in the document';
                 break;
             case 'InvalidTaxes':
-                $errorJson['Results'][0]['Message'] = 'The taxes are invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The taxes are invalid';
                 break;
             case 'NotEnoughStock':
-                $errorJson['Results'][0]['Message'] = 'There is not enough stock';
+                $errorJsonArray['Results'][0]['Message'] = 'There is not enough stock';
                 break;
             case 'QuantityZero':
-                $errorJson['Results'][0]['Message'] = 'The quantity is zero';
+                $errorJsonArray['Results'][0]['Message'] = 'The quantity is zero';
                 break;
             case 'SkipToNextDetail':
-                $errorJson['Results'][0]['Message'] = 'Skip to the next detail';
+                $errorJsonArray['Results'][0]['Message'] = 'Skip to the next detail';
                 break;
             case 'InvalidEntityInDetail':
-                $errorJson['Results'][0]['Message'] = 'The entity in the detail is invalid';
+                $errorJsonArray['Results'][0]['Message'] = 'The entity in the detail is invalid';
                 break;
             case 'NoTaxesDefined':
-                $errorJson['Results'][0]['Message'] = 'No taxes are defined';
+                $errorJsonArray['Results'][0]['Message'] = 'No taxes are defined';
                 break;
             case 'OnlyOnePercentageTaxAllowed':
-                $errorJson['Results'][0]['Message'] = 'Only one percentage tax is allowed';
+                $errorJsonArray['Results'][0]['Message'] = 'Only one percentage tax is allowed';
                 break;
             case 'NotAllowedOtherTaxesOverPercentageTax':
-                $errorJson['Results'][0]['Message'] = 'Not allowed other taxes over the percentage tax';
+                $errorJsonArray['Results'][0]['Message'] = 'Not allowed other taxes over the percentage tax';
                 break;
             case 'TaxRateDoesntHaveSAFTDesignation':
-                $errorJson['Results'][0]['Message'] = 'The tax rate does not have a SAFT designation';
+                $errorJsonArray['Results'][0]['Message'] = 'The tax rate does not have a SAFT designation';
                 break;
             case 'EXCEPTION':
-                $errorJson['Results'][0]['Message'] = 'An exception occurred! Please contact the administrator';
+                $errorJsonArray['Results'][0]['Message'] = 'An exception occurred! Please contact the administrator';
                 break;
             default:
-                $errorJson['Results'][0]['Message'] = 'An unknown error occurred! Please contact the administrator';
+                $errorJsonArray['Results'][0]['Message'] = 'An unknown error occurred! Please contact the administrator';
                 break;
         }
 
-        return $errorJson['Results'][0]['Message'];
+        return $errorJsonArray['Results'][0]['Message'];
     }
 }
