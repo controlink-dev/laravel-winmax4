@@ -316,7 +316,8 @@ class Winmax4EntitiesController extends Controller
         $localEntity = Winmax4Entity::where('id_winmax4', $id)->first();
         $response = $this->winmax4Service->deleteEntities($id);
 
-        if(isset($response['error'])){
+        $responseDecoded = json_decode($response, true);
+        if(isset($responseDecoded['error'])){
             // If the result is not OK, we will disable the entity
             $response = $this->winmax4Service->putEntities($id, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
         }

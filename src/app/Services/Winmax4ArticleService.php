@@ -555,7 +555,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         $article = json_decode($response->getBody()->getContents(), true);
 
-        if (is_array($article) && $article['error'] === true) {
+        if (is_array($article) && isset($article['error']) && $article['error'] === true) {
             return $article;
         }
 
