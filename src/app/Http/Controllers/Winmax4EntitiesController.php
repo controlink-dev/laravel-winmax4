@@ -142,7 +142,7 @@ class Winmax4EntitiesController extends Controller
      * @return JsonResponse Returns a JSON response with the API result.
      * @throws GuzzleException If an error occurs during the API request.
      */
-    public function postEntities(Request $request): JsonResponse
+    public function postEntities(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -202,7 +202,7 @@ class Winmax4EntitiesController extends Controller
             }
         }
 
-        return $response;
+        return response()->json($response);
     }
 
     /**
