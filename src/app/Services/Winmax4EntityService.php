@@ -200,7 +200,7 @@ class Winmax4EntityService extends Winmax4Service
 
             $responseDecoded = json_decode($response->getBody()->getContents());
 
-            if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+            if ($responseDecoded && $responseDecoded->error === true) {
                 return $responseDecoded;
             }
 
