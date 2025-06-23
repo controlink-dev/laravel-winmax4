@@ -450,8 +450,7 @@ class Winmax4EntityService extends Winmax4Service
      * @return JsonResponse|Winmax4Entity JSON response or deleted entity object.
      * @throws GuzzleException
      */
-    public function deleteEntities(int $idWinmax4): Winmax4Entity|JsonResponse
-    {
+    public function deleteEntities(int $idWinmax4){
         $localEntity = Winmax4Entity::where('id_winmax4', $idWinmax4)->first();
 
         $response = $this->client->delete($this->url . '/Files/Entities/?id='.$idWinmax4, [
