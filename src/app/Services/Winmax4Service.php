@@ -8,6 +8,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Psr7\Response;
+
 
 class Winmax4Service
 {
@@ -90,7 +93,7 @@ class Winmax4Service
      * Handle non-200 responses from the Winmax4 API
      *
      * @param $response
-     * @return array
+     * @return ResponseInterface
      */
     private function handleNon200Response($response, $license_id): array
     {
@@ -128,11 +131,16 @@ class Winmax4Service
             $status = 'API_ERROR';
         }
 
-        return [
-            'error' => true,
-            'status' => $status,
-            'message' => $errorMsg,
-        ];
+
+        return new Response(
+            400,
+            ['Content-Type' => 'application/json'],
+            json_encode([
+                'error' => true,
+                'status' => $status,
+                'message' => $errorMsg,
+            ])
+        );
     }
 
     /**
