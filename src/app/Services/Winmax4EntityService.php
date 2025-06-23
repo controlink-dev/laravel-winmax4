@@ -153,7 +153,7 @@ class Winmax4EntityService extends Winmax4Service
      * @return array Returns the entity object
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postEntities(string $name, string $code = null, int $entityType = null, string $taxPayerID = null, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT'): array
+    public function postEntities(string $name, string $code = null, int $entityType = null, string $taxPayerID = null, string $address = null, string $zipCode = null, string $locality = null, ?int $isActive = 1, string $phone = null, string $fax = null, string $mobilePhone = null, string $email = null, ?string $country = 'PT')
     {
             //Check if taxPayerID do not start with 5 or 6
             $gdpr = [];
@@ -201,7 +201,7 @@ class Winmax4EntityService extends Winmax4Service
             $responseDecoded = json_decode($response->getBody()->getContents());
 
             if ($responseDecoded && $responseDecoded->error === true) {
-                return $responseDecoded;
+                return $responseDecoded->toArray();
             }
 
             $builder->updateOrCreate(
