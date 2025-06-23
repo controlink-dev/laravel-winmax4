@@ -105,8 +105,7 @@ class Winmax4Service
                 'message' => $errorMsg,
                 config('winmax4.license_column') => session('licenseID') ?? $license_id,
             ]);
-        }
-        if($statusCode == 404){
+        }else if($statusCode == 404){
             $errorMsg = 'Data not found.';
             Winmax4SyncErrors::create([
                 'message' => $errorMsg,
