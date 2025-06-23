@@ -125,7 +125,7 @@ class Winmax4Service
 
         return [
             'error' => true,
-            'status' => $body?->Results['Code'] ?? 'API_ERROR',
+            'status' => $bodyDecoded['Results'][0]['Code'] ?? 'API_ERROR',
             'message' => $errorMsg,
         ];
     }
