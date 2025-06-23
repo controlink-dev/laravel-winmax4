@@ -201,7 +201,7 @@ class Winmax4EntityService extends Winmax4Service
             $responseDecoded = json_decode($response->getBody()->getContents());
 
             if ($responseDecoded && $responseDecoded->error === true) {
-                return $responseDecoded->toArray();
+                return $responseDecoded;
             }
 
             $builder->updateOrCreate(
