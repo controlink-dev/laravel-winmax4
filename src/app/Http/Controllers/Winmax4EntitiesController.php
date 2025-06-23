@@ -176,7 +176,7 @@ class Winmax4EntitiesController extends Controller
             $request->country,
         );
 
-        if($response['error'] && $response['status'] === 'ENTITYCODEINUSE') {
+        if(isset($response['error']) && $response['error'] && $response['status'] === 'ENTITYCODEINUSE') {
             $idWinmax4 = Winmax4Entity::where('code', $request->code)->value('id_winmax4');
 
             if($idWinmax4){
