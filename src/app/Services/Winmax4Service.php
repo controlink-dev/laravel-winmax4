@@ -162,6 +162,8 @@ class Winmax4Service
             return 'Data not found';
         }
 
+        $errorJson = json_decode($errorJson, true);
+
         switch ($errorJson['Results'][0]['Code']) {
             case 'ARTICLECODEINUSE':
                 $errorJson['Results'][0]['Message'] = 'Article code is already in use';
