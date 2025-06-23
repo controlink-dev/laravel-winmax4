@@ -70,7 +70,6 @@ class Winmax4Controller extends Controller
             'username' => 'required',
             'password' => 'required',
             'n_terminal' => 'required',
-            'warehouse_id' => 'required',
         ]);
 
         $url = $request->url;
@@ -86,9 +85,9 @@ class Winmax4Controller extends Controller
         $type_docs_credit_note = $request->type_docs_credit_note;
         $type_docs_receipt = $request->type_docs_receipt;
 
-        $response = $this->winmax4Service->generateToken($url, $company_code, $username, $password, $n_terminal);
+        $response = $this->winmax4Service->generateToken($company_code, $username, $password, $n_terminal);
 
-        if ($response->Results[0]->Code === 'OK') {
+        if (isset($response) && $response->Results[0]->Code === 'OK') {
             $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), $request->sessionID)->first();
 
             $exists = $winmax4 ? true : false;
@@ -136,7 +135,7 @@ class Winmax4Controller extends Controller
         } else {
             return response()->json([
                 'message' => 'Error',
-                'error' => $response->Results[0]->Message,
+                'error' => $response['message'],
             ], 400);
         }
     }

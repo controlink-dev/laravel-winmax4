@@ -7,6 +7,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use Decimal\Decimal;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Winmax4ArticleService extends Winmax4Service
@@ -50,7 +51,7 @@ class Winmax4ArticleService extends Winmax4Service
      */
     public function getArticles($lastChangeDateAfter = null): object|array|null
     {
-        $url = $this->url . '/Files/Articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
+        $url = 'Files/Articles?IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true';
 
         if($lastChangeDateAfter){
             $url .= "&LastChangeDateAfter=". $lastChangeDateAfter;
@@ -66,14 +67,16 @@ class Winmax4ArticleService extends Winmax4Service
 
         try {
             $response = $this->client->get($url, [
-                'verify' => $this->settings['verify_ssl_guzzle'],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                    'Content-Type' => 'application/json',
                 ],
             ]);
 
             $responseJSONDecoded = json_decode($response->getBody()->getContents());
+
+            if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
+                return $responseJSONDecoded;
+            }
 
             if(is_null($responseJSONDecoded)){
                 return null;
@@ -82,10 +85,8 @@ class Winmax4ArticleService extends Winmax4Service
             if($responseJSONDecoded->Data->Filter->TotalPages > 1){
                 for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
                     $response = $this->client->get($url . '&PageNumber=' . $i, [
-                        'verify' => $this->settings['verify_ssl_guzzle'],
                         'headers' => [
                             'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                            'Content-Type' => 'application/json',
                         ],
                     ]);
 
@@ -95,26 +96,9 @@ class Winmax4ArticleService extends Winmax4Service
 
             return $responseJSONDecoded;
 
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
-
-            // Log or handle the error response
-            if ($e->hasResponse()) {
-                $errorResponse = $e->getResponse();
-                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
-
-                // Return the error JSON or handle it as needed
-                return [
-                    'error' => true,
-                    'status' => $errorResponse->getStatusCode(),
-                    'message' => $this->renderErrorMessage($errorJson),
-                ];
-            }
-
-            // If no response is available
-            return [
-                'error' => true,
-                'message' => $e->getMessage(),
-            ];
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
         }
     }
 
@@ -178,12 +162,10 @@ class Winmax4ArticleService extends Winmax4Service
      */
     public function postArticles(string $code, string $designation, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): object|array|null
     {
-        try{
-            $response = $this->client->post($this->url . '/files/articles', [
-                'verify' => $this->settings['verify_ssl_guzzle'],
+        try {
+            $response = $this->client->post('Files/Articles', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                    'Content-Type' => 'application/json',
                 ],
                 'json' => [
                     'Code' => $code,
@@ -213,126 +195,112 @@ class Winmax4ArticleService extends Winmax4Service
                     ]],
                 ],
             ]);
-
-            if(config('winmax4.use_soft_deletes')) {
-                $builder = Winmax4Article::withTrashed();
-            } else {
-                $builder = new Winmax4Article();
-            }
-
-            $responseDecoded = json_decode($response->getBody()->getContents());
-
-            $articleData = $responseDecoded->Data->Article;
-            $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
-            $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
-            $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
-
-            $article = $builder->updateOrCreate(
-                [
-                    'code' => $articleData->Code,
-                ],
-                [
-                    'id_winmax4' => $articleData->ID,
-                    'code' => $articleData->Code,
-                    'designation' => $articleData->Designation,
-                    'family_code' => $articleData->FamilyCode,
-                    'sub_family_code' => $subFamilyCode,
-                    'sub_sub_family_code' => $subSubFamilyCode,
-                    'is_active' => $articleData->IsActive,
-                ]
-            );
-
-            if (isset($articleData->Prices) && is_array($articleData->Prices)) {
-                foreach ($articleData->Prices as $price) {
-                    $article->prices()->updateOrCreate(
-                        [
-                            'article_id' => $article->id,
-                        ],
-                        [
-                            'article_id' => $article->id,
-                            'currency_code' => $price->CurrencyCode,
-                            'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
-                            'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
-                            'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
-                            'sales_price2_with_taxes' => $price->SalesPrice2WithTaxes ?? 0,
-                            'sales_price3_without_taxes' => $price->SalesPrice3WithoutTaxes ?? 0,
-                            'sales_price3_with_taxes' => $price->SalesPrice3WithTaxes ?? 0,
-                            'sales_price4_without_taxes' => $price->SalesPrice4WithoutTaxes ?? 0,
-                            'sales_price4_with_taxes' => $price->SalesPrice4WithTaxes ?? 0,
-                            'sales_price5_without_taxes' => $price->SalesPrice5WithoutTaxes ?? 0,
-                            'sales_price5_with_taxes' => $price->SalesPrice5WithTaxes ?? 0,
-                            'sales_price6_without_taxes' => $price->SalesPrice6WithoutTaxes ?? 0,
-                            'sales_price6_with_taxes' => $price->SalesPrice6WithTaxes ?? 0,
-                            'sales_price7_without_taxes' => $price->SalesPrice7WithoutTaxes ?? 0,
-                            'sales_price7_with_taxes' => $price->SalesPrice7WithTaxes ?? 0,
-                            'sales_price8_without_taxes' => $price->SalesPrice8WithoutTaxes ?? 0,
-                            'sales_price8_with_taxes' => $price->SalesPrice8WithTaxes ?? 0,
-                            'sales_price9_without_taxes' => $price->SalesPrice9WithoutTaxes ?? 0,
-                            'sales_price9_with_taxes' => $price->SalesPrice9WithTaxes ?? 0,
-                            'sales_price_extra_without_taxes' => $price->SalesPriceExtraWithoutTaxes ?? 0,
-                            'sales_price_extra_with_taxes' => $price->SalesPriceExtraWithTaxes ?? 0,
-                            'sales_price_hold_without_taxes' => $price->SalesPriceHoldWithoutTaxes ?? 0,
-                            'sales_price_hold_with_taxes' => $price->SalesPriceHoldWithTaxes ?? 0,
-                        ]
-                    );
-                }
-            }
-
-            if (isset($articleData->SaleTaxes) && is_array($articleData->SaleTaxes)) {
-                foreach ($articleData->SaleTaxes as $saleTax) {
-                    $article->saleTaxes()->updateOrCreate(
-                        [
-                            'article_id' => $article->id,
-                        ],
-                        [
-                            'article_id' => $article->id,
-                            'tax_fee_code' => $saleTax->TaxFeeCode,
-                            'percentage' => $saleTax->Percentage,
-                            'fixedAmount' => $saleTax->FixedAmount ?? 0,
-                        ]
-                    );
-                }
-            }
-
-            if (isset($articleData->PurchaseTaxes) && is_array($articleData->PurchaseTaxes)) {
-                foreach ($articleData->PurchaseTaxes as $purchaseTax) {
-                    $article->purchaseTaxes()->updateOrCreate(
-                        [
-                            'article_id' => $article->id,
-                        ],
-                        [
-                            'article_id' => $article->id,
-                            'tax_fee_code' => $purchaseTax->TaxFeeCode,
-                            'percentage' => $purchaseTax->Percentage,
-                            'fixedAmount' => $purchaseTax->FixedAmount ?? 0,
-                        ]
-                    );
-                }
-            }
-
-            return $article->toArray();
-
-        }catch (\GuzzleHttp\Exception\RequestException $e) {
-
-            // Log or handle the error response
-            if ($e->hasResponse()) {
-                $errorResponse = $e->getResponse();
-                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
-
-                // Return the error JSON or handle it as needed
-                return [
-                    'error' => true,
-                    'status' => $errorResponse->getStatusCode(),
-                    'message' => $this->renderErrorMessage($errorJson),
-                ];
-            }
-
-            // If no response is available
-            return [
-                'error' => true,
-                'message' => $e->getMessage(),
-            ];
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
         }
+
+        if(config('winmax4.use_soft_deletes')) {
+            $builder = Winmax4Article::withTrashed();
+        } else {
+            $builder = new Winmax4Article();
+        }
+
+        $responseDecoded = json_decode($response->getBody()->getContents());
+
+        if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+            return $responseDecoded;
+        }
+
+        $articleData = $responseDecoded->Data->Article;
+        $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
+        $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
+        $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
+
+        $article = $builder->updateOrCreate(
+            [
+                'code' => $articleData->Code,
+            ],
+            [
+                'id_winmax4' => $articleData->ID,
+                'code' => $articleData->Code,
+                'designation' => $articleData->Designation,
+                'family_code' => $articleData->FamilyCode,
+                'sub_family_code' => $subFamilyCode,
+                'sub_sub_family_code' => $subSubFamilyCode,
+                'is_active' => $articleData->IsActive,
+            ]
+        );
+
+        if (isset($articleData->Prices) && is_array($articleData->Prices)) {
+            foreach ($articleData->Prices as $price) {
+                $article->prices()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'currency_code' => $price->CurrencyCode,
+                        'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
+                        'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
+                        'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
+                        'sales_price2_with_taxes' => $price->SalesPrice2WithTaxes ?? 0,
+                        'sales_price3_without_taxes' => $price->SalesPrice3WithoutTaxes ?? 0,
+                        'sales_price3_with_taxes' => $price->SalesPrice3WithTaxes ?? 0,
+                        'sales_price4_without_taxes' => $price->SalesPrice4WithoutTaxes ?? 0,
+                        'sales_price4_with_taxes' => $price->SalesPrice4WithTaxes ?? 0,
+                        'sales_price5_without_taxes' => $price->SalesPrice5WithoutTaxes ?? 0,
+                        'sales_price5_with_taxes' => $price->SalesPrice5WithTaxes ?? 0,
+                        'sales_price6_without_taxes' => $price->SalesPrice6WithoutTaxes ?? 0,
+                        'sales_price6_with_taxes' => $price->SalesPrice6WithTaxes ?? 0,
+                        'sales_price7_without_taxes' => $price->SalesPrice7WithoutTaxes ?? 0,
+                        'sales_price7_with_taxes' => $price->SalesPrice7WithTaxes ?? 0,
+                        'sales_price8_without_taxes' => $price->SalesPrice8WithoutTaxes ?? 0,
+                        'sales_price8_with_taxes' => $price->SalesPrice8WithTaxes ?? 0,
+                        'sales_price9_without_taxes' => $price->SalesPrice9WithoutTaxes ?? 0,
+                        'sales_price9_with_taxes' => $price->SalesPrice9WithTaxes ?? 0,
+                        'sales_price_extra_without_taxes' => $price->SalesPriceExtraWithoutTaxes ?? 0,
+                        'sales_price_extra_with_taxes' => $price->SalesPriceExtraWithTaxes ?? 0,
+                        'sales_price_hold_without_taxes' => $price->SalesPriceHoldWithoutTaxes ?? 0,
+                        'sales_price_hold_with_taxes' => $price->SalesPriceHoldWithTaxes ?? 0,
+                    ]
+                );
+            }
+        }
+
+        if (isset($articleData->SaleTaxes) && is_array($articleData->SaleTaxes)) {
+            foreach ($articleData->SaleTaxes as $saleTax) {
+                $article->saleTaxes()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'tax_fee_code' => $saleTax->TaxFeeCode,
+                        'percentage' => $saleTax->Percentage,
+                        'fixedAmount' => $saleTax->FixedAmount ?? 0,
+                    ]
+                );
+            }
+        }
+
+        if (isset($articleData->PurchaseTaxes) && is_array($articleData->PurchaseTaxes)) {
+            foreach ($articleData->PurchaseTaxes as $purchaseTax) {
+                $article->purchaseTaxes()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'tax_fee_code' => $purchaseTax->TaxFeeCode,
+                        'percentage' => $purchaseTax->Percentage,
+                        'fixedAmount' => $purchaseTax->FixedAmount ?? 0,
+                    ]
+                );
+            }
+        }
+
+        return $article->toArray();
     }
     
     /**
@@ -386,11 +354,9 @@ class Winmax4ArticleService extends Winmax4Service
     public function putArticles(int $idWinmax4, string $code, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): array
     {
         try {
-            $response = $this->client->put($this->url . '/files/articles/?id=' . $idWinmax4, [
-                'verify' => $this->settings['verify_ssl_guzzle'],
+            $response = $this->client->put('Files/Articles/?id=' . $idWinmax4, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                    'Content-Type' => 'application/json',
                 ],
                 'json' => [
                     'FamilyCode' => $familyCode,
@@ -418,123 +384,109 @@ class Winmax4ArticleService extends Winmax4Service
                     ]],
                 ],
             ]);
-
-            $responseDecoded = json_decode($response->getBody()->getContents());
-
-            if (!isset($responseDecoded->Data)) {
-                $errorMessage = isset($responseDecoded->Results[0])
-                    ? json_encode($responseDecoded->Results[0])
-                    : 'Unknown error: Data not found in response.';
-                throw new \Exception($errorMessage);
-            }
-
-            $articleData = $responseDecoded->Data->Article;
-            $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
-            $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
-            $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
-
-            Winmax4Article::where('id_winmax4', $idWinmax4)->update([
-                'code' => $articleData->Code,
-                'designation' => $articleData->Designation,
-                'family_code' => $articleData->FamilyCode,
-                'sub_family_code' => $subFamilyCode,
-                'sub_sub_family_code' => $subSubFamilyCode,
-                'is_active' => $articleData->IsActive,
-            ]);
-
-            $article = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
-
-            if (isset($articleData->Prices) && is_array($articleData->Prices)) {
-                foreach ($articleData->Prices as $price) {
-                    $article->prices()->updateOrCreate(
-                        [
-                            'article_id' => $article->id,
-                        ],
-                        [
-                            'article_id' => $article->id,
-                            'currency_code' => $price->CurrencyCode,
-                            'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
-                            'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
-                            'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
-                            'sales_price2_with_taxes' => $price->SalesPrice2WithTaxes ?? 0,
-                            'sales_price3_without_taxes' => $price->SalesPrice3WithoutTaxes ?? 0,
-                            'sales_price3_with_taxes' => $price->SalesPrice3WithTaxes ?? 0,
-                            'sales_price4_without_taxes' => $price->SalesPrice4WithoutTaxes ?? 0,
-                            'sales_price4_with_taxes' => $price->SalesPrice4WithTaxes ?? 0,
-                            'sales_price5_without_taxes' => $price->SalesPrice5WithoutTaxes ?? 0,
-                            'sales_price5_with_taxes' => $price->SalesPrice5WithTaxes ?? 0,
-                            'sales_price6_without_taxes' => $price->SalesPrice6WithoutTaxes ?? 0,
-                            'sales_price6_with_taxes' => $price->SalesPrice6WithTaxes ?? 0,
-                            'sales_price7_without_taxes' => $price->SalesPrice7WithoutTaxes ?? 0,
-                            'sales_price7_with_taxes' => $price->SalesPrice7WithTaxes ?? 0,
-                            'sales_price8_without_taxes' => $price->SalesPrice8WithoutTaxes ?? 0,
-                            'sales_price8_with_taxes' => $price->SalesPrice8WithTaxes ?? 0,
-                            'sales_price9_without_taxes' => $price->SalesPrice9WithoutTaxes ?? 0,
-                            'sales_price9_with_taxes' => $price->SalesPrice9WithTaxes ?? 0,
-                            'sales_price_extra_without_taxes' => $price->SalesPriceExtraWithoutTaxes ?? 0,
-                            'sales_price_extra_with_taxes' => $price->SalesPriceExtraWithTaxes ?? 0,
-                            'sales_price_hold_without_taxes' => $price->SalesPriceHoldWithoutTaxes ?? 0,
-                            'sales_price_hold_with_taxes' => $price->SalesPriceHoldWithTaxes ?? 0,
-                        ]
-                    );
-                }
-            }
-
-            if (isset($articleData->SaleTaxes) && is_array($articleData->SaleTaxes)) {
-                foreach ($articleData->SaleTaxes as $saleTax) {
-                    $article->saleTaxes()->updateOrCreate(
-                        [
-                            'article_id' => $article->id,
-                        ],
-                        [
-                            'article_id' => $article->id,
-                            'tax_fee_code' => $saleTax->TaxFeeCode,
-                            'percentage' => $saleTax->Percentage,
-                            'fixedAmount' => $saleTax->FixedAmount ?? 0,
-                        ]
-                    );
-                }
-            }
-
-            if (isset($articleData->PurchaseTaxes) && is_array($articleData->PurchaseTaxes)) {
-                foreach ($articleData->PurchaseTaxes as $purchaseTax) {
-                    $article->purchaseTaxes()->updateOrCreate(
-                        [
-                            'article_id' => $article->id,
-                        ],
-                        [
-                            'article_id' => $article->id,
-                            'tax_fee_code' => $purchaseTax->TaxFeeCode,
-                            'percentage' => $purchaseTax->Percentage,
-                            'fixedAmount' => $purchaseTax->FixedAmount ?? 0,
-                        ]
-                    );
-                }
-            }
-
-            return $article->toArray();
-
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
-
-            // Log or handle the error response
-            if ($e->hasResponse()) {
-                $errorResponse = $e->getResponse();
-                $errorJson = json_decode($errorResponse->getBody()->getContents(), true);
-
-                // Return the error JSON or handle it as needed
-                return [
-                    'error' => true,
-                    'status' => $errorResponse->getStatusCode(),
-                    'message' => $this->renderErrorMessage($errorJson),
-                ];
-            }
-
-            // If no response is available
-            return [
-                'error' => true,
-                'message' => $e->getMessage(),
-            ];
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
         }
+
+        $responseDecoded = json_decode($response->getBody()->getContents());
+
+        if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+            return $responseDecoded;
+        }
+
+        if (!isset($responseDecoded->Data)) {
+            $errorMessage = isset($responseDecoded->Results[0])
+                ? json_encode($responseDecoded->Results[0])
+                : 'Unknown error: Data not found in response.';
+            throw new \Exception($errorMessage);
+        }
+
+        $articleData = $responseDecoded->Data->Article;
+        $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
+        $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
+        $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
+
+        Winmax4Article::where('id_winmax4', $idWinmax4)->update([
+            'code' => $articleData->Code,
+            'designation' => $articleData->Designation,
+            'family_code' => $articleData->FamilyCode,
+            'sub_family_code' => $subFamilyCode,
+            'sub_sub_family_code' => $subSubFamilyCode,
+            'is_active' => $articleData->IsActive,
+        ]);
+
+        $article = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
+
+        if (isset($articleData->Prices) && is_array($articleData->Prices)) {
+            foreach ($articleData->Prices as $price) {
+                $article->prices()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'currency_code' => $price->CurrencyCode,
+                        'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
+                        'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
+                        'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
+                        'sales_price2_with_taxes' => $price->SalesPrice2WithTaxes ?? 0,
+                        'sales_price3_without_taxes' => $price->SalesPrice3WithoutTaxes ?? 0,
+                        'sales_price3_with_taxes' => $price->SalesPrice3WithTaxes ?? 0,
+                        'sales_price4_without_taxes' => $price->SalesPrice4WithoutTaxes ?? 0,
+                        'sales_price4_with_taxes' => $price->SalesPrice4WithTaxes ?? 0,
+                        'sales_price5_without_taxes' => $price->SalesPrice5WithoutTaxes ?? 0,
+                        'sales_price5_with_taxes' => $price->SalesPrice5WithTaxes ?? 0,
+                        'sales_price6_without_taxes' => $price->SalesPrice6WithoutTaxes ?? 0,
+                        'sales_price6_with_taxes' => $price->SalesPrice6WithTaxes ?? 0,
+                        'sales_price7_without_taxes' => $price->SalesPrice7WithoutTaxes ?? 0,
+                        'sales_price7_with_taxes' => $price->SalesPrice7WithTaxes ?? 0,
+                        'sales_price8_without_taxes' => $price->SalesPrice8WithoutTaxes ?? 0,
+                        'sales_price8_with_taxes' => $price->SalesPrice8WithTaxes ?? 0,
+                        'sales_price9_without_taxes' => $price->SalesPrice9WithoutTaxes ?? 0,
+                        'sales_price9_with_taxes' => $price->SalesPrice9WithTaxes ?? 0,
+                        'sales_price_extra_without_taxes' => $price->SalesPriceExtraWithoutTaxes ?? 0,
+                        'sales_price_extra_with_taxes' => $price->SalesPriceExtraWithTaxes ?? 0,
+                        'sales_price_hold_without_taxes' => $price->SalesPriceHoldWithoutTaxes ?? 0,
+                        'sales_price_hold_with_taxes' => $price->SalesPriceHoldWithTaxes ?? 0,
+                    ]
+                );
+            }
+        }
+
+        if (isset($articleData->SaleTaxes) && is_array($articleData->SaleTaxes)) {
+            foreach ($articleData->SaleTaxes as $saleTax) {
+                $article->saleTaxes()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'tax_fee_code' => $saleTax->TaxFeeCode,
+                        'percentage' => $saleTax->Percentage,
+                        'fixedAmount' => $saleTax->FixedAmount ?? 0,
+                    ]
+                );
+            }
+        }
+
+        if (isset($articleData->PurchaseTaxes) && is_array($articleData->PurchaseTaxes)) {
+            foreach ($articleData->PurchaseTaxes as $purchaseTax) {
+                $article->purchaseTaxes()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'tax_fee_code' => $purchaseTax->TaxFeeCode,
+                        'percentage' => $purchaseTax->Percentage,
+                        'fixedAmount' => $purchaseTax->FixedAmount ?? 0,
+                    ]
+                );
+            }
+        }
+
+        return $article->toArray();
     }
 
     /**
@@ -589,16 +541,24 @@ class Winmax4ArticleService extends Winmax4Service
     {
         $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
 
-        $response = $this->client->delete($this->url . '/files/articles/?id=' . $idWinmax4, [
-            'verify' => $this->settings['verify_ssl_guzzle'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
-                'Content-Type' => 'application/json',
-                'http_errors' => false,
-            ],
-        ]);
+        try{
+            $response = $this->client->delete('Files/Articles/?id=' . $idWinmax4, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
+
 
         $article = json_decode($response->getBody()->getContents(), true);
+
+        if (is_array($article) && $article['error'] === true) {
+            return $article;
+        }
+
 
         if ($article['Results'][0]['Code'] !== self::WINMAX4_RESPONSE_OK) {
             $article = $this->putArticles(
@@ -621,47 +581,6 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         return $article;
-    }
-
-    public function renderErrorMessage($errorJson){
-        if($errorJson == null){
-            return 'Articles not found';
-        }
-
-        switch ($errorJson['Results'][0]['Code']) {
-            case 'ARTICLECODEINUSE':
-                $errorJson['Results'][0]['Message'] = 'Article code is already in use';
-                break;
-            case 'REQUIREDFIELDSAREMISSING':
-                $errorJson['Results'][0]['Message'] = 'Required fields are missing';
-                break;
-            case 'ARTICLEDESIGNATIONCANTBECHANGED':
-                $errorJson['Results'][0]['Message'] = 'Article designation cannot be changed';
-                break;
-            case 'DUPLICATEARTICLESALETAXFEES':
-                $errorJson['Results'][0]['Message'] = 'Duplicate article sale tax fees';
-                break;
-            case 'DUPLICATEARTICLEPURCHASETAXFEES':
-                $errorJson['Results'][0]['Message'] = 'Duplicate article purchase tax fees';
-                break;
-            case 'TAXFEECODENOTFOUND':
-                $errorJson['Results'][0]['Message'] = 'Tax fee code not found';
-                break;
-            case 'CURRENCYNOTFOUND':
-                $errorJson['Results'][0]['Message'] = 'Currency not found';
-                break;
-            case 'DUPLICATEARTICLEPRICECURRENCY':
-                $errorJson['Results'][0]['Message'] = 'Duplicate article price currency';
-                break;
-            case 'EXCEPTION':
-                $errorJson['Results'][0]['Message'] = 'An exception occurred! Please contact the administrator';
-                break;
-            default:
-                $errorJson['Results'][0]['Message'] = 'An unknown error occurred! Please contact the administrator';
-                break;
-        }
-
-        return $errorJson;
     }
 
 }

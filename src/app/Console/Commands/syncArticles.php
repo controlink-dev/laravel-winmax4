@@ -67,7 +67,8 @@ class syncArticles extends Command
                 $winmax4Setting->company_code,
                 $winmax4Setting->username,
                 $winmax4Setting->password,
-                $winmax4Setting->n_terminal
+                $winmax4Setting->n_terminal,
+                $winmax4Setting->license_id
             );
 
             if(config('winmax4.use_license')){

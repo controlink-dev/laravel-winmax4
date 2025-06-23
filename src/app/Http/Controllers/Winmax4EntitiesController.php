@@ -142,7 +142,7 @@ class Winmax4EntitiesController extends Controller
      * @return JsonResponse Returns a JSON response with the API result.
      * @throws GuzzleException If an error occurs during the API request.
      */
-    public function postEntities(Request $request): JsonResponse
+    public function postEntities(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -160,7 +160,7 @@ class Winmax4EntitiesController extends Controller
             'country' => 'string|size:2|in:PT',
         ]);
 
-        return response()->json($this->winmax4Service->postEntities(
+        $response = $this->winmax4Service->postEntities(
             $request->name,
             $request->code,
             $request->entityType,
@@ -174,7 +174,35 @@ class Winmax4EntitiesController extends Controller
             $request->mobilePhone,
             $request->email,
             $request->country,
-        ), 200);
+        );
+
+        if(isset($response['error']) && $response['error'] && $response['status'] === 'ENTITYCODEINUSE') {
+            $idWinmax4 = Winmax4Entity::where('code', $request->code)->value('id_winmax4');
+
+            if($idWinmax4){
+                if(Winmax4Entity::where('code', $request->code)->first()->is_active == 0){
+                    $this->winmax4Service->putEntities($idWinmax4,
+                        $request->name,
+                        $request->code,
+                        $request->entityType,
+                        $request->taxPayerID,
+                        $request->address,
+                        $request->zipCode,
+                        $request->locality,
+                        1,
+                        $request->phone,
+                        $request->fax,
+                        $request->mobilePhone,
+                        $request->email,
+                        $request->country,
+                    );
+
+                    return Winmax4Entity::where('code', $request->code)->first()->toArray();
+                }
+            }
+        }
+
+        return response()->json($response);
     }
 
     /**
@@ -283,8 +311,16 @@ class Winmax4EntitiesController extends Controller
      * @return \Illuminate\Http\JsonResponse JSON response with the deletion result.
      * @throws GuzzleException
      */
-    public function deleteEntities(int $id): JsonResponse
+    public function deleteEntities(int $id)
     {
-        return response()->json($this->winmax4Service->deleteEntities($id), 200);
+        $localEntity = Winmax4Entity::where('id_winmax4', $id)->first();
+        $response = $this->winmax4Service->deleteEntities($id);
+
+        if(isset($response['error'])){
+            // If the result is not OK, we will disable the entity
+            $response = $this->winmax4Service->putEntities($id, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
+        }
+
+        return response()->json($response, 200);
     }
 }
