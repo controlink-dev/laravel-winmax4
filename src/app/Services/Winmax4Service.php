@@ -95,7 +95,7 @@ class Winmax4Service
      * @param $response
      * @return ResponseInterface
      */
-    private function handleNon200Response($response, $license_id): array
+    private function handleNon200Response($response, $license_id): Response|ResponseInterface
     {
         // Handle the non-200 response here,
         // For example, you can log the error or throw an exception
