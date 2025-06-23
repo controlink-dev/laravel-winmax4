@@ -115,9 +115,10 @@ class Winmax4Service
         }
         else
         {
+            $bodyDecoded = json_decode($body, true);
             $errorMsg = $this->renderErrorMessage($body);
             Winmax4SyncErrors::create([
-                'message' => "Error {$statusCode} while accessing Winmax4 API: {$body->Results['Code']} - {$errorMsg}",
+                'message' => "Error {$statusCode} while accessing Winmax4 API: {$bodyDecoded['Results'][0]['Code']} - {$errorMsg}",
                 config('winmax4.license_column') => session('licenseID')
             ]);
         }
