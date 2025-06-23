@@ -122,9 +122,15 @@ class Winmax4Service
             ]);
         }
 
+        if(isset($bodyDecoded) && isset($bodyDecoded['Results'])){
+            $status = $bodyDecoded['Results'][0]['Code'];
+        }else{
+            $status = 'API_ERROR';
+        }
+
         return [
             'error' => true,
-            'status' => $bodyDecoded['Results'][0]['Code'] ?? 'API_ERROR',
+            'status' => $status,
             'message' => $errorMsg,
         ];
     }
