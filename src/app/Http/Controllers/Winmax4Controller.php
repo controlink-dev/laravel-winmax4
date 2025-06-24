@@ -87,6 +87,12 @@ class Winmax4Controller extends Controller
 
         $response = $this->winmax4Service->generateToken($company_code, $username, $password, $n_terminal, $url);
 
+        if(!$response || isset($response['error'])) {
+            return response()->json([
+                'message' => 'Error',
+                'error' => 'Failed to connect to Winmax4 API:' . ($response['message'] ?? ''),
+            ], 500);
+        }
 
         if (isset($response) && $response->Results[0]->Code === 'OK') {
             $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), $request->sessionID)->first();
