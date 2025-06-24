@@ -88,7 +88,7 @@ class Winmax4Controller extends Controller
         $response = $this->winmax4Service->generateToken($company_code, $username, $password, $n_terminal, $url);
 
 
-        if (isset($response) && $response['Results'][0]['Code'] === 'OK') {
+        if (isset($response) && $response->Results[0]->Code === 'OK') {
             $winmax4 = Winmax4Setting::where(config('winmax4.license_column'), $request->sessionID)->first();
 
             $exists = $winmax4 ? true : false;
@@ -130,7 +130,7 @@ class Winmax4Controller extends Controller
 
             return response()->json([
                 'message' => 'Success',
-                'data' => $response['Results'][0]['Message'],
+                'data' => $response->Results[0]->Message,
                 'first_time' => !$exists,
             ], 201);
         } else {
