@@ -223,6 +223,7 @@ class Winmax4EntityService extends Winmax4Service
                     'phone' => $responseDecoded->Data->Entity->Phone,
                     'tax_payer_id' => $responseDecoded->Data->Entity->TaxPayerID,
                     'zip_code' => $responseDecoded->Data->Entity->ZipCode,
+                    'deleted_at' => null,
                 ]
             );
 

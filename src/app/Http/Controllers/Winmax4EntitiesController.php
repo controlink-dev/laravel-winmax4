@@ -176,14 +176,14 @@ class Winmax4EntitiesController extends Controller
             $request->country,
         );
 
-        if(isset($response['error']) && $response['error'] && $response['status'] === 'ENTITYCODEINUSE') {
-            $idWinmax4 = Winmax4Entity::where('code', $request->code)->value('id_winmax4');
+        if(isset($response['error']) && $response['error'] && $response['status'] == 'ENTITYCODEINUSE') {
+            $entity = Winmax4Entity::withTrashed()->where('code', $request->code)->first();
 
-            if($idWinmax4){
-                if(Winmax4Entity::where('code', $request->code)->first()->is_active == 0){
-                    $this->winmax4Service->putEntities($idWinmax4,
-                        $request->name,
+            if($entity){
+                if($entity->is_active == 0){
+                    $this->winmax4Service->putEntities($entity->id_winmax4,
                         $request->code,
+                        $request->name,
                         $request->entityType,
                         $request->taxPayerID,
                         $request->address,
