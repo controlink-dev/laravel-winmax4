@@ -334,8 +334,8 @@ class Winmax4EntityService extends Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        if (is_array($entity) && $entity['error'] === true) {
-            return $entity;
+        if (isset($entity) && $entity->error === true) {
+            return collect($entity)->toArray();
         }
 
         Winmax4Entity::where('id_winmax4', $idWinmax4)->update([
