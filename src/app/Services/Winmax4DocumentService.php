@@ -281,16 +281,19 @@ class Winmax4DocumentService extends Winmax4Service
             }
         }
 
-        foreach ($documentResponse->Data->Taxes as $tax) {
-            $documentTax = new Winmax4DocumentTax();
-            $documentTax->document_id = $document->id;
-            $documentTax->tax_fee_code = $tax->TaxFeeCode;
-            $documentTax->percentage = $tax->Percentage;
-            $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
-            $documentTax->total_affected = $tax->TotalAffected;
-            $documentTax->total = $tax->Total;
-            $documentTax->save();
+        if(isset($documentResponse->Data->Taxes)){
+            foreach ($documentResponse->Data->Taxes as $tax) {
+                $documentTax = new Winmax4DocumentTax();
+                $documentTax->document_id = $document->id;
+                $documentTax->tax_fee_code = $tax->TaxFeeCode;
+                $documentTax->percentage = $tax->Percentage;
+                $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
+                $documentTax->total_affected = $tax->TotalAffected;
+                $documentTax->total = $tax->Total;
+                $documentTax->save();
+            }
         }
+
 
         //Split the document number to get the type document and the number of the documentNumberRelation (e.g. FR A2025/1 -> FR is the type and A2025/1 is the number)
 
