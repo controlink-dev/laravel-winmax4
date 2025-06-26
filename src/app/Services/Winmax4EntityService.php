@@ -334,7 +334,7 @@ class Winmax4EntityService extends Winmax4Service
 
         $entity = json_decode($response->getBody()->getContents());
 
-        if (isset($entity) && $entity->error === true) {
+        if (isset($entity->error) && $entity->error === true) {
             return collect($entity)->toArray();
         }
 
