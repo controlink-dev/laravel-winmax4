@@ -87,10 +87,10 @@ class Winmax4Controller extends Controller
 
         $response = $this->winmax4Service->generateToken($company_code, $username, $password, $n_terminal, $url);
 
-        if(!$response || isset($response['error'])) {
+        if(!$response || isset($response->error)) {
             return response()->json([
-                'message' => 'Error',
-                'error' => 'Failed to connect to Winmax4 API:' . ($response['message'] ?? ''),
+                'error' => true,
+                'message' => 'Failed to connect to Winmax4 API: ('. $response->status .'): ' . ($response->message ?? ''),
             ], 500);
         }
 
