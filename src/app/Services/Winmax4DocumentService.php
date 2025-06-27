@@ -173,6 +173,17 @@ class Winmax4DocumentService extends Winmax4Service
             $ExternalDocumentsRelation = $documentNumberRelation;
         }
 
+        $paymentTypeJson = [];
+        if($paymentType){
+            $paymentTypeJson = [
+                [
+                    'ID' => $paymentType->id_winmax4,
+                    'Value' => $valueInvoice,
+                ],
+            ];
+        }
+
+
         try{
             $response = $this->client->post('Transactions/Documents', [
                 'headers' => [
@@ -188,12 +199,7 @@ class Winmax4DocumentService extends Winmax4Service
                         'Code' => $entity->code,
                         'TaxPayerID' => $entity->tax_payer_id,
                     ],
-                    'PaymentTypes' => [
-                        [
-                            'ID' => $paymentType->id_winmax4,
-                            'Value' => $valueInvoice,
-                        ],
-                    ],
+                    'PaymentTypes' => $paymentTypeJson,
                     'Details' => $details,
                     'Format' => 0,
                 ],

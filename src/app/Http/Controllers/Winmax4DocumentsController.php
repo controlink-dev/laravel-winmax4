@@ -168,7 +168,6 @@ class Winmax4DocumentsController extends Controller
             'documentType' => 'required',
             'warehouse' => 'required',
             'entity' => 'required',
-            'paymentType' => 'required',
             'details.*' => 'required|array',
             'details.*.ArticleCode' => 'required',
             'details.*.Quantity' => 'required',
