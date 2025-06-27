@@ -159,7 +159,7 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, string $documentNumberRelation = null): object|array|null
+    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, ?Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, string $documentNumberRelation = null): object|array|null
     {
         $ExternalDocumentsRelation = '';
         if($isNC){
