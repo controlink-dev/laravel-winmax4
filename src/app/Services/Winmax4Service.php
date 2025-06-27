@@ -70,10 +70,11 @@ class Winmax4Service
      * @param string $n_terminal
      * @return object | array
      */
-    public function generateToken(string $company_code, string $username, string $password, string $n_terminal)
+    public function generateToken(string $company_code, string $username, string $password, string $n_terminal, string $url = '')
     {
         try {
-            $response = $this->client->post('Account/GenerateToken', [
+
+            $response = $this->client->post($url . 'Account/GenerateToken', [
                 'json' => [
                     'Company' => $company_code,
                     'UserLogin' => $username,

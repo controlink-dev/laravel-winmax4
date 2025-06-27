@@ -176,14 +176,14 @@ class Winmax4EntitiesController extends Controller
             $request->country,
         );
 
-        if(isset($response['error']) && $response['error'] && $response['status'] === 'ENTITYCODEINUSE') {
-            $idWinmax4 = Winmax4Entity::where('code', $request->code)->value('id_winmax4');
+        if(isset($response['error']) && $response['error'] && $response['status'] == 'ENTITYCODEINUSE') {
+            $entity = Winmax4Entity::withTrashed()->where('code', $request->code)->first();
 
-            if($idWinmax4){
-                if(Winmax4Entity::where('code', $request->code)->first()->is_active == 0){
-                    $this->winmax4Service->putEntities($idWinmax4,
-                        $request->name,
+            if($entity){
+                if($entity->is_active == 0){
+                    $this->winmax4Service->putEntities($entity->id_winmax4,
                         $request->code,
+                        $request->name,
                         $request->entityType,
                         $request->taxPayerID,
                         $request->address,
@@ -316,7 +316,8 @@ class Winmax4EntitiesController extends Controller
         $localEntity = Winmax4Entity::where('id_winmax4', $id)->first();
         $response = $this->winmax4Service->deleteEntities($id);
 
-        if(isset($response['error'])){
+        $responseDecoded = json_decode($response, true);
+        if(isset($responseDecoded['error'])){
             // If the result is not OK, we will disable the entity
             $response = $this->winmax4Service->putEntities($id, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
         }
