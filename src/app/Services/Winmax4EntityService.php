@@ -350,6 +350,7 @@ class Winmax4EntityService extends Winmax4Service
             'phone' => $entity->Data->Entity->Phone,
             'tax_payer_id' => $entity->Data->Entity->TaxPayerID,
             'zip_code' => $entity->Data->Entity->ZipCode,
+            'deleted_at' => null,
         ]);
 
         return Winmax4Entity::withTrashed()->where('id_winmax4', $idWinmax4)->first()->toArray();
