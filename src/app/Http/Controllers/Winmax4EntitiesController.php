@@ -317,7 +317,7 @@ class Winmax4EntitiesController extends Controller
         $response = $this->winmax4Service->deleteEntities($id);
 
         $responseDecoded = json_decode($response, true);
-        if(isset($responseDecoded['error'])){
+        if(isset($responseDecoded['error']) || $responseDecoded['Results'][0]['Code'] === 'ENTITYINUSE') {
             // If the result is not OK, we will disable the entity
             $response = $this->winmax4Service->putEntities($id, $localEntity->code, $localEntity->name, $localEntity->entity_type, $localEntity->tax_payer_id, $localEntity->address, $localEntity->zip_code, $localEntity->location, 0, $localEntity->phone, $localEntity->fax, $localEntity->mobile_phone, $localEntity->email, $localEntity->country_code);
         }
