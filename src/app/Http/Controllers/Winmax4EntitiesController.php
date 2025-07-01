@@ -197,7 +197,7 @@ class Winmax4EntitiesController extends Controller
                         $request->country,
                     );
 
-                    return Winmax4Entity::where('code', $request->code)->first()->toArray();
+                    return Winmax4Entity::withTrashed()->where('code', $request->code)->first()->toArray();
                 }
             }
         }
