@@ -191,17 +191,16 @@ class Winmax4EntityService extends Winmax4Service
                 return $this->handleConnectionError($e);
             }
 
-
-            if(config('winmax4.use_soft_deletes')) {
-                $builder = Winmax4Entity::withTrashed();
-            } else {
-                $builder = new Winmax4Entity();
-            }
-
             $responseDecoded = json_decode($response->getBody()->getContents());
 
             if ($responseDecoded && isset($responseDecoded->error) && $responseDecoded->error === true) {
                 return json_decode(json_encode($responseDecoded), true);
+            }
+
+            if(config('winmax4.use_soft_deletes')) {
+                $builder = Winmax4Entity::withTrashed()->where('id_winmax4', $responseDecoded->Data->Entity->ID)->first();
+            } else {
+                $builder = new Winmax4Entity();
             }
 
             $builder->updateOrCreate(
