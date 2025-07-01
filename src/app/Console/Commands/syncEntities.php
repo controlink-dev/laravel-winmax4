@@ -129,6 +129,15 @@ class syncEntities extends Command
                                 //Check if the entities is_active status has changed
                                 if ($localEntity->is_active != $entity->IsActive) {
 
+                                    // Check if the entity is soft deleted
+                                    if(config('winmax4.use_soft_deletes') && !$entity->IsActive && $localEntity->deleted_at == null){
+                                        //If the entity is soft deleted, set the deleted_at timestamp
+                                        $localEntity->deleted_at = now();
+                                    }else{
+                                        //If the entity is not soft deleted, clear the deleted_at timestamp
+                                        $localEntity->deleted_at = null;
+                                    }
+
                                     //If has changed, update the entity
                                     $localEntity->is_active = $entity->IsActive;
                                     $localEntity->save();

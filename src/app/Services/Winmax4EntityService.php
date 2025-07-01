@@ -198,7 +198,7 @@ class Winmax4EntityService extends Winmax4Service
             }
 
             if(config('winmax4.use_soft_deletes')) {
-                $builder = Winmax4Entity::withTrashed()->where('id_winmax4', $responseDecoded->Data->Entity->ID)->first();
+                $builder = Winmax4Entity::withTrashed();
             } else {
                 $builder = new Winmax4Entity();
             }
