@@ -338,7 +338,7 @@ class Winmax4EntityService extends Winmax4Service
             return collect($entity)->toArray();
         }
 
-        Winmax4Entity::where('id_winmax4', $idWinmax4)->update([
+        Winmax4Entity::withTrashed()->where('id_winmax4', $idWinmax4)->update([
             'name' => $entity->Data->Entity->Name,
             'address' => $entity->Data->Entity->Address,
             'country_code' => $entity->Data->Entity->CountryCode,
@@ -353,7 +353,7 @@ class Winmax4EntityService extends Winmax4Service
             'zip_code' => $entity->Data->Entity->ZipCode,
         ]);
 
-        return Winmax4Entity::where('id_winmax4', $idWinmax4)->first()->toArray();
+        return Winmax4Entity::withTrashed()->where('id_winmax4', $idWinmax4)->first()->toArray();
     }
 
     /**
