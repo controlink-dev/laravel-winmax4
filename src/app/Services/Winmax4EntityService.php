@@ -330,6 +330,7 @@ class Winmax4EntityService extends Winmax4Service
             return $this->handleConnectionError($e);
         }
 
+        dd($response);
 
         $entity = json_decode($response->getBody()->getContents());
 
