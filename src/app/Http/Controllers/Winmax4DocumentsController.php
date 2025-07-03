@@ -187,4 +187,28 @@ class Winmax4DocumentsController extends Controller
             $request->has('isNC') ? $request->isNC ? $request->documentNumberRelation : null : null
         ), 200);
     }
+
+    /**
+     * Pays documents on the Winmax4 generating a receipt.
+     *
+     * This method posts a payment for a document to the Winmax4 API.
+     */
+    public function payDocuments(Request $request): JsonResponse{
+        $request->validate([
+            'entityCode' => 'required|exists:winmax4_entities,code',
+            'documents.*' => 'required|array',
+            'documents.*.DocumentTypeCode' => 'required',
+            'documents.*.DocumentNumber' => 'required',
+            'documents.*.Serie' => 'required',
+            'documents.*.Number' => 'required',
+            'documents.*.Year' => 'required',
+            'value' => 'numeric',
+        ]);
+
+        return response()->json($this->winmax4Service->payDocuments(
+            $request->entityCode,
+            $request->documents,
+            $request->value ?? null
+        ), 200);
+    }
 }

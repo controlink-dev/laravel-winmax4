@@ -2,6 +2,7 @@
 
 namespace Controlink\LaravelWinmax4\app\Services;
 
+use Carbon\Carbon;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Document;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentDetail;
@@ -174,7 +175,7 @@ class Winmax4DocumentService extends Winmax4Service
         }
 
         $paymentTypeJson = [];
-        if($paymentType){
+        if($paymentType && $paymentType->id_winmax4 != 0){
             $paymentTypeJson = [
                 [
                     'ID' => $paymentType->id_winmax4,
@@ -183,26 +184,30 @@ class Winmax4DocumentService extends Winmax4Service
             ];
         }
 
+        $json = [
+            'DocumentTypeCode' => $documentType->code,
+            'IsPOS' => true,
+            'SourceWarehouseCode' => $warehouse->code,
+            'TargetWarehouseCode' => $warehouse->code,
+            'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
+            'Entity' => [
+                'Code' => $entity->code,
+                'TaxPayerID' => $entity->tax_payer_id,
+            ],
+            'Details' => $details,
+            'Format' => 0,
+        ];
+
+        if($paymentType){
+            $json['PaymentTypes'] = $paymentTypeJson;
+        }
 
         try{
             $response = $this->client->post('Transactions/Documents', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 ],
-                'json' => [
-                    'DocumentTypeCode' => $documentType->code,
-                    'IsPOS' => true,
-                    'SourceWarehouseCode' => $warehouse->code,
-                    'TargetWarehouseCode' => $warehouse->code,
-                    'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
-                    'Entity' => [
-                        'Code' => $entity->code,
-                        'TaxPayerID' => $entity->tax_payer_id,
-                    ],
-                    'PaymentTypes' => $paymentTypeJson,
-                    'Details' => $details,
-                    'Format' => 0,
-                ],
+                'json' => $json
             ]);
         } catch (ConnectException $e) {
             // Handle timeouts, connection failures, DNS errors, etc.
@@ -313,5 +318,118 @@ class Winmax4DocumentService extends Winmax4Service
         }
 
         return $document;
+    }
+
+    /**
+     * Pays documents on the Winmax4 generating a receipt.
+     *
+     * This method posts a payment for a document to the Winmax4 API.
+     *
+     * @param string $entityCode The code of the entity to pay the documents for.
+     * @param array $documents An array of documents to be paid.
+     * @param float|null $value The value to be paid, if applicable.
+     * @return object|array|null Returns the API response decoded from JSON, or null on failure.
+     * @throws GuzzleException If there is a problem with the HTTP request.
+     */
+    public function payDocuments(string $entityCode, array $documents, ?float $value = null): object|array|null
+    {
+        $entity = Winmax4Entity::where('code', $entityCode)->first();
+
+        if(!$entity){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Entity not found',
+            ], 404);
+        }
+
+        try{
+            $response = $this->client->post('Transactions/DocumentsPayment', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+                'json' => [
+                    'EntityCode' => $entityCode,
+                    'Documents' => $documents,
+                    'Value' => $value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
+
+        $paymentResponse = json_decode($response->getBody()->getContents());
+
+        if (is_array($paymentResponse) && $paymentResponse['error'] === true) {
+            return $paymentResponse;
+        }
+
+        foreach($paymentResponse->Data->Documents as $document){
+            $fullDocument = self::getDocuments(null, $document->DocumentTypeCode, $document->DocumentNumber, $document->Serie, $document->Number, null, null, $entityCode, null, null, 'DocumentsAndDetails', true, 'All', 'DocumentDateAsc', 'JSON');
+            $localDocument = new Winmax4Document();
+            $localDocument->document_type_id = Winmax4DocumentType::where('code', $document->DocumentTypeCode)->first()->id;
+            $localDocument->document_number = $document->DocumentNumber;
+            $localDocument->serie = $document->Serie;
+            $localDocument->number = $document->Number;
+            $localDocument->date = $document->Date;
+            $localDocument->external_identification = $document->ExternalIdentification ?? null;
+            $localDocument->currency_code = $document->CurrencyCode;
+            $localDocument->is_deleted = $document->IsDeleted;
+            $localDocument->user_login = $document->UserLogin;
+            $localDocument->terminal_code = $document->TerminalCode;
+            $localDocument->source_warehouse_code = $document->SourceWarehouseCode;
+            $localDocument->target_warehouse_code = $document->TargetWarehouseCode ?? null;
+            $localDocument->entity_id = Winmax4Entity::where('code', $entityCode)->first()->id;
+            $localDocument->total_without_taxes = $document->TotalWithoutTaxes;
+            $localDocument->total_applied_taxes = $document->TotalAppliedTaxes;
+            $localDocument->total_with_taxes = $document->TotalWithTaxes;
+            $localDocument->total_liquidated = $document->TotalLiquidated;
+            $localDocument->load_address = $document->LoadAddress;
+            $localDocument->load_location = $document->LoadLocation;
+            $localDocument->load_zip_code = $document->LoadZipCode;
+            $localDocument->load_date_time = $document->LoadDateTime;
+            $localDocument->load_vehicle_license_plate = $document->LoadVehicleLicensePlate ?? null;
+            $localDocument->load_country_code = $document->LoadCountryCode;
+            $localDocument->unload_address = $document->UnloadAddress;
+            $localDocument->unload_location = $document->UnloadLocation;
+            $localDocument->unload_zip_code = $document->UnloadZipCode;
+            $localDocument->unload_date_time = $document->UnloadDateTime;
+            $localDocument->unload_country_code = $document->UnloadCountryCode;
+            $localDocument->hash_characters = $document->HashCharacters;
+            $localDocument->ta_doc_code_id = $document->TADocCodeID ?? null;
+            $localDocument->atcud = $document->ATCUD ?? null;
+            $localDocument->table_number = $document->TableNumber ?? null;
+            $localDocument->table_split_number = $document->TableSplitNumber ?? null;
+            $localDocument->sales_person_code = $document->SalesPersonCode ?? null;
+            $localDocument->remarks = $document->Remarks ?? null;
+            $localDocument->save();
+
+            if(isset($fullDocument->Data->Taxes)){
+                foreach ($fullDocument->Data->Taxes as $tax) {
+                    $documentTax = new Winmax4DocumentTax();
+                    $documentTax->document_id = $localDocument->id;
+                    $documentTax->tax_fee_code = $tax->TaxFeeCode;
+                    $documentTax->percentage = $tax->Percentage;
+                    $documentTax->fixedAmount = $tax->FixedAmount ?? 0;
+                    $documentTax->total_affected = $tax->TotalAffected;
+                    $documentTax->total = $tax->Total;
+                    $documentTax->save();
+                }
+            }
+
+            foreach($document->RelatedDocuments as $relatedDocument){
+                $relatedLocalDocument = Winmax4Document::where('document_number', $relatedDocument->DocumentNumber)
+                    ->where('document_type_id', Winmax4DocumentType::where('code', $relatedDocument->DocumentTypeCode)->first()->id)
+                    ->where('serie', $relatedDocument->Serie)
+                    ->where('number', $relatedDocument->Number)
+                    ->where('year', Carbon::parse($relatedDocument->Date)->year)
+                    ->first();
+
+                $relatedLocalDocument->total_liquidated = $relatedDocument->Total - $relatedDocument->TotalNotLiquidated;
+                $relatedLocalDocument->save();
+            }
+        }
+
+        return $paymentResponse;
     }
 }

@@ -63,6 +63,7 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
     Route::prefix('documents')->group(function () {
         Route::get('/get', [Winmax4DocumentsController::class, 'getDocuments'])->name('winmax4.documents.query');
         Route::post('/store', [Winmax4DocumentsController::class, 'postDocuments'])->name('winmax4.documents.store');
+        Route::post('/pay', [Winmax4DocumentsController::class, 'payDocuments'])->name('winmax4.documents.pay');
     });
 
     Route::prefix('payment_types')->group(function () {
