@@ -212,6 +212,8 @@ class Winmax4ArticleService extends Winmax4Service
             return $responseDecoded;
         }
 
+        dd($responseDecoded);
+
         $articleData = $responseDecoded->Data->Article;
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
         $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
