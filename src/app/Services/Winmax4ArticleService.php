@@ -208,7 +208,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         $responseDecoded = json_decode($response->getBody()->getContents());
 
-        if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+        if (isset($responseDecoded) && isset($responseDecoded->error) && $responseDecoded->error === true) {
             return $responseDecoded;
         }
 
@@ -391,7 +391,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         $responseDecoded = json_decode($response->getBody()->getContents());
 
-        if (is_array($responseDecoded) && $responseDecoded['error'] === true) {
+        if (isset($responseDecoded) && isset($responseDecoded->error) && $responseDecoded->error === true) {
             return $responseDecoded;
         }
 
@@ -558,7 +558,6 @@ class Winmax4ArticleService extends Winmax4Service
         if (is_array($article) && isset($article['error']) && $article['error'] === true) {
             return $article;
         }
-
 
         if ($article['Results'][0]['Code'] !== self::WINMAX4_RESPONSE_OK) {
             $article = $this->putArticles(
