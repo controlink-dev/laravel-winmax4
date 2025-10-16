@@ -199,8 +199,8 @@ class Winmax4DocumentsController extends Controller
             'documents.*' => 'required|array',
             'documents.*.DocumentTypeCode' => 'required',
             'documents.*.DocumentNumber' => 'required',
-            'documents.*.Serie' => 'required',
-            'documents.*.Number' => 'required',
+//            'documents.*.Serie' => 'required',
+//            'documents.*.Number' => 'required',
             'documents.*.Year' => 'required',
             'value' => 'numeric',
         ]);

@@ -366,6 +366,8 @@ class Winmax4DocumentService extends Winmax4Service
 
         foreach($paymentResponse->Data->Documents as $document){
             $fullDocument = self::getDocuments(null, $document->DocumentTypeCode, $document->DocumentNumber, $document->Serie, $document->Number, null, null, $entityCode, null, null, 'DocumentsAndDetails', true, 'All', 'DocumentDateAsc', 'JSON');
+            $winmax4Document = $fullDocument->Data->Documents[0];
+
             $localDocument = new Winmax4Document();
             $localDocument->document_type_id = Winmax4DocumentType::where('code', $document->DocumentTypeCode)->first()->id;
             $localDocument->document_number = $document->DocumentNumber;
@@ -373,35 +375,35 @@ class Winmax4DocumentService extends Winmax4Service
             $localDocument->number = $document->Number;
             $localDocument->date = $document->Date;
             $localDocument->external_identification = $document->ExternalIdentification ?? null;
-            $localDocument->currency_code = $document->CurrencyCode;
-            $localDocument->is_deleted = $document->IsDeleted;
-            $localDocument->user_login = $document->UserLogin;
-            $localDocument->terminal_code = $document->TerminalCode;
-            $localDocument->source_warehouse_code = $document->SourceWarehouseCode;
-            $localDocument->target_warehouse_code = $document->TargetWarehouseCode ?? null;
+            $localDocument->currency_code = $winmax4Document->CurrencyCode;
+            $localDocument->is_deleted = $winmax4Document->IsDeleted;
+            $localDocument->user_login = $winmax4Document->UserLogin;
+            $localDocument->terminal_code = $winmax4Document->TerminalCode;
+            $localDocument->source_warehouse_code = $winmax4Document->SourceWarehouseCode;
+            $localDocument->target_warehouse_code = $winmax4Document->TargetWarehouseCode ?? null;
             $localDocument->entity_id = Winmax4Entity::where('code', $entityCode)->first()->id;
-            $localDocument->total_without_taxes = $document->TotalWithoutTaxes;
-            $localDocument->total_applied_taxes = $document->TotalAppliedTaxes;
-            $localDocument->total_with_taxes = $document->TotalWithTaxes;
-            $localDocument->total_liquidated = $document->TotalLiquidated;
-            $localDocument->load_address = $document->LoadAddress;
-            $localDocument->load_location = $document->LoadLocation;
-            $localDocument->load_zip_code = $document->LoadZipCode;
-            $localDocument->load_date_time = $document->LoadDateTime;
-            $localDocument->load_vehicle_license_plate = $document->LoadVehicleLicensePlate ?? null;
-            $localDocument->load_country_code = $document->LoadCountryCode;
-            $localDocument->unload_address = $document->UnloadAddress;
-            $localDocument->unload_location = $document->UnloadLocation;
-            $localDocument->unload_zip_code = $document->UnloadZipCode;
-            $localDocument->unload_date_time = $document->UnloadDateTime;
-            $localDocument->unload_country_code = $document->UnloadCountryCode;
-            $localDocument->hash_characters = $document->HashCharacters;
-            $localDocument->ta_doc_code_id = $document->TADocCodeID ?? null;
-            $localDocument->atcud = $document->ATCUD ?? null;
-            $localDocument->table_number = $document->TableNumber ?? null;
-            $localDocument->table_split_number = $document->TableSplitNumber ?? null;
-            $localDocument->sales_person_code = $document->SalesPersonCode ?? null;
-            $localDocument->remarks = $document->Remarks ?? null;
+            $localDocument->total_without_taxes = $winmax4Document->TotalWithoutTaxes;
+            $localDocument->total_applied_taxes = $winmax4Document->TotalAppliedTaxes;
+            $localDocument->total_with_taxes = $winmax4Document->TotalWithTaxes;
+            $localDocument->total_liquidated = $winmax4Document->TotalLiquidated;
+            $localDocument->load_address = $winmax4Document->LoadAddress;
+            $localDocument->load_location = $winmax4Document->LoadLocation;
+            $localDocument->load_zip_code = $winmax4Document->LoadZipCode;
+            $localDocument->load_date_time = $winmax4Document->LoadDateTime;
+            $localDocument->load_vehicle_license_plate = $winmax4Document->LoadVehicleLicensePlate ?? null;
+            $localDocument->load_country_code = $winmax4Document->LoadCountryCode;
+            $localDocument->unload_address = $winmax4Document->UnloadAddress;
+            $localDocument->unload_location = $winmax4Document->UnloadLocation;
+            $localDocument->unload_zip_code = $winmax4Document->UnloadZipCode;
+            $localDocument->unload_date_time = $winmax4Document->UnloadDateTime;
+            $localDocument->unload_country_code = $winmax4Document->UnloadCountryCode;
+            $localDocument->hash_characters = $winmax4Document->HashCharacters;
+            $localDocument->ta_doc_code_id = $winmax4Document->TADocCodeID ?? null;
+            $localDocument->atcud = $winmax4Document->ATCUD ?? null;
+            $localDocument->table_number = $winmax4Document->TableNumber ?? null;
+            $localDocument->table_split_number = $winmax4Document->TableSplitNumber ?? null;
+            $localDocument->sales_person_code = $winmax4Document->SalesPersonCode ?? null;
+            $localDocument->remarks = $winmax4Document->Remarks ?? null;
             $localDocument->save();
 
             if(isset($fullDocument->Data->Taxes)){
