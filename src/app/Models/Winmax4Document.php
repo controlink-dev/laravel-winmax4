@@ -52,6 +52,7 @@ class Winmax4Document extends Model
         'remarks',
         'document_tax_id',
         'url',
+        'cancel_reason'
     ];
 
     protected static function booted()

@@ -174,6 +174,11 @@ class Winmax4DocumentsController extends Controller
             'details.*.DiscountPercentage1' => 'required',
             'details.*.DiscountPercentage2' => 'required',
             'documentNumberRelation' => 'required_if:isNC,true',
+
+            'RelatedDocuments' => 'required_if:isNC,true|array|min:1',
+            'RelatedDocuments.*.DocumentTypeCode' => 'required_if:isNC,true|string',
+            'RelatedDocuments.*.DocumentNumber' => 'required_if:isNC,true|string',
+            'RelatedDocuments.*.Date' => 'required_if:isNC,true|date',
         ]);
 
         return response()->json($this->winmax4Service->postDocuments(
@@ -184,7 +189,8 @@ class Winmax4DocumentsController extends Controller
             $request->details,
             $request->valueInvoice,
             $request->has('isNC') ? $request->isNC : false,
-            $request->has('isNC') ? $request->isNC ? $request->documentNumberRelation : null : null
+            $request->has('isNC') ? $request->isNC ? $request->documentNumberRelation : null : null,
+            $request->has('isNC') ? $request->isNC ? $request->RelatedDocuments : null : null
         ), 200);
     }
 
@@ -209,6 +215,29 @@ class Winmax4DocumentsController extends Controller
             $request->entityCode,
             $request->documents,
             $request->value ?? null
+        ), 200);
+    }
+
+    /**
+     * Deletes documents on the Winmax4 generating a cancellation.
+     *
+     * This method deletes a document from the Winmax4 API.
+     */
+    public function deleteDocuments(Request $request): JsonResponse{
+        $request->validate([
+            'DocumentTypeCode' => 'required',
+            'DocumentNumber' => 'required',
+            'Serie' => 'required',
+            'Number' => 'required',
+            'CancelReason' => 'required',
+        ]);
+
+        return response()->json($this->winmax4Service->deleteDocuments(
+            $request->DocumentTypeCode,
+            $request->DocumentNumber,
+            $request->Serie,
+            $request->Number,
+            $request->CancelReason
         ), 200);
     }
 }

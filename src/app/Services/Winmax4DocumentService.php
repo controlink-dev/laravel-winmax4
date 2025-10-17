@@ -8,6 +8,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4Document;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentDetail;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentDetailTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentPaymentTypes;
+use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentRelation;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
@@ -160,7 +161,7 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, ?Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, string $documentNumberRelation = null): object|array|null
+    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, ?Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, string $documentNumberRelation = null, array $RelatedDocuments = null): object|array|null
     {
         $ExternalDocumentsRelation = '';
         if($isNC){
@@ -168,6 +169,13 @@ class Winmax4DocumentService extends Winmax4Service
                 return response()->json([
                     'status' => 'error',
                     'message' => 'The document number relation is required for credit notes',
+                ], 404);
+            }
+
+            if(count($RelatedDocuments) == 0){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The related documents are required for credit notes',
                 ], 404);
             }
 
@@ -189,7 +197,7 @@ class Winmax4DocumentService extends Winmax4Service
             'IsPOS' => true,
             'SourceWarehouseCode' => $warehouse->code,
             'TargetWarehouseCode' => $warehouse->code,
-            'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
+            //'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
             'Entity' => [
                 'Code' => $entity->code,
                 'TaxPayerID' => $entity->tax_payer_id,
@@ -200,6 +208,9 @@ class Winmax4DocumentService extends Winmax4Service
 
         if($paymentType){
             $json['PaymentTypes'] = $paymentTypeJson;
+        }
+        if ($isNC){
+            $json['RelatedDocuments'] = $RelatedDocuments;
         }
 
         try{
@@ -315,6 +326,36 @@ class Winmax4DocumentService extends Winmax4Service
                 ->where('document_type_id', Winmax4DocumentType::where('code', $documentNumberRelation[0])->first()->id)
                 ->first();
             $documentRelation->delete();
+
+            //Adicionar a tabela winmax4_documents_relation
+            $documentRelationLink = new Winmax4DocumentRelation();
+            $documentRelationLink->document_id = $documentRelation->id;
+            $documentRelationLink->related_document_id = $document->id;
+            $documentRelationLink->save();
+
+            //Validar se a Fatura($documentRelation) está liquidada
+            if ($documentRelation->total_liquidated == 0) {
+                //Fatura ainda não está liquidada
+                //Criar Recibo de pagamento da Fatura ($documentRelation) e da NC ($document)
+                $this->payDocuments($entity->code, [
+                    [
+                        'DocumentTypeCode' => $documentRelation->documentType->code,
+                        'DocumentNumber' => $documentRelation->document_number,
+                        'Serie' => $documentRelation->serie,
+                        'Number' => $documentRelation->number,
+                        'Year' => Carbon::parse($documentRelation->date)->year,
+                        'value' => $documentRelation->total_with_taxes,
+                    ],
+                    [
+                        'DocumentTypeCode' => $document->documentType->code,
+                        'DocumentNumber' => $document->document_number,
+                        'Serie' => $document->serie,
+                        'Number' => $document->number,
+                        'Year' => Carbon::parse($document->date)->year,
+                        'value' => $document->total_with_taxes,
+                    ],
+                ]);
+            }
         }
 
         return $document;
@@ -364,6 +405,9 @@ class Winmax4DocumentService extends Winmax4Service
             return $paymentResponse;
         }
 
+        $result = new \stdClass();
+        $result->documents = [];
+
         foreach($paymentResponse->Data->Documents as $document){
             $fullDocument = self::getDocuments(null, $document->DocumentTypeCode, $document->DocumentNumber, $document->Serie, $document->Number, null, null, $entityCode, null, null, 'DocumentsAndDetails', true, 'All', 'DocumentDateAsc', 'JSON');
             $winmax4Document = $fullDocument->Data->Documents[0];
@@ -389,15 +433,15 @@ class Winmax4DocumentService extends Winmax4Service
             $localDocument->load_address = $winmax4Document->LoadAddress;
             $localDocument->load_location = $winmax4Document->LoadLocation;
             $localDocument->load_zip_code = $winmax4Document->LoadZipCode;
-            $localDocument->load_date_time = $winmax4Document->LoadDateTime;
+            $localDocument->load_date_time = $winmax4Document->LoadDateTime ?? null;
             $localDocument->load_vehicle_license_plate = $winmax4Document->LoadVehicleLicensePlate ?? null;
-            $localDocument->load_country_code = $winmax4Document->LoadCountryCode;
-            $localDocument->unload_address = $winmax4Document->UnloadAddress;
-            $localDocument->unload_location = $winmax4Document->UnloadLocation;
-            $localDocument->unload_zip_code = $winmax4Document->UnloadZipCode;
-            $localDocument->unload_date_time = $winmax4Document->UnloadDateTime;
-            $localDocument->unload_country_code = $winmax4Document->UnloadCountryCode;
-            $localDocument->hash_characters = $winmax4Document->HashCharacters;
+            $localDocument->load_country_code = $winmax4Document->LoadCountryCode ?? null;
+            $localDocument->unload_address = $winmax4Document->UnloadAddress ?? null;
+            $localDocument->unload_location = $winmax4Document->UnloadLocation ?? null;
+            $localDocument->unload_zip_code = $winmax4Document->UnloadZipCode ?? null;
+            $localDocument->unload_date_time = $winmax4Document->UnloadDateTime ?? null;
+            $localDocument->unload_country_code = $winmax4Document->UnloadCountryCode ?? null;
+            $localDocument->hash_characters = $winmax4Document->HashCharacters ?? null;
             $localDocument->ta_doc_code_id = $winmax4Document->TADocCodeID ?? null;
             $localDocument->atcud = $winmax4Document->ATCUD ?? null;
             $localDocument->table_number = $winmax4Document->TableNumber ?? null;
@@ -405,6 +449,8 @@ class Winmax4DocumentService extends Winmax4Service
             $localDocument->sales_person_code = $winmax4Document->SalesPersonCode ?? null;
             $localDocument->remarks = $winmax4Document->Remarks ?? null;
             $localDocument->save();
+
+            $result->documents[] = $localDocument;
 
             if(isset($fullDocument->Data->Taxes)){
                 foreach ($fullDocument->Data->Taxes as $tax) {
@@ -420,18 +466,80 @@ class Winmax4DocumentService extends Winmax4Service
             }
 
             foreach($document->RelatedDocuments as $relatedDocument){
-                $relatedLocalDocument = Winmax4Document::where('document_number', $relatedDocument->DocumentNumber)
+                $relatedLocalDocument = Winmax4Document::withTrashed()
+                    ->where('document_number', $relatedDocument->DocumentNumber)
                     ->where('document_type_id', Winmax4DocumentType::where('code', $relatedDocument->DocumentTypeCode)->first()->id)
                     ->where('serie', $relatedDocument->Serie)
                     ->where('number', $relatedDocument->Number)
-                    ->where('year', Carbon::parse($relatedDocument->Date)->year)
                     ->first();
 
                 $relatedLocalDocument->total_liquidated = $relatedDocument->Total - $relatedDocument->TotalNotLiquidated;
                 $relatedLocalDocument->save();
+
+                //Adicionar a tabela winmax4_documents_relation
+                $documentRelation = new Winmax4DocumentRelation();
+                $documentRelation->document_id = $relatedLocalDocument->id;
+                $documentRelation->related_document_id = $localDocument->id;
+                $documentRelation->save();
             }
         }
 
-        return $paymentResponse;
+        return $result;
+        //return $paymentResponse;
+    }
+
+
+    /**
+     * Deletes a document from Winmax4 API
+     *
+     * This method deletes a document from the Winmax4 API using the provided document type, number, serie, number, and cancel reason.
+     *
+     * ### Parameters
+     * @param string $documentTypeCode The code of the document type to be deleted.
+     * @param string $documentNumber The number of the document to be deleted.
+     * @param string $serie The serie of the document to be deleted.
+     * @param int $number The number of the document to be deleted.
+     * @param string $CancelReason The reason for cancelling the document.
+     * @return object|array|null Returns the API response decoded from JSON, or null on failure.
+     * @throws GuzzleException If there is a problem with the HTTP request.
+     */
+    public function deleteDocuments(string $documentTypeCode, string $documentNumber, string $serie, int $number, string $CancelReason): object|array|null
+    {
+        try{
+            $response = $this->client->delete('Transactions/Documents', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+                'json' => [
+                    'DocumentTypeCode' => $documentTypeCode,
+                    'DocumentNumber' => $documentNumber,
+                    'Serie' => $serie,
+                    'Number' => $number,
+                    'CancelReason' => $CancelReason,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            // Handle timeouts, connection failures, DNS errors, etc.
+            return $this->handleConnectionError($e);
+        }
+
+        $responseJSONDecoded = json_decode($response->getBody()->getContents());
+
+        if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
+            return $responseJSONDecoded;
+        }
+
+        $localDocument = Winmax4Document::where('document_number', $documentTypeCode)
+            ->where('document_type_id', Winmax4DocumentType::where('code', $documentNumber)->first()->id)
+            ->where('serie', $serie)
+            ->where('number', $number)
+            ->first();
+
+        $localDocument->is_deleted = true;
+        $localDocument->cancel_reason = $CancelReason;
+        $localDocument->save();
+        $localDocument->delete();
+
+        return $responseJSONDecoded;
     }
 }
