@@ -227,6 +227,7 @@ class Winmax4DocumentsController extends Controller
         $request->validate([
             'DocumentTypeCode' => 'required',
             'DocumentNumber' => 'required',
+            'Year' => 'required',
             'Serie' => 'required',
             'Number' => 'required',
             'CancelReason' => 'required',
@@ -235,6 +236,7 @@ class Winmax4DocumentsController extends Controller
         return response()->json($this->winmax4Service->deleteDocuments(
             $request->DocumentTypeCode,
             $request->DocumentNumber,
+            $request->Year,
             $request->Serie,
             $request->Number,
             $request->CancelReason

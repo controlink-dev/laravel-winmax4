@@ -497,13 +497,14 @@ class Winmax4DocumentService extends Winmax4Service
      * ### Parameters
      * @param string $documentTypeCode The code of the document type to be deleted.
      * @param string $documentNumber The number of the document to be deleted.
+     * @param int $year The year of the document to be deleted.
      * @param string $serie The serie of the document to be deleted.
      * @param int $number The number of the document to be deleted.
      * @param string $CancelReason The reason for cancelling the document.
      * @return object|array|null Returns the API response decoded from JSON, or null on failure.
      * @throws GuzzleException If there is a problem with the HTTP request.
      */
-    public function deleteDocuments(string $documentTypeCode, string $documentNumber, string $serie, int $number, string $CancelReason): object|array|null
+    public function deleteDocuments(string $documentTypeCode, string $documentNumber, int $year,string $serie, int $number, string $CancelReason): object|array|null
     {
         try{
             $response = $this->client->delete('Transactions/Documents', [
@@ -513,6 +514,7 @@ class Winmax4DocumentService extends Winmax4Service
                 'json' => [
                     'DocumentTypeCode' => $documentTypeCode,
                     'DocumentNumber' => $documentNumber,
+                    'Year' => $year,
                     'Serie' => $serie,
                     'Number' => $number,
                     'CancelReason' => $CancelReason,
