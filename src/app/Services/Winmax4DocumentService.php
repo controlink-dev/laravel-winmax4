@@ -531,8 +531,8 @@ class Winmax4DocumentService extends Winmax4Service
             return $responseJSONDecoded;
         }
 
-        $localDocument = Winmax4Document::where('document_number', $documentTypeCode)
-            ->where('document_type_id', Winmax4DocumentType::where('code', $documentNumber)->first()->id)
+        $localDocument = Winmax4Document::where('document_number', $documentNumber)
+            ->where('document_type_id', Winmax4DocumentType::where('code', $documentTypeCode)->first()->id)
             ->where('serie', $serie)
             ->where('number', $number)
             ->first();
