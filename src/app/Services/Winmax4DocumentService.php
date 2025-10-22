@@ -54,7 +54,7 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the decoded JSON response.
      * @throws GuzzleException
      */
-    public function getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null, $externalIdentification = null, $toDate = null, $entityCode = null, $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails', $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): object|array|null
+    public function getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null, $externalIdentification = null, $toDate = null, $entityCode = null, $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails', $includeCustomContent = true, $includeRelatedDocuments = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): object|array|null
     {
         $url = 'Transactions/Documents?DocumentTypeCode=' . $documentTypeCode .
             '&DocumentNumber=' . $documentNumber .
@@ -67,7 +67,8 @@ class Winmax4DocumentService extends Winmax4Service
             '&EntityTaxPayerID=' . $entityTaxPayerID .
             '&SalesPersonCode=' . $salesPersonCode .
             '&IncludeRemarks=' . $includeRemarks .
-            '&IncludeCustomContent=' . $includeCustomContent .
+            '&IncludeCustomContent=' . ($includeCustomContent ? 'true' : 'false') .
+            '&IncludeRelatedDocuments='. ($includeRelatedDocuments ? 'true' : 'false') .
             '&LiquidateStatus=' . $liquidateStatus .
             '&Order=' . $order .
             '&Format=' . $format;
@@ -161,25 +162,15 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, ?Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, string $documentNumberRelation = null, array $RelatedDocuments = null): object|array|null
+    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, ?Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, array $RelatedDocuments = null): object|array|null
     {
-        $ExternalDocumentsRelation = '';
         if($isNC){
-            if(is_null($documentNumberRelation)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'The document number relation is required for credit notes',
-                ], 404);
-            }
-
             if(count($RelatedDocuments) == 0){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'The related documents are required for credit notes',
                 ], 404);
             }
-
-            $ExternalDocumentsRelation = $documentNumberRelation;
         }
 
         $paymentTypeJson = [];
@@ -197,7 +188,6 @@ class Winmax4DocumentService extends Winmax4Service
             'IsPOS' => true,
             'SourceWarehouseCode' => $warehouse->code,
             'TargetWarehouseCode' => $warehouse->code,
-            //'ExternalDocumentsRelation' => $ExternalDocumentsRelation,
             'Entity' => [
                 'Code' => $entity->code,
                 'TaxPayerID' => $entity->tax_payer_id,
@@ -320,41 +310,46 @@ class Winmax4DocumentService extends Winmax4Service
         //Split the document number to get the type document and the number of the documentNumberRelation (e.g. FR A2025/1 -> FR is the type and A2025/1 is the number)
 
         if($isNC){
-            $documentNumberRelation = explode(' ', $documentNumberRelation);
+            $DocsToReicive = [];
+            $totalNCPay = 0;
+            foreach ($RelatedDocuments as $relatedDocument) {
 
-            $documentRelation = Winmax4Document::where('document_number', $documentNumberRelation[1])
-                ->where('document_type_id', Winmax4DocumentType::where('code', $documentNumberRelation[0])->first()->id)
-                ->first();
-            $documentRelation->delete();
-
-            //Adicionar a tabela winmax4_documents_relation
-            $documentRelationLink = new Winmax4DocumentRelation();
-            $documentRelationLink->document_id = $documentRelation->id;
-            $documentRelationLink->related_document_id = $document->id;
-            $documentRelationLink->save();
-
-            //Validar se a Fatura($documentRelation) está liquidada
-            if ($documentRelation->total_liquidated == 0) {
-                //Fatura ainda não está liquidada
-                //Criar Recibo de pagamento da Fatura ($documentRelation) e da NC ($document)
-                $this->payDocuments($entity->code, [
-                    [
+                $documentRelation = Winmax4Document::where('document_number', $relatedDocument['DocumentNumber'])
+                    ->where('document_type_id', Winmax4DocumentType::where('code', $relatedDocument['DocumentTypeCode'])->first()->id)
+                    ->first();
+                $documentRelation->delete();
+                if ($documentRelation->total_liquidated == 0){
+                    $DocsToReicive[] = [
                         'DocumentTypeCode' => $documentRelation->documentType->code,
                         'DocumentNumber' => $documentRelation->document_number,
                         'Serie' => $documentRelation->serie,
                         'Number' => $documentRelation->number,
                         'Year' => Carbon::parse($documentRelation->date)->year,
                         'value' => $documentRelation->total_with_taxes,
-                    ],
-                    [
-                        'DocumentTypeCode' => $document->documentType->code,
-                        'DocumentNumber' => $document->document_number,
-                        'Serie' => $document->serie,
-                        'Number' => $document->number,
-                        'Year' => Carbon::parse($document->date)->year,
-                        'value' => $document->total_with_taxes,
-                    ],
-                ]);
+                    ];
+                    $totalNCPay += $documentRelation->total_with_taxes;
+                }
+
+                //Adicionar a tabela winmax4_documents_relation
+                $documentRelationLink = new Winmax4DocumentRelation();
+                $documentRelationLink->document_id = $documentRelation->id;
+                $documentRelationLink->related_document_id = $document->id;
+                $documentRelationLink->save();
+            }
+
+            if ($DocsToReicive != []){
+                //Add the NC to the DocsToReicive
+                $DocsToReicive[] = [
+                    'DocumentTypeCode' => $document->documentType->code,
+                    'DocumentNumber' => $document->document_number,
+                    'Serie' => $document->serie,
+                    'Number' => $document->number,
+                    'Year' => Carbon::parse($document->date)->year,
+                    //'value' => $document->total_with_taxes,
+                    'value' => $totalNCPay,
+                ];
+
+                $this->payDocuments($entity->code, $DocsToReicive, $totalNCPay);
             }
         }
 
@@ -535,13 +530,92 @@ class Winmax4DocumentService extends Winmax4Service
             ->where('document_type_id', Winmax4DocumentType::where('code', $documentTypeCode)->first()->id)
             ->where('serie', $serie)
             ->where('number', $number)
+            ->with('documentType')
             ->first();
+
 
         $localDocument->is_deleted = true;
         $localDocument->cancel_reason = $CancelReason;
         $localDocument->save();
         $localDocument->delete();
 
+
+        //Validar se o documento tem documentos relacionados
+        $relatedDocuments = Winmax4DocumentRelation::where('document_id', $localDocument->id)
+            ->orWhere('related_document_id', $localDocument->id)
+            ->get();
+        //order by id ascending
+        $relatedDocuments = $relatedDocuments->sortBy('id');
+
+        if ($relatedDocuments){
+            $result = $this->getDocuments(null,
+                $localDocument->documentType->code,
+                $localDocument->document_number,
+                $localDocument->serie,
+                $localDocument->number,
+                null, null, null, null, null,
+                'DocumentsAndDetails',
+                true, 'All', 'DocumentDateAsc', 'JSON');
+            $documentData = $result->Data->Documents[0];
+
+            foreach ($relatedDocuments as $relation) {
+                // Identify the related document (it can be on either side of the relation)
+                $relatedDocumentId = ($relation->document_id == $localDocument->id)
+                    ? $relation->related_document_id
+                    : $relation->document_id;
+
+
+                $relatedDocument = Winmax4Document::withTrashed()->with('documentType')->find($relatedDocumentId);
+
+                if (!$relatedDocument) {
+                    continue;
+                }
+
+                //Se o documento anulado for uma Nota de Crédito
+                if ($localDocument->documentType->code == 'NC') {
+                    $relatedDocument->deleted_at = null;
+
+                    //Validar se o $relatedDocument (FA) têm algum documento relacionado que seja um Recibo
+                    $relatedDocumentRelations = Winmax4DocumentRelation::where('document_id', $relatedDocument->id)->get();
+                    $hasReceipt = false;
+                    foreach ($relatedDocumentRelations as $relatedRelation) {
+                        $relatedDocId = $relatedRelation->related_document_id;
+
+                        $relatedDoc = Winmax4Document::withTrashed()->find($relatedDocId);
+                        if ($relatedDoc && $relatedDoc->document_type_id == Winmax4DocumentType::where('code', 'RE')->first()->id) {
+                            $hasReceipt = true;
+                            break;
+                        }
+                    }
+                    if (!$hasReceipt) {
+                        $relatedDocument->total_liquidated = 0;
+                    }
+
+                    $relatedDocument->save();
+                }
+
+                //Se o documento relacionado for uma Nota de Crédito
+                elseif ($relatedDocument->documentType->code == 'NC') {
+                    $relatedDocument->total_liquidated = 0;
+                    $relatedDocument->save();
+                }
+
+                else {
+                    foreach ($documentData->RelatedDocuments as $doc) {
+                        //Validar se o documento relacionado é o mesmo que estamos a processar
+                        if ($doc->DocumentTypeCode == $relatedDocument->documentType->code &&
+                            $doc->DocumentNumber == $relatedDocument->document_number) {
+                            $relatedDocument->total_liquidated = $relatedDocument->total_liquidated - $doc->TotalRelation;
+                            $relatedDocument->save();
+
+                            break;
+                        }
+                    }
+                }
+
+                $relation->delete();
+            }
+        }
         return $responseJSONDecoded;
     }
 }

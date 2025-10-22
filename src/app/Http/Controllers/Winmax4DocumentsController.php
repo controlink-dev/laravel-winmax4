@@ -98,9 +98,9 @@ class Winmax4DocumentsController extends Controller
      *
      * @return JsonResponse Returns a JSON response with all documents.
      */
-    public function getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null, $externalIdentification = null, $toDate = null, $entityCode = null, $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails', $includeCustomContent = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): JsonResponse
+    public function getDocuments($fromDate = null, $documentTypeCode = null, $documentNumber = null, $serie = null, $number = null, $externalIdentification = null, $toDate = null, $entityCode = null, $entityTaxPayerID = null, $salesPersonCode = null, $includeRemarks = 'DocumentsAndDetails', $includeCustomContent = true, $includeRelatedDocuments = true, $liquidateStatus = 'All', $order = 'DocumentDateAsc', $format = 'JSON'): JsonResponse
     {
-        return response()->json($this->winmax4Service->getDocuments($fromDate, $documentTypeCode, $documentNumber, $serie, $number, $externalIdentification, $toDate, $entityCode, $entityTaxPayerID, $salesPersonCode, $includeRemarks, $includeCustomContent, $liquidateStatus, $order, $format), 200);
+        return response()->json($this->winmax4Service->getDocuments($fromDate, $documentTypeCode, $documentNumber, $serie, $number, $externalIdentification, $toDate, $entityCode, $entityTaxPayerID, $salesPersonCode, $includeRemarks, $includeCustomContent, $includeRelatedDocuments, $liquidateStatus, $order, $format), 200);
     }
 
     /**
@@ -173,7 +173,6 @@ class Winmax4DocumentsController extends Controller
             'details.*.Quantity' => 'required',
             'details.*.DiscountPercentage1' => 'required',
             'details.*.DiscountPercentage2' => 'required',
-            'documentNumberRelation' => 'required_if:isNC,true',
 
             'RelatedDocuments' => 'required_if:isNC,true|array|min:1',
             'RelatedDocuments.*.DocumentTypeCode' => 'required_if:isNC,true|string',
@@ -189,7 +188,6 @@ class Winmax4DocumentsController extends Controller
             $request->details,
             $request->valueInvoice,
             $request->has('isNC') ? $request->isNC : false,
-            $request->has('isNC') ? $request->isNC ? $request->documentNumberRelation : null : null,
             $request->has('isNC') ? $request->isNC ? $request->RelatedDocuments : null : null
         ), 200);
     }
