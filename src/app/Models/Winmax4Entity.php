@@ -30,9 +30,6 @@ class Winmax4Entity extends Model
         'phone',
         'tax_payer_id',
         'zip_code',
-        'total_debt',
-        'total_credit',
-        'total_balance'
     ];
 
     protected static function booted()
