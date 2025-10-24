@@ -162,7 +162,7 @@ class Winmax4DocumentService extends Winmax4Service
      * @return object|array|null Returns the API response decoded from JSON, or null on failure
      * @throws GuzzleException If there is a problem with the HTTP request
      */
-    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, ?Winmax4PaymentType $paymentType, array $details, float $valueInvoice, bool $isNC = false, array $RelatedDocuments = null): object|array|null
+    public function postDocuments(object $documentType, Winmax4Warehouse $warehouse, Winmax4Entity $entity, $paymentType, array $details, float $valueInvoice, bool $isNC = false, array $RelatedDocuments = null): object|array|null
     {
         if($isNC){
             if(count($RelatedDocuments) == 0){
@@ -364,10 +364,11 @@ class Winmax4DocumentService extends Winmax4Service
      * @param string $entityCode The code of the entity to pay the documents for.
      * @param array $documents An array of documents to be paid.
      * @param float|null $value The value to be paid, if applicable.
+     * @param int|null $PaymentTypeID The ID of the payment type to be used, if applicable.
      * @return object|array|null Returns the API response decoded from JSON, or null on failure.
      * @throws GuzzleException If there is a problem with the HTTP request.
      */
-    public function payDocuments(string $entityCode, array $documents, ?float $value = null): object|array|null
+    public function payDocuments(string $entityCode, array $documents, ?float $value = null, int $PaymentTypeID = null): object|array|null
     {
         $entity = Winmax4Entity::where('code', $entityCode)->first();
 
@@ -387,6 +388,7 @@ class Winmax4DocumentService extends Winmax4Service
                     'EntityCode' => $entityCode,
                     'Documents' => $documents,
                     'Value' => $value,
+                    'PaymentTypeID' => $PaymentTypeID,
                 ],
             ]);
         } catch (ConnectException $e) {

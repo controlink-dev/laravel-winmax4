@@ -203,8 +203,6 @@ class Winmax4DocumentsController extends Controller
             'documents.*' => 'required|array',
             'documents.*.DocumentTypeCode' => 'required',
             'documents.*.DocumentNumber' => 'required',
-//            'documents.*.Serie' => 'required',
-//            'documents.*.Number' => 'required',
             'documents.*.Year' => 'required',
             'value' => 'numeric',
         ]);
@@ -212,7 +210,8 @@ class Winmax4DocumentsController extends Controller
         return response()->json($this->winmax4Service->payDocuments(
             $request->entityCode,
             $request->documents,
-            $request->value ?? null
+            $request->value ?? null,
+            $request->paymentType ?? null
         ), 200);
     }
 
