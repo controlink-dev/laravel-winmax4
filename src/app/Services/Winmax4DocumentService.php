@@ -579,16 +579,19 @@ class Winmax4DocumentService extends Winmax4Service
 
                     //Validar se o $relatedDocument (FA) têm algum documento relacionado que seja um Recibo
                     $relatedDocumentRelations = Winmax4DocumentRelation::where('document_id', $relatedDocument->id)->get();
+
                     $hasReceipt = false;
                     foreach ($relatedDocumentRelations as $relatedRelation) {
-                        $relatedDocId = $relatedRelation->related_document_id;
+                        $relatedDocId = $relatedRelation->document_id;
 
                         $relatedDoc = Winmax4Document::withTrashed()->find($relatedDocId);
-                        if ($relatedDoc && $relatedDoc->document_type_id == Winmax4DocumentType::where('code', 'RE')->first()->id) {
+                        if ($relatedDoc && $relatedDoc->document_type_id == Winmax4DocumentType::where('code', 'RE')->first()->id ||
+                            $relatedDoc && $relatedDoc->document_type_id == Winmax4DocumentType::where('code', 'FR')->first()->id) {
                             $hasReceipt = true;
                             break;
                         }
                     }
+
                     if (!$hasReceipt) {
                         $relatedDocument->total_liquidated = 0;
                     }
