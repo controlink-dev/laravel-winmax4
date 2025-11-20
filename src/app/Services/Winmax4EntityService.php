@@ -325,8 +325,9 @@ class Winmax4EntityService extends Winmax4Service
                     ...$gdpr,
                 ],
             ]);
-            dd($response);
+
         }catch (ConnectException $e) {
+            dd($e);
             // Handle timeouts, connection failures, DNS errors, etc.
             return $this->handleConnectionError($e);
         }
