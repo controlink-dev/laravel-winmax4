@@ -82,6 +82,7 @@ class Winmax4Service
                     'TerminalCode' => $n_terminal,
                 ],
             ]);
+            dd($response);
         } catch (ConnectException $e) {
             // Handle timeouts, connection failures, DNS errors, etc.
             return $this->handleConnectionError($e);
