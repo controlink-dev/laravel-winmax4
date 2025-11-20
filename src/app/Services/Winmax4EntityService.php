@@ -302,7 +302,6 @@ class Winmax4EntityService extends Winmax4Service
                 'GDPRPersonalInformationAccessExpirationDate' => $expirationDate ?: '2099-12-31',
             ];
         }
-        dd($this, $this->token->Data->AccessToken->Value);
 
         try{
             $response = $this->client->put('Files/Entities/?id='.$idWinmax4, [
@@ -328,7 +327,6 @@ class Winmax4EntityService extends Winmax4Service
             ]);
 
         }catch (ConnectException $e) {
-            dd($e);
             // Handle timeouts, connection failures, DNS errors, etc.
             return $this->handleConnectionError($e);
         }
