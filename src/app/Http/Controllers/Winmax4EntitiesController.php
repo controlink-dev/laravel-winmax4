@@ -262,7 +262,7 @@ class Winmax4EntitiesController extends Controller
             'expirationDate' => 'nullable|date_format:Y-m-d',
             'country' => 'nullable|string|size:2|in:PT',
         ]);
-
+        dd($request->all());
         return response()->json($this->winmax4Service->putEntities(
             $request->id_winmax4,
             $request->code,
