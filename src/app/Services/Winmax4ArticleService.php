@@ -534,12 +534,15 @@ class Winmax4ArticleService extends Winmax4Service
      * | `GuzzleHttp\Exception\GuzzleException`     | Throws when there is an HTTP client error during the DELETE request. |
      *
      * @param int $idWinmax4 The ID of the Winmax4 article to delete.
+     * @param bool $forceDelete Indicates whether to force delete the article.
      * @return array JSON response or deleted article object.
      * @throws GuzzleException
      */
-    public function deleteArticles(int $idWinmax4): array
+    public function deleteArticles(int $idWinmax4, bool $forceDelete): array
     {
-        $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)->first();
+        $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)
+            ->with('details')
+            ->first();
 
         try{
             $response = $this->client->delete('Files/Articles/?id=' . $idWinmax4, [
@@ -574,9 +577,20 @@ class Winmax4ArticleService extends Winmax4Service
                 0
             );
         } else {
-            $localArticle->is_active = 0;
-            $localArticle->deleted_at = now();
-            $localArticle->save();
+
+            if (!$localArticle->details()->exists() && $forceDelete) {
+                if(config('winmax4.use_soft_deletes')) {
+                    $localArticle->forceDelete();
+                    return $article;
+                } else {
+                    $localArticle->delete();
+                    return $article;
+                }
+            }else{
+                $localArticle->is_active = 0;
+                $localArticle->deleted_at = now();
+                $localArticle->save();
+            }
         }
 
         return $article;

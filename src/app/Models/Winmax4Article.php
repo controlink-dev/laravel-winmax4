@@ -84,4 +84,9 @@ class Winmax4Article extends Model
     {
         return $this->hasMany(Winmax4ArticleStocks::class, 'article_id', 'id');
     }
+
+    public function details()
+    {
+        return $this->hasMany(Winmax4DocumentDetail::class, 'article_id', 'id');
+    }
 }

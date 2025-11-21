@@ -225,12 +225,13 @@ class Winmax4ArticlesController extends Controller
      * | `Exception`                                | Throws when the deletion process encounters an error.  |
      *
      * @param int $id The ID of the article to be deleted.
+     * @param boolean $forceDelete Indicates whether to force delete the article.
      * @return \Illuminate\Http\JsonResponse JSON response with the deletion result.
      * @throws GuzzleException
      */
-    public function deleteArticles(int $id): JsonResponse
+    public function deleteArticles(int $id, bool $forceDelete): JsonResponse
     {
-        return response()->json($this->winmax4Service->deleteArticles($id), 200);
+        return response()->json($this->winmax4Service->deleteArticles($id, $forceDelete), 200);
     }
 
 
