@@ -5,6 +5,7 @@ namespace Controlink\LaravelWinmax4\app\Services;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Article;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use Decimal\Decimal;
 use GuzzleHttp\Exception\ConnectException;
@@ -403,7 +404,6 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         $articleData = $responseDecoded->Data->Article;
-        dd($articleData);
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
         $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
         $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
@@ -411,9 +411,9 @@ class Winmax4ArticleService extends Winmax4Service
         Winmax4Article::where('id_winmax4', $idWinmax4)->update([
             'code' => $articleData->Code,
             'designation' => $articleData->Designation,
-            'family_code' => $articleData->FamilyCode,
-            'sub_family_code' => $subFamilyCode,
-            'sub_sub_family_code' => $subSubFamilyCode,
+            'family_id' => Winmax4Family::where('code', $articleData->FamilyCode)->first()->id,
+            'sub_family_id' => Winmax4Family::where('code', $subFamilyCode)->first()->id ?? null,
+            'sub_sub_family_id' => Winmax4Family::where('code', $subSubFamilyCode)->first()->id ?? null,
             'is_active' => $articleData->IsActive,
         ]);
 
@@ -427,7 +427,7 @@ class Winmax4ArticleService extends Winmax4Service
                     ],
                     [
                         'article_id' => $article->id,
-                        'currency_code' => $price->CurrencyCode,
+                        'currency_code' => Winmax4Currency::where('code', $price->CurrencyCode)->first()->id,
                         'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
                         'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
                         'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
