@@ -403,6 +403,7 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         $articleData = $responseDecoded->Data->Article;
+        dd($articleData);
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
         $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
         $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
