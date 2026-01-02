@@ -9,9 +9,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Alterar FK de license para cascade on delete
+        // 1. Modifica FK de article_id para cascade on delete
         Schema::table('winmax4_articles_prices', function (Blueprint $table) {
-            $table->unsignedBigInteger('article_id');
+            $table->dropForeign(['article_id']); // remove apenas a constraint
+        });
+
+        // Recria a FK com cascade on delete
+        Schema::table('winmax4_articles_prices', function (Blueprint $table) {
             $table->foreign('article_id')
                 ->references('id')
                 ->on('winmax4_articles')
