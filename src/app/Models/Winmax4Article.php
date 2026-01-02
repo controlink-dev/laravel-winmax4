@@ -26,10 +26,10 @@ class Winmax4Article extends Model
         'designation',
         'short_description',
         'is_active',
-        'family_code',
-        'sub_family_code',
-        'sub_sub_family_code',
-        'sub_sub_sub_family_code',
+        'family_id',
+        'sub_family_id',
+        'sub_sub_family_id',
+        'sub_sub_sub_family_id',
         'stock_unit_code',
         'image_url',
         'extras',
@@ -52,17 +52,17 @@ class Winmax4Article extends Model
 
     public function family()
     {
-        return $this->belongsTo(Winmax4Family::class, 'family_code', 'code');
+        return $this->belongsTo(Winmax4Family::class, 'family_id', 'id');
     }
 
     public function subFamily()
     {
-        return $this->belongsTo(Winmax4SubFamily::class, 'sub_family_code', 'code');
+        return $this->belongsTo(Winmax4SubFamily::class, 'sub_family_id', 'id');
     }
 
     public function subSubFamily()
     {
-        return $this->belongsTo(Winmax4SubSubFamily::class, 'sub_sub_family_code', 'code');
+        return $this->belongsTo(Winmax4SubSubFamily::class, 'sub_sub_family_id', 'id');
     }
 
     public function saleTaxes()

@@ -351,7 +351,7 @@ class Winmax4ArticleService extends Winmax4Service
      * @param int|null $is_active Indicates if the article is active.
      * @return array Returns the updated article object.
      */
-    public function putArticles(int $idWinmax4, string $code, string $familyCode, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyCode = null, string $subSubFamilyCode = null, ?int $stock = 0, ?int $is_active = 1): array
+    public function putArticles(int $idWinmax4, string $code, string $familyId, string $vatCode, string $vatRate, string $priceWithoutVat, string $priceWithVat, string $subFamilyId = null, string $subSubFamilyId = null, ?int $stock = 0, ?int $is_active = 1): array
     {
         try {
             $response = $this->client->put('Files/Articles/?id=' . $idWinmax4, [
@@ -359,10 +359,10 @@ class Winmax4ArticleService extends Winmax4Service
                     'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
                 ],
                 'json' => [
-                    'FamilyCode' => $familyCode,
+                    'FamilyCode' => $familyId,
                     'SubFamilies' => [
-                        'SubFamilyCode' => $subFamilyCode,
-                        'SubSubFamilyCode' => $subSubFamilyCode,
+                        'SubFamilyCode' => $subFamilyId,
+                        'SubSubFamilyCode' => $subSubFamilyId,
                     ],
                     'IsActive' => $is_active,
                     'ArticlePrices' => [
@@ -403,6 +403,8 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         $articleData = $responseDecoded->Data->Article;
+
+        dd($articleData);
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
         $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
         $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
