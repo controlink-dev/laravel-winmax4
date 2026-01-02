@@ -59,24 +59,11 @@ return new class extends Migration
               AND a.sub_family_id IS NOT NULL
         ");
 
-        // 2.4 Sub sub sub families: (sub_sub_family_id, code)
-        DB::statement("
-            UPDATE winmax4_articles a
-            JOIN winmax4_sub_sub_sub_families sssf
-              ON sssf.sub_sub_family_id = a.sub_sub_family_id
-             AND sssf.code              = a.sub_sub_sub_family_code
-            SET a.sub_sub_sub_family_id = sssf.id
-            WHERE a.sub_sub_sub_family_code IS NOT NULL
-              AND a.sub_sub_sub_family_id IS NULL
-              AND a.sub_sub_family_id IS NOT NULL
-        ");
-
         // 3) Criar FKs (agora sim, por ID)
         Schema::table('winmax4_articles', function (Blueprint $table) {
             $table->foreign('family_id')->references('id')->on('winmax4_families')->cascadeOnDelete();
             $table->foreign('sub_family_id')->references('id')->on('winmax4_sub_families')->cascadeOnDelete();
             $table->foreign('sub_sub_family_id')->references('id')->on('winmax4_sub_sub_families')->cascadeOnDelete();
-            $table->foreign('sub_sub_sub_family_id')->references('id')->on('winmax4_sub_sub_sub_families')->cascadeOnDelete();
         });
 
         // 4) (Opcional) Remover colunas de código antigas
@@ -96,19 +83,21 @@ return new class extends Migration
             $table->dropForeign(['family_id']);
             $table->dropForeign(['sub_family_id']);
             $table->dropForeign(['sub_sub_family_id']);
-            $table->dropForeign(['sub_sub_sub_family_id']);
 
             $table->dropIndex(['family_id']);
             $table->dropIndex(['sub_family_id']);
             $table->dropIndex(['sub_sub_family_id']);
-            $table->dropIndex(['sub_sub_sub_family_id']);
 
             $table->dropColumn([
                 'family_id',
                 'sub_family_id',
                 'sub_sub_family_id',
-                'sub_sub_sub_family_id',
             ]);
+
+            $table->foreignId('family_code')->nullable()->after('is_active');
+            $table->foreignId('sub_family_code')->nullable()->after('family_code');
+            $table->foreignId('sub_sub_family_code')->nullable()->after('sub_family_code');
+            $table->foreignId('sub_sub_sub_family_code')->nullable()->after('sub_sub_family_code');
         });
     }
 };
