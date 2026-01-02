@@ -391,6 +391,7 @@ class Winmax4ArticleService extends Winmax4Service
 
         $responseDecoded = json_decode($response->getBody()->getContents());
 
+        dd($responseDecoded);
         if (isset($responseDecoded) && isset($responseDecoded->error) && $responseDecoded->error === true) {
             return $responseDecoded;
         }
