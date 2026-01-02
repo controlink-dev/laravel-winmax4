@@ -49,7 +49,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        // 1. Reverter FK de license para restrict on delete
+        // 1. Reverter FK de article para restrict on delete
         Schema::table('winmax4_articles_prices', function (Blueprint $table) {
             $table->dropForeign(['article_id']);
             $table->foreignIdFor(Controlink\LaravelWinmax4\app\Models\Winmax4Article::class, 'article_id')
