@@ -40,7 +40,7 @@ return new class extends Migration
         Schema::table('winmax4_articles_stocks', function (Blueprint $table) {
             $table->foreign('warehouse_id')
                 ->references('id')
-                ->on('winmax4_currencies')
+                ->on('winmax4_warehouses')
                 ->cascadeOnDelete();
 
             $table->dropColumn('warehouse_code');
