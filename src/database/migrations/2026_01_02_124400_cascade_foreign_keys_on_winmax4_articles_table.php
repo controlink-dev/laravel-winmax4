@@ -11,11 +11,11 @@ return new class extends Migration
     {
         // First, make the foreign key columns nullable
         Schema::table('winmax4_articles', function (Blueprint $table) {
-            $table->foreign('family_code')->references('id')->on('winmax4_families')->onDeleteCascade()->change();
-            $table->foreign('sub_family_code')->references('id')->on('winmax4_sub_families')->onDeleteCascade()->change();
-            $table->foreign('sub_sub_family_code')->references('id')->on('winmax4_sub_sub_families')->onDeleteCascade()->change();
-            $table->foreign('sub_sub_sub_family_code')->references('id')->on('winmax4_sub_sub_sub_families')->change();
-            $table->foreign('stock_unit_code')->references('id')->on('winmax4_stock_units')->onDeleteCascade()->change();
+            $table->foreign('family_code')->references('code')->on('winmax4_families')->onDeleteCascade()->change();
+            $table->foreign('sub_family_code')->references('code')->on('winmax4_sub_families')->onDeleteCascade()->change();
+            $table->foreign('sub_sub_family_code')->references('code')->on('winmax4_sub_sub_families')->onDeleteCascade()->change();
+            $table->foreign('sub_sub_sub_family_code')->references('code')->on('winmax4_sub_sub_sub_families')->change();
+            $table->foreign('stock_unit_code')->references('code')->on('winmax4_stock_units')->onDeleteCascade()->change();
         });
     }
 
