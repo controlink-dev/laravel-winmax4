@@ -14,12 +14,10 @@ return new class extends Migration
             $table->unsignedBigInteger('family_id')->nullable()->after('family_code');
             $table->unsignedBigInteger('sub_family_id')->nullable()->after('sub_family_code');
             $table->unsignedBigInteger('sub_sub_family_id')->nullable()->after('sub_sub_family_code');
-            $table->unsignedBigInteger('sub_sub_sub_family_id')->nullable()->after('sub_sub_sub_family_code');
 
             $table->index('family_id');
             $table->index('sub_family_id');
             $table->index('sub_sub_family_id');
-            $table->index('sub_sub_sub_family_id');
         });
 
         // 2) Backfill por ordem (importante!)
