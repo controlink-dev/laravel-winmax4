@@ -427,7 +427,7 @@ class Winmax4ArticleService extends Winmax4Service
                     ],
                     [
                         'article_id' => $article->id,
-                        'currency_code' => Winmax4Currency::where('code', $price->CurrencyCode)->first()->id,
+                        'currency_id' => Winmax4Currency::where('code', $price->CurrencyCode)->first()->id,
                         'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
                         'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
                         'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
