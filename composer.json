@@ -3,7 +3,7 @@
     "description": "This package is a Laravel 11 service provider for Winmax4 API",
     "type": "library",
     "require": {
-        "laravel/framework": "^12.0"
+        "laravel/framework": "^12.0",
     },
     "license": "proprietary",
     "autoload": {

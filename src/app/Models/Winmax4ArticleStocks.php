@@ -14,7 +14,7 @@ class Winmax4ArticleStocks extends Model
 
     protected $fillable = [
         'article_id',
-        'warehouse_code',
+        'warehouse_id',
         'current',
     ];
 

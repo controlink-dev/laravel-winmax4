@@ -21,12 +21,12 @@ class Winmax4Document extends Model
         'number',
         'date',
         'external_identification',
-        'currency_code',
+        'currency_id',
         'is_deleted',
         'user_login',
         'terminal_code',
-        'source_warehouse_code',
-        'target_warehouse_code',
+        'source_warehouse_id',
+        'target_warehouse_id',
         'entity_id',
         'total_without_taxes',
         'total_applied_taxes',
@@ -69,6 +69,21 @@ class Winmax4Document extends Model
     public function documentType()
     {
         return $this->belongsTo(Winmax4DocumentType::class, 'document_type_id', 'id');
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Winmax4Currency::class, 'currency_id', 'id');
+    }
+
+    public function sourceWarehouse()
+    {
+        return $this->belongsTo(Winmax4Warehouse::class, 'source_warehouse_id', 'id');
+    }
+
+    public function targetWarehouse()
+    {
+        return $this->belongsTo(Winmax4Warehouse::class, 'target_warehouse_id', 'id');
     }
 
     public function entity()

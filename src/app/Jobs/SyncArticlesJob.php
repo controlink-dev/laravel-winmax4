@@ -7,6 +7,8 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4ArticlePrices;
 use Controlink\LaravelWinmax4\app\Models\Winmax4ArticlePurchaseTaxes;
 use Controlink\LaravelWinmax4\app\Models\Winmax4ArticleSaleTaxes;
 use Controlink\LaravelWinmax4\app\Models\Winmax4ArticleStocks;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Currency;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Family;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
@@ -47,10 +49,9 @@ class SyncArticlesJob implements ShouldQueue
                     'designation' => $this->article->Designation ?? null,
                     'short_description' => $this->article->ShortDescription ?? null,
                     'is_active' => $this->article->IsActive,
-                    'family_code' => $this->article->FamilyCode,
-                    'sub_family_code' => $this->article->SubFamilyCode ?? null,
-                    'sub_sub_family_code' => $this->article->SubSubFamilyCode ?? null,
-                    'sub_sub_sub_family_code' => $this->article->SubSubSubFamilyCode ?? null,
+                    'family_id' => Winmax4Family::where('code', $this->article->FamilyCode)->first()?->id,
+                    'sub_family_id' => Winmax4Family::where('code', $this->article->SubFamilyCode)->first()?->id ?? null,
+                    'sub_sub_family_id' => Winmax4Family::where('code', $this->article->SubSubFamilyCode)->first()?->id ?? null,
                     'stock_unit_code' => $this->article->StockUnitCode ?? null,
                     'image_url' => $this->article->ImageUrl ?? null,
                     'extras' => json_encode($this->article->Extras ?? []),
@@ -68,10 +69,9 @@ class SyncArticlesJob implements ShouldQueue
                     'designation' => $this->article->Designation ?? null,
                     'short_description' => $this->article->ShortDescription ?? null,
                     'is_active' => $this->article->IsActive,
-                    'family_code' => $this->article->FamilyCode,
-                    'sub_family_code' => $this->article->SubFamilyCode ?? null,
-                    'sub_sub_family_code' => $this->article->SubSubFamilyCode ?? null,
-                    'sub_sub_sub_family_code' => $this->article->SubSubSubFamilyCode ?? null,
+                    'family_id' => Winmax4Family::where('code', $this->article->FamilyCode)->first()?->id,
+                    'sub_family_id' => Winmax4Family::where('code', $this->article->SubFamilyCode)->first()?->id ?? null,
+                    'sub_sub_family_id' => Winmax4Family::where('code', $this->article->SubSubFamilyCode)->first()?->id ?? null,
                     'stock_unit_code' => $this->article->StockUnitCode ?? null,
                     'image_url' => $this->article->ImageUrl ?? null,
                     'extras' => json_encode($this->article->Extras ?? []),
@@ -116,7 +116,7 @@ class SyncArticlesJob implements ShouldQueue
                 Winmax4ArticlePrices::updateOrCreate(
                     [
                         'article_id' => $article->id,
-                        'currency_code' => $price->CurrencyCode,
+                        'currency_id' => Winmax4Currency::where('code', $price->CurrencyCode)->first()?->id,
                     ],
                     [
                         'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
@@ -151,7 +151,7 @@ class SyncArticlesJob implements ShouldQueue
                 Winmax4ArticleStocks::updateOrCreate(
                     [
                         'article_id' => $article->id,
-                        'warehouse_code' => $stock->WarehouseCode,
+                        'warehouse_id' => Winmax4Warehouse::where('code', $stock->WarehouseCode)->first()?->id,
                     ],
                     [
                         'current' => $stock->Current ?? 0,

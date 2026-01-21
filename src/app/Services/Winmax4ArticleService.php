@@ -214,6 +214,7 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         $articleData = $responseDecoded->Data->Article;
+        $familyCode = property_exists($articleData, 'FamilyCode') ? $articleData->FamilyCode : null;
         $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
         $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
         $stock = property_exists($articleData, 'Stock') ? $articleData->Stock : 0;
@@ -226,9 +227,9 @@ class Winmax4ArticleService extends Winmax4Service
                 'id_winmax4' => $articleData->ID,
                 'code' => $articleData->Code,
                 'designation' => $articleData->Designation,
-                'family_code' => $articleData->FamilyCode,
-                'sub_family_code' => $subFamilyCode,
-                'sub_sub_family_code' => $subSubFamilyCode,
+                'family_id' => Winmax4Family::where('code', $familyCode)->first()->id,
+                'sub_family_id' => Winmax4Family::where('code', $subFamilyCode)->first()->id ?? null,
+                'sub_sub_family_id' => Winmax4Family::where('code', $subSubFamilyCode)->first()->id ?? null,
                 'is_active' => $articleData->IsActive,
             ]
         );
@@ -241,7 +242,7 @@ class Winmax4ArticleService extends Winmax4Service
                     ],
                     [
                         'article_id' => $article->id,
-                        'currency_code' => $price->CurrencyCode,
+                        'currency_id' => Winmax4Currency::where('code', $price->CurrencyCode)->first()->id,
                         'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
                         'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
                         'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
@@ -541,9 +542,7 @@ class Winmax4ArticleService extends Winmax4Service
      */
     public function deleteArticles(int $idWinmax4, bool $forceDelete): array
     {
-        $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)
-            ->with('details')
-            ->first();
+        $localArticle = Winmax4Article::where('id_winmax4', $idWinmax4)->with('details')->first();
 
         try{
             $response = $this->client->delete('Files/Articles/?id=' . $idWinmax4, [
@@ -567,13 +566,13 @@ class Winmax4ArticleService extends Winmax4Service
             $article = $this->putArticles(
                 $idWinmax4,
                 $localArticle->code,
-                $localArticle->family_code,
+                $localArticle->family_id,
                 $localArticle->saleTaxes[0]->tax_fee_code,
                 $localArticle->saleTaxes[0]->percentage,
                 $localArticle->prices[0]->sales_price1_without_taxes,
                 $localArticle->prices[0]->sales_price1_with_taxes,
-                $localArticle->sub_family_code,
-                $localArticle->sub_sub_family_code,
+                $localArticle->sub_family_id,
+                $localArticle->sub_sub_family_id,
                 $localArticle->stock,
                 0
             );

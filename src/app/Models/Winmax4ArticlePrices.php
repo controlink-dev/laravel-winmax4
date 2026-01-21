@@ -14,7 +14,7 @@ class Winmax4ArticlePrices extends Model
 
     protected $fillable = [
         'article_id',
-        'currency_code',
+        'currency_id',
         'sales_price1_without_taxes',
         'sales_price1_with_taxes',
         'sales_price2_without_taxes',
@@ -38,7 +38,6 @@ class Winmax4ArticlePrices extends Model
         'sales_price_hold_without_taxes',
         'sales_price_hold_with_taxes',
     ];
-
 
     public function article()
     {
