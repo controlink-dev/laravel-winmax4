@@ -12,6 +12,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use Controlink\LaravelWinmax4\app\Services\Winmax4DocumentService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4DocumentTypeService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4Service;
@@ -101,12 +102,12 @@ class syncDocuments extends Command
                              'number' => $document->Number,
                              'date' => $document->Date,
                              'external_identification' => $document->ExternalIdentification ?? null,
-                             'currency_code' => $document->CurrencyCode,
+                             'currency_id' => Winmax4Currency::where('code', $document->CurrencyCode)->first()->id,
                              'is_deleted' => $document->IsDeleted,
                              'user_login' => $document->UserLogin,
                              'terminal_code' => $document->TerminalCode,
-                             'source_warehouse_code' => $document->SourceWarehouseCode,
-                             'target_warehouse_code' => $document->TargetWarehouseCode ?? null,
+                             'source_warehouse_id' => Winmax4Warehouse::where('code', $document->SourceWarehouseCode)->first()->id,
+                             'target_warehouse_id' => Winmax4Warehouse::where('code', $document->TargetWarehouseCode)->first()->id ?? null,
                              'entity_id' => Winmax4Entity::where('code', $document->Entity->Code)->first()->id,
                              'total_without_taxes' => $document->TotalWithoutTaxes,
                              'total_applied_taxes' => $document->TotalAppliedTaxes,
@@ -143,12 +144,12 @@ class syncDocuments extends Command
                              'number' => $document->Number,
                              'date' => $document->Date,
                              'external_identification' => $document->ExternalIdentification ?? null,
-                             'currency_code' => $document->CurrencyCode,
+                             'currency_id' => Winmax4Currency::where('code', $document->CurrencyCode)->first()->id,
                              'is_deleted' => $document->IsDeleted,
                              'user_login' => $document->UserLogin,
                              'terminal_code' => $document->TerminalCode,
-                             'source_warehouse_code' => $document->SourceWarehouseCode,
-                             'target_warehouse_code' => $document->TargetWarehouseCode ?? null,
+                             'source_warehouse_id' => Winmax4Warehouse::where('code', $document->SourceWarehouseCode)->first()->id,
+                             'target_warehouse_id' => Winmax4Warehouse::where('code', $document->TargetWarehouseCode)->first()->id ?? null,
                              'entity_id' => Winmax4Entity::where('code', $document->Entity->Code)->first()->id,
                              'total_without_taxes' => $document->TotalWithoutTaxes,
                              'total_applied_taxes' => $document->TotalAppliedTaxes,
