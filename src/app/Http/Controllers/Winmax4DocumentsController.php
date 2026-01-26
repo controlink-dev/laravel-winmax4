@@ -211,7 +211,8 @@ class Winmax4DocumentsController extends Controller
             $request->entityCode,
             $request->documents,
             $request->value ?? null,
-            $request->paymentType ?? null
+            $request->paymentType ?? null,
+            $request->license_id ?? null
         ), 200);
     }
 

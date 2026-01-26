@@ -14,6 +14,7 @@ use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentTax;
 use Controlink\LaravelWinmax4\app\Models\Winmax4DocumentType;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4PaymentType;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Warehouse;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -366,10 +367,11 @@ class Winmax4DocumentService extends Winmax4Service
      * @param array $documents An array of documents to be paid.
      * @param float|null $value The value to be paid, if applicable.
      * @param int|null $PaymentTypeID The ID of the payment type to be used, if applicable.
+     * @param string|null $license_id The license ID, if applicable.
      * @return object|array|null Returns the API response decoded from JSON, or null on failure.
      * @throws GuzzleException If there is a problem with the HTTP request.
      */
-    public function payDocuments(string $entityCode, array $documents, ?float $value = null, int $PaymentTypeID = null): object|array|null
+    public function payDocuments(string $entityCode, array $documents, ?float $value = null, int $PaymentTypeID = null, string $license_id = null): object|array|null
     {
         $entity = Winmax4Entity::where('code', $entityCode)->first();
 
@@ -411,6 +413,9 @@ class Winmax4DocumentService extends Winmax4Service
             $winmax4Document = $fullDocument->Data->Documents[0];
 
             $localDocument = new Winmax4Document();
+            //If config winmax4.use_license is true, set the license_id
+            (config('winmax4.use_license') && $license_id ? $localDocument->license_id = $license_id : null);
+
             $localDocument->document_type_id = Winmax4DocumentType::where('code', $document->DocumentTypeCode)->first()->id;
             $localDocument->document_number = $document->DocumentNumber;
             $localDocument->serie = $document->Serie;
@@ -422,7 +427,10 @@ class Winmax4DocumentService extends Winmax4Service
             $localDocument->user_login = $winmax4Document->UserLogin;
             $localDocument->terminal_code = $winmax4Document->TerminalCode;
             $localDocument->source_warehouse_id = Winmax4Warehouse::where('code', $winmax4Document->SourceWarehouseCode)->first()->id;
-            $localDocument->target_warehouse_id = Winmax4Warehouse::where('code', $winmax4Document->TargetWarehouseCode)->first()->id ?? null;
+
+            //TODO: Verificar se é necessário guardar o target_warehouse_id
+            //$localDocument->target_warehouse_id = Winmax4Warehouse::where('code', $winmax4Document->TargetWarehouseCode)->first()->id ?? null;
+
             $localDocument->entity_id = Winmax4Entity::where('code', $entityCode)->first()->id;
             $localDocument->total_without_taxes = $winmax4Document->TotalWithoutTaxes;
             $localDocument->total_applied_taxes = $winmax4Document->TotalAppliedTaxes;
