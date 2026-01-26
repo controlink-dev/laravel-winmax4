@@ -22,8 +22,6 @@ return new class extends Migration
 
         // 1. Recria a FK com cascade on delete
         Schema::table('winmax4_articles_prices', function (Blueprint $table) {
-            $table->dropForeign(['article_id']);
-
             $table->foreign('article_id')
                 ->references('id')
                 ->on('winmax4_articles')
