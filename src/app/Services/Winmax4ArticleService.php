@@ -83,6 +83,10 @@ class Winmax4ArticleService extends Winmax4Service
                 return null;
             }
 
+            if (is_object($responseJSONDecoded) && isset($responseJSONDecoded->error) && $responseJSONDecoded->error === true) {
+                return null;
+            }
+
             if($responseJSONDecoded->Data->Filter->TotalPages > 1){
                 for($i = 2; $i <= $responseJSONDecoded->Data->Filter->TotalPages; $i++){
                     $response = $this->client->get($url . '&PageNumber=' . $i, [
