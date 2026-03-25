@@ -49,9 +49,19 @@ class SyncArticlesJob implements ShouldQueue
                     'designation' => $this->article->Designation ?? null,
                     'short_description' => $this->article->ShortDescription ?? null,
                     'is_active' => $this->article->IsActive,
-                    'family_id' => Winmax4Family::where('code', $this->article->FamilyCode)->first()?->id,
-                    'sub_family_id' => Winmax4Family::where('code', $this->article->SubFamilyCode)->first()?->id ?? null,
-                    'sub_sub_family_id' => Winmax4Family::where('code', $this->article->SubSubFamilyCode)->first()?->id ?? null,
+
+                    'family_id' => isset($this->article->FamilyCode)
+                        ? Winmax4Family::where('code', $this->article->FamilyCode)->first()?->id
+                        : null,
+
+                    'sub_family_id' => isset($this->article->SubFamilyCode)
+                        ? Winmax4Family::where('code', $this->article->SubFamilyCode)->first()?->id
+                        : null,
+
+                    'sub_sub_family_id' => isset($this->article->SubSubFamilyCode)
+                        ? Winmax4Family::where('code', $this->article->SubSubFamilyCode)->first()?->id
+                        : null,
+
                     'stock_unit_code' => $this->article->StockUnitCode ?? null,
                     'image_url' => $this->article->ImageUrl ?? null,
                     'extras' => json_encode($this->article->Extras ?? []),
@@ -69,9 +79,19 @@ class SyncArticlesJob implements ShouldQueue
                     'designation' => $this->article->Designation ?? null,
                     'short_description' => $this->article->ShortDescription ?? null,
                     'is_active' => $this->article->IsActive,
-                    'family_id' => Winmax4Family::where('code', $this->article->FamilyCode)->first()?->id,
-                    'sub_family_id' => Winmax4Family::where('code', $this->article->SubFamilyCode)->first()?->id ?? null,
-                    'sub_sub_family_id' => Winmax4Family::where('code', $this->article->SubSubFamilyCode)->first()?->id ?? null,
+
+                    'family_id' => isset($this->article->FamilyCode)
+                        ? Winmax4Family::where('code', $this->article->FamilyCode)->first()?->id
+                        : null,
+
+                    'sub_family_id' => isset($this->article->SubFamilyCode)
+                        ? Winmax4Family::where('code', $this->article->SubFamilyCode)->first()?->id
+                        : null,
+
+                    'sub_sub_family_id' => isset($this->article->SubSubFamilyCode)
+                        ? Winmax4Family::where('code', $this->article->SubSubFamilyCode)->first()?->id
+                        : null,
+
                     'stock_unit_code' => $this->article->StockUnitCode ?? null,
                     'image_url' => $this->article->ImageUrl ?? null,
                     'extras' => json_encode($this->article->Extras ?? []),
