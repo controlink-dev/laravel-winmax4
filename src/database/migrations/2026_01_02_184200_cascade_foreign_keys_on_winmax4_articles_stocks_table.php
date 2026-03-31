@@ -36,19 +36,32 @@ return new class extends Migration
         });
 
         // 2. Backfill: code -> id
-        DB::statement("
-            UPDATE winmax4_articles_stocks astock
-            JOIN winmax4_articles a
-              ON a.id = astock.article_id
-            JOIN winmax4_warehouses w
-              ON w.license_id = a.license_id
-             AND w.code       = astock.warehouse_code
-            SET astock.warehouse_id = w.id
-            WHERE astock.warehouse_code IS NOT NULL
-              AND astock.warehouse_id IS NULL
-        ");
+        if(config('winmax4.use_license')) {
+            DB::statement("
+                UPDATE winmax4_articles_stocks astock
+                JOIN winmax4_articles a
+                  ON a.id = astock.article_id
+                JOIN winmax4_warehouses w
+                  ON w.license_id = a.license_id
+                 AND w.code       = astock.warehouse_code
+                SET astock.warehouse_id = w.id
+                WHERE astock.warehouse_code IS NOT NULL
+                  AND astock.warehouse_id IS NULL
+            ");
+        } else {
+            DB::statement("
+                UPDATE winmax4_articles_stocks astock
+                JOIN winmax4_articles a
+                  ON a.id = astock.article_id
+                JOIN winmax4_warehouses w
+                  ON w.code = astock.warehouse_code
+                SET astock.warehouse_id = w.id
+                WHERE astock.warehouse_code IS NOT NULL
+                  AND astock.warehouse_id IS NULL
+            ");
+        }
 
-        // 3. Cria FK para currency_id e remove currency_code
+        // 3. Cria FK para warehouse_id e remove warehouse_code
         Schema::table('winmax4_articles_stocks', function (Blueprint $table) {
             $table->foreign('warehouse_id')
                 ->references('id')

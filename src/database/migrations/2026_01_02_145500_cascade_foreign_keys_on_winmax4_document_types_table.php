@@ -11,12 +11,14 @@ return new class extends Migration
     {
         // 1. Alterar FK de license para cascade on delete
         Schema::table('winmax4_document_types', function (Blueprint $table) {
-            $table->dropForeign([config('winmax4.license_column')]);
+            if(config('winmax4.use_license')){
+                $table->dropForeign([config('winmax4.license_column')]);
 
-            $table->foreign(config('winmax4.license_column'))
-                ->references('id')
-                ->on(config('winmax4.licenses_table'))
-                ->cascadeOnDelete();
+                $table->foreign(config('winmax4.license_column'))
+                    ->references('id')
+                    ->on(config('winmax4.licenses_table'))
+                    ->cascadeOnDelete();
+            }
         });
     }
 
@@ -24,12 +26,14 @@ return new class extends Migration
     {
         // 1. Reverter FK de license para restrict on delete
         Schema::table('winmax4_document_types', function (Blueprint $table) {
-            $table->dropForeign([config('winmax4.license_column')]);
+            if(config('winmax4.use_license')){
+                $table->dropForeign([config('winmax4.license_column')]);
 
-            $table->foreign(config('winmax4.license_column'))
-                ->references('id')
-                ->on(config('winmax4.licenses_table'))
-                ->restrictOnDelete();
+                $table->foreign(config('winmax4.license_column'))
+                    ->references('id')
+                    ->on(config('winmax4.licenses_table'))
+                    ->restrictOnDelete();
+            }
         });
     }
 };

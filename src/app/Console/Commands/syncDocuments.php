@@ -62,8 +62,10 @@ class syncDocuments extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            if(!$winmax4Setting->tenant){
-                continue;
+            if(config('winmax4.use_license')){
+                if(!$winmax4Setting->tenant){
+                    continue;
+                }
             }
 
             $this->info('Syncing document types for ' . $winmax4Setting->company_code . '...');
@@ -134,6 +136,8 @@ class syncDocuments extends Command
                          ]
                      );
                  }else{
+                    $documentType = Winmax4DocumentType::where('code', $document->DocumentTypeCode)->first();
+                    
                      $savedDocument = Winmax4Document::updateOrCreate(
                          [
                              'document_type_id' => $documentType->id,
