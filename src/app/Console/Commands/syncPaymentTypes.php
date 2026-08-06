@@ -74,7 +74,14 @@ class syncPaymentTypes extends Command
                 $winmax4Setting->license_id
             );
 
-            $paymentTypes = $winmax4Service->getPaymentTypes()->Data->PaymentTypes;
+            $response = $winmax4Service->getPaymentTypes();
+
+            if ($response === null || (is_object($response) && isset($response->error) && $response->error === true)) {
+                $this->warn("Skipping payment types sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            $paymentTypes = $response->Data->PaymentTypes ?? [];
 
             foreach ($paymentTypes as $paymentType) {
                  if(config('winmax4.use_license')){

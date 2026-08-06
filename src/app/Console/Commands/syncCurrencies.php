@@ -78,7 +78,14 @@ class syncCurrencies extends Command
                 $localCurrencies = Winmax4Currency::get();
             }
 
-            if ($winmax4Service->getCurrencies() == null) {
+            $response = $winmax4Service->getCurrencies();
+
+            if (is_object($response) && isset($response->error) && $response->error === true) {
+                $this->warn("Skipping currencies sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            if ($response === null) {
                 foreach ($localCurrencies as $localCurrency) {
                     if(config('winmax4.use_soft_deletes')){
                         $localCurrency->is_active = false;
@@ -96,7 +103,7 @@ class syncCurrencies extends Command
                 }
             }else{
                 // Get all currencies from Winmax4
-                $currencies = $winmax4Service->getCurrencies()->Data->Currencies;
+                $currencies = $response->Data->Currencies ?? [];
 
                 //Check if the currencies is_active status has changed
                 foreach ($currencies as $currency) {

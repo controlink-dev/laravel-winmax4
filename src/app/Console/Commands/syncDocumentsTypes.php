@@ -71,7 +71,14 @@ class syncDocumentsTypes extends Command
                 $winmax4Setting->license_id
             );
 
-            $documentTypes = $winmax4Service->getDocumentTypes()->Data->DocumentTypes;
+            $response = $winmax4Service->getDocumentTypes();
+
+            if ($response === null || (is_object($response) && isset($response->error) && $response->error === true)) {
+                $this->warn("Skipping document types sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            $documentTypes = $response->Data->DocumentTypes ?? [];
 
             $documentTypes = collect($documentTypes)->where('TransactionType', 0)->where('EntityType', 0);
 

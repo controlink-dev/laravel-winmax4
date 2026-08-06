@@ -73,7 +73,14 @@ class syncTaxes extends Command
                 $winmax4Setting->license_id
             );
 
-            $taxes = $winmax4Service->getTaxes()->Data->Taxes;
+            $response = $winmax4Service->getTaxes();
+
+            if ($response === null || (is_object($response) && isset($response->error) && $response->error === true)) {
+                $this->warn("Skipping taxes sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            $taxes = $response->Data->Taxes ?? [];
 
             foreach ($taxes as $tax) {
                 if(config('winmax4.use_license')){

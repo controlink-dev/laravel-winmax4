@@ -72,7 +72,14 @@ class syncWarehouses extends Command
                 $winmax4Setting->license_id
             );
 
-            $warehouses = $winmax4Service->getWarehouses()->Data->Warehouses;
+            $response = $winmax4Service->getWarehouses();
+
+            if ($response === null || (is_object($response) && isset($response->error) && $response->error === true)) {
+                $this->warn("Skipping warehouses sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            $warehouses = $response->Data->Warehouses ?? [];
 
             foreach ($warehouses as $warehouse) {
                  if(config('winmax4.use_license')){
