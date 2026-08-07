@@ -1,6 +1,6 @@
 # Laravel Winmax4
 
-A Laravel package (compatible with Laravel 10, 11, 12 and 13) that wraps the Winmax4 API. It ships configuration for connecting to Winmax4, console commands and queued jobs that sync Winmax4 data (articles, entities, families, taxes, currencies, warehouses, payment types, document types and documents) into your own database, a set of Eloquent models mapped to that data, and HTTP controllers for interacting with the API. The package also supports two independent multi-tenancy modes: license-scoped rows in a single database, or fully separated per-tenant databases.
+A Laravel package (compatible with Laravel 10, 11, 12 and 13) that wraps the Winmax4 API. It ships configuration for connecting to Winmax4, console commands and queued jobs that sync Winmax4 data (articles, entities, families, taxes, currencies, warehouses, payment types, document types and documents) into your own database, a set of Eloquent models mapped to that data, and HTTP controllers for interacting with the API. The package also supports two multi-tenancy strategies — license-scoped rows in a single database, and fully separated per-tenant databases — which are designed to be used together (see [Multi-tenancy](#multi-tenancy)).
 
 ## Installation
 
@@ -50,6 +50,17 @@ php artisan winmax4:namespace-update "Controlink\LaravelWinmax4\app\Models" "App
 
 The command recurses into every subdirectory under `app/Models/Winmax4` (including `Concerns/`), rewriting the namespace in each `.php` file it finds.
 
+### Upgrading an existing install
+
+`vendor:publish` only copies files the first time — `composer update` never touches files that were already published into your application. If you published the models before this package version and are upgrading, your `app/Models/Winmax4` copies still have the old inline `booted()` logic and are missing the new `Concerns/HasWinmax4Connection.php` and `Concerns/HasLicenseScope.php` traits, so the `use_separated_databases` and `connection_name` config keys will silently do nothing even after the package upgrade. To pick up the new traits, re-publish the models with `--force` and re-run the namespace rewrite:
+
+```bash
+php artisan vendor:publish --tag=winmax4-models --force
+php artisan winmax4:namespace-update {oldNamespace} {newNamespace}
+```
+
+Use the same `oldNamespace`/`newNamespace` arguments you originally used (see the example above). `--force` overwrites your published models directory, so commit or diff any local customizations first.
+
 ## Configuration reference
 
 All configuration lives in `config/winmax4.php` after publishing (or the package default at `src/config/winmax4.php` if unpublished):
@@ -63,14 +74,14 @@ All configuration lives in `config/winmax4.php` after publishing (or the package
 | `licenses_table` | `WINMAX4_LICENSES_TABLE` | `licenses` | The table that holds your application's licenses/tenants. |
 | `licenses_model` | `WINMAX4_LICENSES_MODEL` | `App\Models\License` | The Eloquent model class for licenses/tenants, used by relationships such as `Winmax4Setting::tenant()`. |
 | `use_soft_deletes` | `WINMAX4_USE_SOFT_DELETES` | `false` | Whether sync commands soft-delete (deactivate) records that no longer exist upstream instead of force-deleting them. |
-| `use_separated_databases` | `WINMAX4_USE_SEPARATED_DATABASES` | `false` | Whether every package model should resolve its connection from `connection_name` instead of the application's default connection (per-tenant database mode). Also disables the `HasLicenseScope` global scope. Has no effect by itself unless `connection_name` is also set (see below). |
-| `connection_name` | `WINMAX4_CONNECTION_NAME` | `null` | The name of the database connection (as configured in `config/database.php`) that package models should use when `use_separated_databases` is `true`. **Both must be set together**: `HasWinmax4Connection` only overrides the connection when `use_separated_databases` is `true` AND `connection_name` is non-empty, but `HasLicenseScope` disables its scope whenever `use_separated_databases` is `true`, regardless of `connection_name`. Enabling `use_separated_databases` while leaving `connection_name` at its default `null` therefore leaves models on the default connection with license scoping already off — an unscoped, cross-tenant read/write hazard. |
+| `use_separated_databases` | `WINMAX4_USE_SEPARATED_DATABASES` | `false` | Whether every package model should resolve its connection from `connection_name` instead of the application's default connection (per-tenant database mode). Also disables the `HasLicenseScope` global scope and its creating-hook auto-fill. Requires `connection_name` to also be set (see below), and works best with `use_license` left `true` so tenant tables still have the `license_id` column (see [Multi-tenancy](#multi-tenancy)). |
+| `connection_name` | `WINMAX4_CONNECTION_NAME` | `null` | The name of the database connection (as configured in `config/database.php`) that package models should use when `use_separated_databases` is `true`. **Required when `use_separated_databases` is `true`**: `HasWinmax4Connection::getConnectionName()` throws a `RuntimeException` if `use_separated_databases` is `true` and `connection_name` is empty/null, instead of silently falling back to the application's default connection. |
 | `verify_ssl_guzzle` | `WINMAX4_VERIFY_SSL_GUZZLE` | `true` | Whether the Guzzle HTTP client verifies the Winmax4 API's SSL certificate. |
 | `queue` | `WINMAX4_QUEUE` | `winmax4` | The queue name that sync jobs are dispatched to. |
 
 ## Multi-tenancy
 
-The package supports two mutually-exclusive multi-tenancy strategies. **`use_license` and `use_separated_databases` are not meant to be combined** — enabling `use_separated_databases` automatically disables the license global scope (see below) to avoid double-scoping.
+The package supports two multi-tenancy strategies, license scoping and separated databases, and they are meant to be combined rather than treated as alternatives. **When using `use_separated_databases`, keep `use_license` set to `true` as well.** The migrations only add the `license_id` column (named by `license_column`) to package tables when `use_license` is `true` at migration time; every package controller filters its queries by that column (`Winmax4Setting::where(config('winmax4.license_column'), ...)`), so if the column is missing you get a missing-column SQL error on every package route. Turning on `use_separated_databases` does not remove the need for that column — it only disables the `HasLicenseScope` global scope and its creating-hook auto-fill (see below), because tenant isolation is already handled at the connection level once separated databases are in use.
 
 ### License scoping (single database)
 
@@ -95,9 +106,11 @@ $articles = Winmax4Article::all();
 
 ### Separated databases (per-tenant database)
 
-When `use_separated_databases` is `true` **and** `connection_name` is set, every package model uses the `HasWinmax4Connection` trait (`Controlink\LaravelWinmax4\app\Models\Concerns\HasWinmax4Connection`) to resolve its database connection from `config('winmax4.connection_name')` instead of the application's default connection. In this mode, `HasLicenseScope` automatically skips registering the license global scope (it only activates when `use_separated_databases` is `false`), since tenant isolation is already handled at the connection level.
+When `use_separated_databases` is `true`, every package model uses the `HasWinmax4Connection` trait (`Controlink\LaravelWinmax4\app\Models\Concerns\HasWinmax4Connection`) to resolve its database connection from `config('winmax4.connection_name')` instead of the application's default connection. `connection_name` must be set in this mode: `getConnectionName()` throws a `RuntimeException` if `use_separated_databases` is `true` and `connection_name` is empty/null, so a missing connection name fails fast instead of silently querying the wrong (central) database.
 
-> **Important:** `HasLicenseScope` disables itself as soon as `use_separated_databases` is `true`, independently of whether `connection_name` is actually set. If you turn on `use_separated_databases` but leave `connection_name` unset, models stay on the default connection *and* lose license scoping — set both config keys together, never `use_separated_databases` alone.
+In this mode, `HasLicenseScope` automatically skips registering the license global scope and its creating-hook auto-fill (they only activate when `use_separated_databases` is `false`), since tenant isolation is already handled at the connection level. **This does not remove the need for the `license_id` column itself** — keep `use_license` set to `true` too, so the migrations still create that column on your tenant databases (package controllers query it directly and error on a missing column). In short: for separated databases, run with `use_license=true`, `use_separated_databases=true`, and a valid `connection_name`.
+
+> **Important:** Leaving `connection_name` unset while `use_separated_databases` is `true` throws a `RuntimeException` from `HasWinmax4Connection::getConnectionName()` — the package fails fast rather than silently falling back to the default connection with tenant isolation only partially in effect. Set both config keys together, and keep `use_license` set to `true` so the `license_id` column exists on tenant tables (see above).
 
 Example — the host application resolves the tenant and configures a connection before touching any `Winmax4*` model:
 
