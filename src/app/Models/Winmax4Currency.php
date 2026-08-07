@@ -2,13 +2,14 @@
 
 namespace Controlink\LaravelWinmax4\app\Models;
 
-use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
+use Controlink\LaravelWinmax4\app\Models\Concerns\HasLicenseScope;
+use Controlink\LaravelWinmax4\app\Models\Concerns\HasWinmax4Connection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Winmax4Currency extends Model
 {
-    use HasFactory;
+    use HasFactory, HasWinmax4Connection, HasLicenseScope;
 
     protected $table = 'winmax4_currencies';
 
@@ -20,15 +21,4 @@ class Winmax4Currency extends Model
         'article_decimals',
         'document_decimals',
     ];
-
-    protected static function booted()
-    {
-        if(config('winmax4.use_license') && !app()->runningInConsole()){
-            static::addGlobalScope(new LicenseScope());
-
-            static::creating(function ($model) {
-                $model->{config('winmax4.license_column')} = session(config('winmax4.license_session_key'));
-            });
-        }
-    }
 }

@@ -2,14 +2,15 @@
 
 namespace Controlink\LaravelWinmax4\app\Models;
 
-use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
+use Controlink\LaravelWinmax4\app\Models\Concerns\HasLicenseScope;
+use Controlink\LaravelWinmax4\app\Models\Concerns\HasWinmax4Connection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Winmax4Document extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasWinmax4Connection, HasLicenseScope;
 
     protected $table = 'winmax4_documents';
 
@@ -54,17 +55,6 @@ class Winmax4Document extends Model
         'url',
         'cancel_reason'
     ];
-
-    protected static function booted()
-    {
-        if(config('winmax4.use_license') && !app()->runningInConsole()){
-            static::addGlobalScope(new LicenseScope());
-
-            static::creating(function ($model) {
-                $model->{config('winmax4.license_column')} = session(config('winmax4.license_session_key'));
-            });
-        }
-    }
 
     public function documentType()
     {
