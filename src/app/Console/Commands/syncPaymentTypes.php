@@ -49,19 +49,21 @@ class syncPaymentTypes extends Command
         }
 
         if ($license_id != null) {
-            $this->info('Syncing document types for license id ' . $license_id . '...');
+            $this->info('Syncing payment types for license id ' . $license_id . '...');
             $winmax4Settings = Winmax4Setting::where(config('winmax4.license_column'), $license_id)->get();
         } else {
-            $this->info('Syncing document types for all licenses...');
+            $this->info('Syncing payment types for all licenses...');
             $winmax4Settings = Winmax4Setting::get();
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            if(!$winmax4Setting->tenant){
-                continue;
+            if(config('winmax4.use_license')){
+                if(!$winmax4Setting->tenant){
+                    continue;
+                }
             }
 
-            $this->info('Syncing warehouses for ' . $winmax4Setting->company_code . '...');
+            $this->info('Syncing payment types for ' . $winmax4Setting->company_code . '...');
             $winmax4Service = new Winmax4PaymentTypeService(
                 false,
                 $winmax4Setting->url,
@@ -72,7 +74,14 @@ class syncPaymentTypes extends Command
                 $winmax4Setting->license_id
             );
 
-            $paymentTypes = $winmax4Service->getPaymentTypes()->Data->PaymentTypes;
+            $response = $winmax4Service->getPaymentTypes();
+
+            if ($response === null || (is_object($response) && isset($response->error) && $response->error === true)) {
+                $this->warn("Skipping payment types sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            $paymentTypes = $response->Data->PaymentTypes ?? [];
 
             foreach ($paymentTypes as $paymentType) {
                  if(config('winmax4.use_license')){

@@ -59,7 +59,7 @@ class Winmax4DocumentTypeService extends Winmax4Service
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
 
-        if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
+        if (is_object($responseJSONDecoded) && isset($responseJSONDecoded->error) && $responseJSONDecoded->error === true) {
             return $responseJSONDecoded;
         }
 

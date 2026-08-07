@@ -59,8 +59,10 @@ class syncEntities extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            if(!$winmax4Setting->tenant){
-                continue;
+            if(config('winmax4.use_license')){
+                if(!$winmax4Setting->tenant){
+                    continue;
+                }
             }
 
             $this->info('Syncing entities  for ' . $winmax4Setting->company_code . '...');

@@ -35,17 +35,30 @@ return new class extends Migration
         });
 
         // 2. Backfill: code -> id
-        DB::statement("
-            UPDATE winmax4_articles_prices ap
-            JOIN winmax4_articles a
-              ON a.id = ap.article_id
-            JOIN winmax4_currencies c
-              ON c.license_id = a.license_id
-             AND c.code       = ap.currency_code
-            SET ap.currency_id = c.id
-            WHERE ap.currency_code IS NOT NULL
-              AND ap.currency_id IS NULL
-        ");
+        if (config('winmax4.use_license')) {
+            DB::statement("
+                UPDATE winmax4_articles_prices ap
+                JOIN winmax4_articles a
+                ON a.id = ap.article_id
+                JOIN winmax4_currencies c
+                ON c.license_id = a.license_id
+                AND c.code       = ap.currency_code
+                SET ap.currency_id = c.id
+                WHERE ap.currency_code IS NOT NULL
+                AND ap.currency_id IS NULL
+            ");
+        } else {
+            DB::statement("
+                UPDATE winmax4_articles_prices ap
+                JOIN winmax4_articles a
+                  ON a.id = ap.article_id
+                JOIN winmax4_currencies c
+                  ON c.code = ap.currency_code
+                SET ap.currency_id = c.id
+                WHERE ap.currency_code IS NOT NULL
+                  AND ap.currency_id IS NULL
+            ");
+        }
 
         // 3. Cria FK para currency_id e remove currency_code
         Schema::table('winmax4_articles_prices', function (Blueprint $table) {

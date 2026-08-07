@@ -105,25 +105,16 @@ class Winmax4Service
 
         if ($statusCode == 401) {
             $errorMsg = 'Unauthorized access to Winmax4 API. Please check your credentials.';
-            Winmax4SyncErrors::create([
-                'message' => $errorMsg,
-                config('winmax4.license_column') => session('licenseID') ?? $license_id,
-            ]);
+            $this->logSyncError($errorMsg, $license_id);
         }else if($statusCode == 404){
             $errorMsg = 'Data not found.';
-            Winmax4SyncErrors::create([
-                'message' => $errorMsg,
-                config('winmax4.license_column') => session('licenseID')  ?? $license_id,
-            ]);
+            $this->logSyncError($errorMsg, $license_id);
         }
         else
         {
             $bodyDecoded = json_decode($body, true);
             $errorMsg = $this->renderErrorMessage($body);
-            Winmax4SyncErrors::create([
-                'message' => "Error {$statusCode} while accessing Winmax4 API: {$bodyDecoded['Results'][0]['Code']} - {$errorMsg}",
-                config('winmax4.license_column') => session('licenseID')
-            ]);
+            $this->logSyncError("Error {$statusCode} while accessing Winmax4 API: {$bodyDecoded['Results'][0]['Code']} - {$errorMsg}", $license_id);
         }
 
         if(isset($bodyDecoded) && isset($bodyDecoded['Results'])){
@@ -153,16 +144,32 @@ class Winmax4Service
     protected function handleConnectionError($exception): array
     {
         // Handle connection errors here
-        Winmax4SyncErrors::create([
-            'message' => 'Connection error: ' . $exception->getMessage(),
-            config('winmax4.license_column') => session('licenseID')
-        ]);
+        $this->logSyncError('Connection error: ' . $exception->getMessage());
 
         return [
             'error' => true,
             'status' => 'CONNECTION_ERROR',
             'message' => 'Connection error: ' . $exception->getMessage(),
         ];
+    }
+
+    /**
+     * Log a sync error, only attaching the license column when the package
+     * is configured to use licenses — the column doesn't exist otherwise.
+     *
+     * @param string $message
+     * @param mixed $license_id
+     * @return void
+     */
+    private function logSyncError(string $message, $license_id = null): void
+    {
+        $attributes = ['message' => $message];
+
+        if (config('winmax4.use_license')) {
+            $attributes[config('winmax4.license_column')] = session('licenseID') ?? $license_id;
+        }
+
+        Winmax4SyncErrors::create($attributes);
     }
 
     /**

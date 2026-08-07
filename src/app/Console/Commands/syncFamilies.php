@@ -56,8 +56,10 @@ class syncFamilies extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            if(!$winmax4Setting->tenant){
-                continue;
+            if(config('winmax4.use_license')){
+                if(!$winmax4Setting->tenant){
+                    continue;
+                }
             }
 
             $this->info('Syncing families  for ' . $winmax4Setting->company_code . '...');
@@ -79,8 +81,15 @@ class syncFamilies extends Command
                 $localFamilies = Winmax4Family::get();
             }
 
-            //If getEntities returns bad response, skip the sync
-            if ($winmax4Service->getFamilies() == null) {
+            //If getFamilies returns bad response, skip the sync
+            $response = $winmax4Service->getFamilies();
+
+            if (is_object($response) && isset($response->error) && $response->error === true) {
+                $this->warn("Skipping families sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            if ($response == null) {
                 foreach ($localFamilies as $localFamily) {
                     if(config('winmax4.use_soft_deletes')){
                         $localFamily->is_active = false;
@@ -99,7 +108,7 @@ class syncFamilies extends Command
             }else {
 
                 // Get all families from Winmax4
-                $families = $winmax4Service->getFamilies()->Data->Families;
+                $families = $response->Data->Families ?? [];
 
                 //Check if the families is_active status has changed
                 foreach ($families as $family) {

@@ -62,8 +62,10 @@ class syncDocuments extends Command
         }
 
         foreach ($winmax4Settings as $winmax4Setting) {
-            if(!$winmax4Setting->tenant){
-                continue;
+            if(config('winmax4.use_license')){
+                if(!$winmax4Setting->tenant){
+                    continue;
+                }
             }
 
             $this->info('Syncing document types for ' . $winmax4Setting->company_code . '...');
@@ -84,13 +86,36 @@ class syncDocuments extends Command
                 $lastSyncedAt = (new Winmax4Controller())->getLastSyncedAt(Winmax4Document::class);
             }
 
-            $documents = $winmax4Service->getDocuments($fromDate = $lastSyncedAt->format('Y-m-d'))->Data->Documents;
+            $response = $winmax4Service->getDocuments($fromDate = $lastSyncedAt->format('Y-m-d'));
+
+            if ($response === null || (is_object($response) && isset($response->error) && $response->error === true)) {
+                $this->warn("Skipping document sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            $documents = $response->Data->Documents ?? [];
 
             foreach ($documents as $document) {
                  if(config('winmax4.use_license')){
                      $documentType = Winmax4DocumentType::where(config('winmax4.license_column'), $winmax4Setting->license_id)
                         ->where('code', $document->DocumentTypeCode)->first();
+                 }else{
+                     $documentType = Winmax4DocumentType::where('code', $document->DocumentTypeCode)->first();
+                 }
 
+                 if (!$documentType) {
+                     $this->warn("Skipping document {$document->DocumentNumber}: document type '{$document->DocumentTypeCode}' not found locally.");
+                     continue;
+                 }
+
+                 $entity = Winmax4Entity::where('code', $document->Entity->Code)->first();
+
+                 if (!$entity) {
+                     $this->warn("Skipping document {$document->DocumentNumber}: entity '{$document->Entity->Code}' not found locally.");
+                     continue;
+                 }
+
+                 if(config('winmax4.use_license')){
                      $savedDocument = Winmax4Document::updateOrCreate(
                          [
                              'document_type_id' => $documentType->id,
@@ -102,13 +127,13 @@ class syncDocuments extends Command
                              'number' => $document->Number,
                              'date' => $document->Date,
                              'external_identification' => $document->ExternalIdentification ?? null,
-                             'currency_id' => Winmax4Currency::where('code', $document->CurrencyCode)->first()->id,
+                             'currency_id' => Winmax4Currency::where('code', $document->CurrencyCode)->first()?->id,
                              'is_deleted' => $document->IsDeleted,
                              'user_login' => $document->UserLogin,
                              'terminal_code' => $document->TerminalCode,
-                             'source_warehouse_id' => Winmax4Warehouse::where('code', $document->SourceWarehouseCode)->first()->id,
-                             'target_warehouse_id' => Winmax4Warehouse::where('code', $document->TargetWarehouseCode)->first()->id ?? null,
-                             'entity_id' => Winmax4Entity::where('code', $document->Entity->Code)->first()->id,
+                             'source_warehouse_id' => Winmax4Warehouse::where('code', $document->SourceWarehouseCode)->first()?->id,
+                             'target_warehouse_id' => Winmax4Warehouse::where('code', $document->TargetWarehouseCode)->first()?->id,
+                             'entity_id' => $entity->id,
                              'total_without_taxes' => $document->TotalWithoutTaxes,
                              'total_applied_taxes' => $document->TotalAppliedTaxes,
                              'total_with_taxes' => $document->TotalWithTaxes,
@@ -144,13 +169,13 @@ class syncDocuments extends Command
                              'number' => $document->Number,
                              'date' => $document->Date,
                              'external_identification' => $document->ExternalIdentification ?? null,
-                             'currency_id' => Winmax4Currency::where('code', $document->CurrencyCode)->first()->id,
+                             'currency_id' => Winmax4Currency::where('code', $document->CurrencyCode)->first()?->id,
                              'is_deleted' => $document->IsDeleted,
                              'user_login' => $document->UserLogin,
                              'terminal_code' => $document->TerminalCode,
-                             'source_warehouse_id' => Winmax4Warehouse::where('code', $document->SourceWarehouseCode)->first()->id,
-                             'target_warehouse_id' => Winmax4Warehouse::where('code', $document->TargetWarehouseCode)->first()->id ?? null,
-                             'entity_id' => Winmax4Entity::where('code', $document->Entity->Code)->first()->id,
+                             'source_warehouse_id' => Winmax4Warehouse::where('code', $document->SourceWarehouseCode)->first()?->id,
+                             'target_warehouse_id' => Winmax4Warehouse::where('code', $document->TargetWarehouseCode)->first()?->id,
+                             'entity_id' => $entity->id,
                              'total_without_taxes' => $document->TotalWithoutTaxes,
                              'total_applied_taxes' => $document->TotalAppliedTaxes,
                              'total_with_taxes' => $document->TotalWithTaxes,
@@ -178,9 +203,16 @@ class syncDocuments extends Command
                  }
 
                 foreach ($document->Details as $detail) {
+                    $article = Winmax4Article::where('code', $detail->ArticleCode)->first();
+
+                    if (!$article) {
+                        $this->warn("Skipping detail for document {$document->DocumentNumber}: article '{$detail->ArticleCode}' not found locally.");
+                        continue;
+                    }
+
                     $documentDetail = Winmax4DocumentDetail::updateOrCreate([
                         'document_id' => $savedDocument->id,
-                        'article_id' => Winmax4Article::where('code', $detail->ArticleCode)->first()->id,
+                        'article_id' => $article->id,
                     ],
                     [
                         'unitary_price_without_taxes' => $detail->UnitaryPriceWithoutTaxes,

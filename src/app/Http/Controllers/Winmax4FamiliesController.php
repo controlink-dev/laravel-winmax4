@@ -50,8 +50,12 @@ class Winmax4FamiliesController extends Controller
      */
     public function __construct()
     {
-        $winmaxSettings = Winmax4Setting::where(config('winmax4.license_column'), session(config('winmax4.license_session_key')))->first();
-
+        if(config('winmax4.use_license')) {
+            $winmaxSettings = Winmax4Setting::where(config('winmax4.license_column'), session(config('winmax4.license_session_key')))->first();
+        } else {
+            $winmaxSettings = Winmax4Setting::first();
+        }
+        
         if(!$winmaxSettings) {
             $this->winmax4Service = new Winmax4FamilyService(true);
         }else{
