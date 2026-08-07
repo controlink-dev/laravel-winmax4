@@ -14,28 +14,10 @@ use GuzzleHttp\Exception\GuzzleException;
 class Winmax4ArticleService extends Winmax4Service
 {
     /**
-     * Winmax4ArticleService constructor.
+     * Fetch a single article from the Winmax4 API by code and upsert it locally.
      *
-     * This constructor initializes the Winmax4ArticleService by retrieving the
-     * appropriate Winmax4 settings based on the license configuration. It checks
-     * if the application is configured to use licenses and retrieves the settings
-     * accordingly. If no settings are found, it initializes the service with a
-     * default configuration.
-     *
-     * ### License Configuration
-     *
-     * The constructor checks the `use_license` configuration option to determine
-     * how to retrieve the Winmax4 settings:
-     *
-     * - If `use_license` is `true`, it retrieves the settings for the current license using the session key defined in `license_session_key`.
-     * - If `use_license` is `false`, it retrieves the first available settings record.
-     *
-     * ### Service Initialization
-     *
-     * After retrieving the settings, it checks if they exist:
-     *
-     * - If no settings are found, it initializes the `Winmax4ArticleService` with a default configuration (passing `true`).
-     * - If settings are found, it initializes the service with those settings.
+     * @param string $code The Winmax4 article code to look up.
+     * @return object|array|null The API error payload, or null if not found.
      */
     public function getArticle(string $code): object|array|null
     {
@@ -50,10 +32,6 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         $responseJSONDecoded = json_decode($response->getBody()->getContents());
-
-        if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
-            return $responseJSONDecoded;
-        }
 
         if (is_null($responseJSONDecoded)) {
             return null;

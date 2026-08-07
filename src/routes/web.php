@@ -44,6 +44,7 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
 
     Route::prefix('articles')->group(function () {
         Route::get('/query', [Winmax4ArticlesController::class, 'getArticles'])->name('winmax4.articles.query');
+        Route::get('/get/{code}', [Winmax4ArticlesController::class, 'getArticle'])->name('winmax4.articles.get');
         Route::post('/store', [Winmax4ArticlesController::class, 'postArticles'])->name('winmax4.articles.store');
         Route::post('/update/{id}', [Winmax4ArticlesController::class, 'putArticles'])->name('winmax4.articles.update');
         Route::post('/delete/{id}', [Winmax4ArticlesController::class, 'deleteArticles'])->name('winmax4.articles.delete');
