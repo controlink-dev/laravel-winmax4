@@ -2,13 +2,13 @@
 
 namespace Controlink\LaravelWinmax4\app\Models;
 
-use Controlink\LaravelWinmax4\app\Models\Scopes\LicenseScope;
+use Controlink\LaravelWinmax4\app\Models\Concerns\HasWinmax4Connection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Winmax4ArticleSaleTaxes extends Model
 {
-    use HasFactory;
+    use HasFactory, HasWinmax4Connection;
 
     protected $table = 'winmax4_articles_sale_taxes';
 
