@@ -63,8 +63,8 @@ All configuration lives in `config/winmax4.php` after publishing (or the package
 | `licenses_table` | `WINMAX4_LICENSES_TABLE` | `licenses` | The table that holds your application's licenses/tenants. |
 | `licenses_model` | `WINMAX4_LICENSES_MODEL` | `App\Models\License` | The Eloquent model class for licenses/tenants, used by relationships such as `Winmax4Setting::tenant()`. |
 | `use_soft_deletes` | `WINMAX4_USE_SOFT_DELETES` | `false` | Whether sync commands soft-delete (deactivate) records that no longer exist upstream instead of force-deleting them. |
-| `use_separated_databases` | `WINMAX4_USE_SEPARATED_DATABASES` | `false` | Whether every package model should resolve its connection from `connection_name` instead of the application's default connection (per-tenant database mode). |
-| `connection_name` | `WINMAX4_CONNECTION_NAME` | `null` | The name of the database connection (as configured in `config/database.php`) that package models should use when `use_separated_databases` is `true`. |
+| `use_separated_databases` | `WINMAX4_USE_SEPARATED_DATABASES` | `false` | Whether every package model should resolve its connection from `connection_name` instead of the application's default connection (per-tenant database mode). Also disables the `HasLicenseScope` global scope. Has no effect by itself unless `connection_name` is also set (see below). |
+| `connection_name` | `WINMAX4_CONNECTION_NAME` | `null` | The name of the database connection (as configured in `config/database.php`) that package models should use when `use_separated_databases` is `true`. **Both must be set together**: `HasWinmax4Connection` only overrides the connection when `use_separated_databases` is `true` AND `connection_name` is non-empty, but `HasLicenseScope` disables its scope whenever `use_separated_databases` is `true`, regardless of `connection_name`. Enabling `use_separated_databases` while leaving `connection_name` at its default `null` therefore leaves models on the default connection with license scoping already off — an unscoped, cross-tenant read/write hazard. |
 | `verify_ssl_guzzle` | `WINMAX4_VERIFY_SSL_GUZZLE` | `true` | Whether the Guzzle HTTP client verifies the Winmax4 API's SSL certificate. |
 | `queue` | `WINMAX4_QUEUE` | `winmax4` | The queue name that sync jobs are dispatched to. |
 
@@ -95,7 +95,9 @@ $articles = Winmax4Article::all();
 
 ### Separated databases (per-tenant database)
 
-When `use_separated_databases` is `true`, every package model uses the `HasWinmax4Connection` trait (`Controlink\LaravelWinmax4\app\Models\Concerns\HasWinmax4Connection`) to resolve its database connection from `config('winmax4.connection_name')` instead of the application's default connection. In this mode, `HasLicenseScope` automatically skips registering the license global scope (it only activates when `use_separated_databases` is `false`), since tenant isolation is already handled at the connection level.
+When `use_separated_databases` is `true` **and** `connection_name` is set, every package model uses the `HasWinmax4Connection` trait (`Controlink\LaravelWinmax4\app\Models\Concerns\HasWinmax4Connection`) to resolve its database connection from `config('winmax4.connection_name')` instead of the application's default connection. In this mode, `HasLicenseScope` automatically skips registering the license global scope (it only activates when `use_separated_databases` is `false`), since tenant isolation is already handled at the connection level.
+
+> **Important:** `HasLicenseScope` disables itself as soon as `use_separated_databases` is `true`, independently of whether `connection_name` is actually set. If you turn on `use_separated_databases` but leave `connection_name` unset, models stay on the default connection *and* lose license scoping — set both config keys together, never `use_separated_databases` alone.
 
 Example — the host application resolves the tenant and configures a connection before touching any `Winmax4*` model:
 
@@ -256,7 +258,7 @@ Passing `--license_id` while `use_license` is `false` makes the command error ou
 
 ## Queues
 
-Sync jobs are dispatched onto the queue configured by `config('winmax4.queue')` (default `winmax4`), so a worker must be listening on that queue for jobs to be processed:
+Only `winmax4:sync-articles`, `winmax4:sync-entities` and `winmax4:sync-families` dispatch queued jobs (`SyncArticlesJob`, `SyncEntitiesJob`, `SyncFamiliesJob`, batched via `Bus::batch(...)`) — the other sync commands (`sync-currencies`, `sync-taxes`, `sync-warehouses`, `sync-payment-types`, `sync-document-types`, `sync-documents`) write to the database synchronously and don't need a worker. The three job-dispatching commands send their batches to the queue configured by `config('winmax4.queue')` (default `winmax4`), so a worker must be listening on that queue for those jobs to be processed:
 
 ```bash
 php artisan queue:work --queue=winmax4
