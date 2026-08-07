@@ -101,7 +101,7 @@ class syncArticles extends Command
             if ($apiArticles == null || is_array($apiArticles) && isset($apiArticles['error'])) {
                 if($apiArticles != null && !$apiArticles['error'] && $apiArticles['status'] != 404){
                     $this->error('An error occurred while syncing articles for ' . $winmax4Setting->company_code. '.');
-                    return;
+                    continue;
                 }
 
                 if(config('winmax4.use_license')){
@@ -111,7 +111,6 @@ class syncArticles extends Command
                 }
             }else if($apiArticles != null && isset($apiArticles->error) && $apiArticles->error) {
                 $this->error($apiArticles->error);
-                return;
             } else {
                 $articles = $apiArticles->Data->Articles;
 
