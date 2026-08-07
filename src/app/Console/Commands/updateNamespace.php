@@ -14,11 +14,8 @@ class updateNamespace extends Command
         $oldNamespace = $this->argument('oldNamespace');
         $newNamespace = $this->argument('newNamespace');
 
-        // Define os arquivos que deseja atualizar
-        $files = [];
-        foreach (glob(app_path('Models/Winmax4') . '/*.php') as $file) {
-            $files[] = $file;
-        }
+        // Define os arquivos que deseja atualizar, incluindo subpastas (ex: Concerns/)
+        $files = glob(app_path('Models/Winmax4') . '/{,**/}*.php', GLOB_BRACE);
 
         foreach ($files as $file) {
             if (file_exists($file)) {
