@@ -3,6 +3,7 @@ composer.phar
 /.idea/
 composer.lock
 /docs/
+/.superpowers/
 /.phpdoc/
 phpdoc.dist.xml
 phpDocumentor.phar
