@@ -223,7 +223,7 @@ php artisan winmax4:sync-document-types {--license_id=}
 php artisan winmax4:sync-documents {--license_id=}
 ```
 
-The `--license_id` option is only accepted when `use_license` is `true`; otherwise the command errors and syncs all licenses configured in `winmax4_settings`.
+Passing `--license_id` while `use_license` is `false` makes the command error out. Omitting `--license_id` syncs every `Winmax4Setting` row (i.e. every configured license/tenant).
 
 ### Full table reference
 
