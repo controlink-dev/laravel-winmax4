@@ -21,6 +21,8 @@ return [
     'licenses_table' => env('WINMAX4_LICENSES_TABLE', 'licenses'),
     'licenses_model' => env('WINMAX4_LICENSES_MODEL', 'App\Models\License'),
     'use_soft_deletes' => env('WINMAX4_USE_SOFT_DELETES', false),
+    'use_separated_databases' => env('WINMAX4_USE_SEPARATED_DATABASES', false),
+    'connection_name' => env('WINMAX4_CONNECTION_NAME', null),
 
 
     /*
