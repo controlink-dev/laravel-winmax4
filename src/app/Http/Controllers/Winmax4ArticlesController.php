@@ -40,6 +40,48 @@ class Winmax4ArticlesController extends Controller
     }
 
     /**
+     * Get a single article from the Winmax4 API by code.
+     *
+     * This method retrieves a specific article using the provided code
+     * through the Winmax4ArticleService and returns it as a JSON response.
+     *
+     * ### Parameters
+     *
+     * | Parameter | Type     | Description                        |
+     * |-----------|----------|------------------------------------|
+     * | `$code`   | `string` | The code of the article to fetch.  |
+     *
+     * ### Return Type
+     *
+     * | Type           | Description                                                      |
+     * |----------------|------------------------------------------------------------------|
+     * | `JsonResponse` | A JSON response containing the article data with status 200.     |
+     *
+     * ### Possible Exceptions
+     *
+     * | Exception   | Condition                                               |
+     * |-------------|---------------------------------------------------------|
+     * | `Exception` | Thrown when the article is not found or an error occurs. |
+     *
+     * @param string $code The code of the article to retrieve.
+     * @return JsonResponse Returns a JSON response with the article data or 404 if not found.
+     */
+    public function getArticle(string $code): JsonResponse
+    {
+        try {
+            $article = $this->winmax4Service->getArticle($code);
+
+            if (is_null($article)) {
+                return response()->json(['error' => 'Article not found'], 404);
+            }
+
+            return response()->json($article, 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Article not found'], 404);
+        }
+    }
+
+    /**
      * Get articles from the Winmax4 API.
      *
      * This method queries the Winmax4Article model using Eloquent ORM to fetch

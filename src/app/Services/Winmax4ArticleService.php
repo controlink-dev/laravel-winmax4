@@ -14,6 +14,158 @@ use GuzzleHttp\Exception\GuzzleException;
 class Winmax4ArticleService extends Winmax4Service
 {
     /**
+     * Winmax4ArticleService constructor.
+     *
+     * This constructor initializes the Winmax4ArticleService by retrieving the
+     * appropriate Winmax4 settings based on the license configuration. It checks
+     * if the application is configured to use licenses and retrieves the settings
+     * accordingly. If no settings are found, it initializes the service with a
+     * default configuration.
+     *
+     * ### License Configuration
+     *
+     * The constructor checks the `use_license` configuration option to determine
+     * how to retrieve the Winmax4 settings:
+     *
+     * - If `use_license` is `true`, it retrieves the settings for the current license using the session key defined in `license_session_key`.
+     * - If `use_license` is `false`, it retrieves the first available settings record.
+     *
+     * ### Service Initialization
+     *
+     * After retrieving the settings, it checks if they exist:
+     *
+     * - If no settings are found, it initializes the `Winmax4ArticleService` with a default configuration (passing `true`).
+     * - If settings are found, it initializes the service with those settings.
+     */
+    public function getArticle(string $code): object|array|null
+    {
+        try {
+            $response = $this->client->get('Files/Articles?Code=' . $code . '&IncludeTaxes=true&IncludeCategories=true&IncludeExtras=true&IncludeHolds=true&IncludeDescriptives=true&IncludeQuestions=true', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token->Data->AccessToken->Value,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            return $this->handleConnectionError($e);
+        }
+
+        $responseJSONDecoded = json_decode($response->getBody()->getContents());
+
+        if (is_array($responseJSONDecoded) && $responseJSONDecoded['error'] === true) {
+            return $responseJSONDecoded;
+        }
+
+        if (is_null($responseJSONDecoded)) {
+            return null;
+        }
+
+        if (is_object($responseJSONDecoded) && isset($responseJSONDecoded->error) && $responseJSONDecoded->error === true) {
+            return $responseJSONDecoded;
+        }
+
+        if (!isset($responseJSONDecoded->Data->Articles) || empty($responseJSONDecoded->Data->Articles)) {
+            return null;
+        }
+
+        $articleData = $responseJSONDecoded->Data->Articles[0];
+
+        $familyCode = property_exists($articleData, 'FamilyCode') ? $articleData->FamilyCode : null;
+        $subFamilyCode = property_exists($articleData, 'SubFamilyCode') ? $articleData->SubFamilyCode : null;
+        $subSubFamilyCode = property_exists($articleData, 'SubSubFamilyCode') ? $articleData->SubSubFamilyCode : null;
+
+        if(config('winmax4.use_soft_deletes')) {
+            $builder = Winmax4Article::withTrashed();
+        } else {
+            $builder = new Winmax4Article();
+        }
+
+        $article = $builder->updateOrCreate(
+            [
+                'code' => $articleData->Code,
+            ],
+            [
+                'id_winmax4' => $articleData->ID,
+                'code' => $articleData->Code,
+                'designation' => $articleData->Designation,
+                'family_id' => $familyCode ? Winmax4Family::where('code', $familyCode)->first()?->id : null,
+                'sub_family_id' => $subFamilyCode ? Winmax4Family::where('code', $subFamilyCode)->first()?->id : null,
+                'sub_sub_family_id' => $subSubFamilyCode ? Winmax4Family::where('code', $subSubFamilyCode)->first()?->id : null,
+                'is_active' => $articleData->IsActive,
+            ]
+        );
+
+        if (isset($articleData->Prices) && is_array($articleData->Prices)) {
+            foreach ($articleData->Prices as $price) {
+                $article->prices()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'currency_id' => Winmax4Currency::where('code', $price->CurrencyCode)->first()->id,
+                        'sales_price1_without_taxes' => $price->SalesPrice1WithoutTaxes ?? 0,
+                        'sales_price1_with_taxes' => $price->SalesPrice1WithTaxes ?? 0,
+                        'sales_price2_without_taxes' => $price->SalesPrice2WithoutTaxes ?? 0,
+                        'sales_price2_with_taxes' => $price->SalesPrice2WithTaxes ?? 0,
+                        'sales_price3_without_taxes' => $price->SalesPrice3WithoutTaxes ?? 0,
+                        'sales_price3_with_taxes' => $price->SalesPrice3WithTaxes ?? 0,
+                        'sales_price4_without_taxes' => $price->SalesPrice4WithoutTaxes ?? 0,
+                        'sales_price4_with_taxes' => $price->SalesPrice4WithTaxes ?? 0,
+                        'sales_price5_without_taxes' => $price->SalesPrice5WithoutTaxes ?? 0,
+                        'sales_price5_with_taxes' => $price->SalesPrice5WithTaxes ?? 0,
+                        'sales_price6_without_taxes' => $price->SalesPrice6WithoutTaxes ?? 0,
+                        'sales_price6_with_taxes' => $price->SalesPrice6WithTaxes ?? 0,
+                        'sales_price7_without_taxes' => $price->SalesPrice7WithoutTaxes ?? 0,
+                        'sales_price7_with_taxes' => $price->SalesPrice7WithTaxes ?? 0,
+                        'sales_price8_without_taxes' => $price->SalesPrice8WithoutTaxes ?? 0,
+                        'sales_price8_with_taxes' => $price->SalesPrice8WithTaxes ?? 0,
+                        'sales_price9_without_taxes' => $price->SalesPrice9WithoutTaxes ?? 0,
+                        'sales_price9_with_taxes' => $price->SalesPrice9WithTaxes ?? 0,
+                        'sales_price_extra_without_taxes' => $price->SalesPriceExtraWithoutTaxes ?? 0,
+                        'sales_price_extra_with_taxes' => $price->SalesPriceExtraWithTaxes ?? 0,
+                        'sales_price_hold_without_taxes' => $price->SalesPriceHoldWithoutTaxes ?? 0,
+                        'sales_price_hold_with_taxes' => $price->SalesPriceHoldWithTaxes ?? 0,
+                    ]
+                );
+            }
+        }
+
+        if (isset($articleData->SaleTaxes) && is_array($articleData->SaleTaxes)) {
+            foreach ($articleData->SaleTaxes as $saleTax) {
+                $article->saleTaxes()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'tax_fee_code' => $saleTax->TaxFeeCode,
+                        'percentage' => $saleTax->Percentage,
+                        'fixedAmount' => $saleTax->FixedAmount ?? 0,
+                    ]
+                );
+            }
+        }
+
+        if (isset($articleData->PurchaseTaxes) && is_array($articleData->PurchaseTaxes)) {
+            foreach ($articleData->PurchaseTaxes as $purchaseTax) {
+                $article->purchaseTaxes()->updateOrCreate(
+                    [
+                        'article_id' => $article->id,
+                    ],
+                    [
+                        'article_id' => $article->id,
+                        'tax_fee_code' => $purchaseTax->TaxFeeCode,
+                        'percentage' => $purchaseTax->Percentage,
+                        'fixedAmount' => $purchaseTax->FixedAmount ?? 0,
+                    ]
+                );
+            }
+        }
+
+        return $article->toArray();
+    }
+
+    /**
      * Get articles from Winmax4 API
      *
      * This method sends a GET request to the specified URL endpoint to fetch a
