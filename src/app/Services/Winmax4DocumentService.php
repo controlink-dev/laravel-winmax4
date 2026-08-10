@@ -259,6 +259,9 @@ class Winmax4DocumentService extends Winmax4Service
         $document->table_split_number = $documentResponse->Data->TableSplitNumber ?? null;
         $document->sales_person_code = $documentResponse->Data->SalesPersonCode ?? null;
         $document->remarks = $documentResponse->Data->Remarks ?? null;
+        if (config('winmax4.use_license')) {
+            $document->{config('winmax4.license_column')} = session(config('winmax4.license_session_key'));
+        }
         $document->save();
 
         /** TODO: Get the $documentResponse and save the paymentsTypes with the returned values from the API
