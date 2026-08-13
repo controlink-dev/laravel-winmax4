@@ -2,12 +2,14 @@
 
 namespace Controlink\LaravelWinmax4\app\Http\Controllers;
 
+use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
 use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
 use Controlink\LaravelWinmax4\app\Services\Winmax4CurrencyService;
 use Controlink\LaravelWinmax4\app\Services\Winmax4DocumentService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class Winmax4DocumentsController extends Controller
 {
@@ -203,7 +205,7 @@ class Winmax4DocumentsController extends Controller
      */
     public function payDocuments(Request $request): JsonResponse{
         $request->validate([
-            'entityCode' => 'required|exists:winmax4_entities,code',
+            'entityCode' => ['required', Rule::exists(Winmax4Entity::class, 'code')],
             'documents.*' => 'required|array',
             'documents.*.DocumentTypeCode' => 'required',
             'documents.*.DocumentNumber' => 'required',

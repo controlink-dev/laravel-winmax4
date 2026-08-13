@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class Winmax4EntitiesController extends Controller
 {
@@ -250,7 +251,7 @@ class Winmax4EntitiesController extends Controller
     public function putEntities(Request $request): JsonResponse
     {
         $request->validate([
-            'id_winmax4' => 'required|integer|exists:winmax4_entities,id_winmax4',
+            'id_winmax4' => ['required', 'integer', Rule::exists(Winmax4Entity::class, 'id_winmax4')],
             'code' => 'required|string|max:255',
             'name' => 'required|string|max:255',
             'entityType' => 'required|integer|in:0,1,2,3,4',
