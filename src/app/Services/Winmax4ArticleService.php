@@ -697,14 +697,22 @@ class Winmax4ArticleService extends Winmax4Service
         }
 
         if ($article['Results'][0]['Code'] !== self::WINMAX4_RESPONSE_OK) {
+
+            $saleTax = $localArticle?->saleTaxes->first();
+            $price = $localArticle?->prices->first();
+
+            if (! $saleTax || ! $price) {
+                return $article;
+            }
+
             $article = $this->putArticles(
                 $idWinmax4,
                 $localArticle->code,
                 $localArticle->family_id,
-                $localArticle->saleTaxes[0]->tax_fee_code,
-                $localArticle->saleTaxes[0]->percentage,
-                $localArticle->prices[0]->sales_price1_without_taxes,
-                $localArticle->prices[0]->sales_price1_with_taxes,
+                $saleTax->tax_fee_code,
+                $saleTax->percentage,
+                $price->sales_price1_without_taxes,
+                $price->sales_price1_with_taxes,
                 $localArticle->sub_family_id,
                 $localArticle->sub_sub_family_id,
                 $localArticle->stock,
@@ -714,10 +722,10 @@ class Winmax4ArticleService extends Winmax4Service
 
             if (!$localArticle->details()->exists() && $forceDelete) {
                 if(config('winmax4.use_soft_deletes')) {
-                    $localArticle->forceDelete();
+                    $localArticle->delete();
                     return $article;
                 } else {
-                    $localArticle->delete();
+                    $localArticle->forceDelete();
                     return $article;
                 }
             }else{

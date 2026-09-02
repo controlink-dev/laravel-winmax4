@@ -72,6 +72,10 @@ class Winmax4Service
      */
     public function generateToken(string $company_code, string $username, string $password, string $n_terminal, string $url = '')
     {
+        $tokenIsEmpty = (object) [
+            'Data' => (object) ['AccessToken' => (object) ['Value' => '']],
+        ];
+
         try {
 
             $response = $this->client->post($url . 'Account/GenerateToken', [
@@ -84,10 +88,14 @@ class Winmax4Service
             ]);
         } catch (ConnectException $e) {
             // Handle timeouts, connection failures, DNS errors, etc.
-            return $this->handleConnectionError($e);
+            $this->handleConnectionError($e);
+
+            return $tokenIsEmpty;
         }
 
-        return json_decode($response->getBody()->getContents());
+        $token = json_decode($response->getBody()->getContents());
+
+        return isset($token->Data->AccessToken->Value) ? $token : $tokenIsEmpty;
     }
 
     /**
