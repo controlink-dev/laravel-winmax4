@@ -180,7 +180,7 @@ class Winmax4DocumentService extends Winmax4Service
             $paymentTypeJson = [
                 [
                     'ID' => $paymentType->id_winmax4,
-                    'Value' => $valueInvoice,
+                    'Value' => round($valueInvoice, 2),
                 ],
             ];
         }
@@ -205,8 +205,6 @@ class Winmax4DocumentService extends Winmax4Service
             $json['RelatedDocuments'] = $RelatedDocuments;
         }
 
-        dd(json_encode($json));
-
         try{
             $response = $this->client->post('Transactions/Documents', [
                 'headers' => [
@@ -215,16 +213,12 @@ class Winmax4DocumentService extends Winmax4Service
                 'json' => $json
             ]);
 
-            dump($json);
         } catch (ConnectException $e) {
             // Handle timeouts, connection failures, DNS errors, etc.
             return $this->handleConnectionError($e);
         }
 
-        $documentResponse = json_decode($response->getBody()->getContents());
-
-        dump($documentResponse);
-        
+        $documentResponse = json_decode($response->getBody()->getContents());        
 
         if (is_array($documentResponse) && $documentResponse['error'] === true) {
             return $documentResponse;
