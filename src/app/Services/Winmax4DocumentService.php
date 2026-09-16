@@ -212,6 +212,8 @@ class Winmax4DocumentService extends Winmax4Service
                 ],
                 'json' => $json
             ]);
+
+            dd($json);
         } catch (ConnectException $e) {
             // Handle timeouts, connection failures, DNS errors, etc.
             return $this->handleConnectionError($e);
@@ -219,8 +221,8 @@ class Winmax4DocumentService extends Winmax4Service
 
         $documentResponse = json_decode($response->getBody()->getContents());
 
-        dd($documentResponse);
         
+
         if (is_array($documentResponse) && $documentResponse['error'] === true) {
             return $documentResponse;
         }
