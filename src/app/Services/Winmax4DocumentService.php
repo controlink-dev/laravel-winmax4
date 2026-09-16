@@ -205,6 +205,8 @@ class Winmax4DocumentService extends Winmax4Service
             $json['RelatedDocuments'] = $RelatedDocuments;
         }
 
+        dd(json_encode($json));
+
         try{
             $response = $this->client->post('Transactions/Documents', [
                 'headers' => [
