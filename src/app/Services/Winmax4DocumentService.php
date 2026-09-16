@@ -219,6 +219,8 @@ class Winmax4DocumentService extends Winmax4Service
 
         $documentResponse = json_decode($response->getBody()->getContents());
 
+        dd($documentResponse);
+        
         if (is_array($documentResponse) && $documentResponse['error'] === true) {
             return $documentResponse;
         }
