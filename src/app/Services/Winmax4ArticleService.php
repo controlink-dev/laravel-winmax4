@@ -528,7 +528,7 @@ class Winmax4ArticleService extends Winmax4Service
         $responseDecoded = json_decode($response->getBody()->getContents());
 
         if (isset($responseDecoded) && isset($responseDecoded->error) && $responseDecoded->error === true) {
-            return $responseDecoded;
+            return (array) $responseDecoded;
         }
 
         if (!isset($responseDecoded->Data)) {
@@ -701,23 +701,35 @@ class Winmax4ArticleService extends Winmax4Service
             $saleTax = $localArticle?->saleTaxes->first();
             $price = $localArticle?->prices->first();
 
-            if (! $saleTax || ! $price) {
+            // putArticles() takes the Winmax4 family codes; the local columns hold Winmax4Family ids.
+            $familyCode = Winmax4Family::where('id', $localArticle?->family_id)->value('code');
+            $subFamilyCode = Winmax4Family::where('id', $localArticle?->sub_family_id)->value('code');
+            $subSubFamilyCode = Winmax4Family::where('id', $localArticle?->sub_sub_family_id)->value('code');
+
+            if (! $saleTax || ! $price || ! $familyCode) {
                 return $article;
             }
 
             $article = $this->putArticles(
                 $idWinmax4,
                 $localArticle->code,
-                $localArticle->family_id,
+                $familyCode,
                 $saleTax->tax_fee_code,
                 $saleTax->percentage,
                 $price->sales_price1_without_taxes,
                 $price->sales_price1_with_taxes,
-                $localArticle->sub_family_id,
-                $localArticle->sub_sub_family_id,
+                $subFamilyCode,
+                $subSubFamilyCode,
                 $localArticle->stock,
                 0
             );
+
+            if (! isset($article['error'])) {
+                $localArticle->is_active = 0;
+                $localArticle->deleted_at = now();
+                $localArticle->save();
+            }
+
         } else {
 
             if (!$localArticle->details()->exists() && $forceDelete) {
