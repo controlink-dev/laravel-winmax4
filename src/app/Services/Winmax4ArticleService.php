@@ -734,6 +734,8 @@ class Winmax4ArticleService extends Winmax4Service
 
             if (!$localArticle->details()->exists() && $forceDelete) {
                 if(config('winmax4.use_soft_deletes')) {
+                    $localArticle->is_active = 0;
+                    $localArticle->save();
                     $localArticle->delete();
                     return $article;
                 } else {
