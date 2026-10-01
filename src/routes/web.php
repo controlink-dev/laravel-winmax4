@@ -36,6 +36,9 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
         Route::get('/get', [Winmax4FamiliesController::class, 'getFamilies'])->name('winmax4.getFamilies');
         Route::get('/getSubFamilies/{family_code}', [Winmax4FamiliesController::class, 'getSubFamilies'])->name('winmax4.getSubFamilies');
         Route::get('/getSubSubFamilies/{sub_family_code}', [Winmax4FamiliesController::class, 'getSubSubFamilies'])->name('winmax4.getSubSubFamilies');
+        Route::post('/store', [Winmax4FamiliesController::class, 'postFamilies'])->name('winmax4.families.store');
+        Route::post('/update/{id}', [Winmax4FamiliesController::class, 'putFamilies'])->name('winmax4.families.update');
+        Route::post('/delete/{id}', [Winmax4FamiliesController::class, 'deleteFamilies'])->name('winmax4.families.delete');
     });
 
     Route::prefix('taxes')->group(function () {
