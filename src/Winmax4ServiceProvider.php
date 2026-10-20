@@ -10,6 +10,7 @@ use Controlink\LaravelWinmax4\app\Console\Commands\syncEntities;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncFamilies;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncPaymentTypes;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncTaxes;
+use Controlink\LaravelWinmax4\app\Console\Commands\syncTerminals;
 use Controlink\LaravelWinmax4\app\Console\Commands\syncWarehouses;
 use Controlink\LaravelWinmax4\app\Console\Commands\updateNamespace;
 use Illuminate\Console\Scheduling\Schedule;
@@ -68,6 +69,7 @@ class Winmax4ServiceProvider extends ServiceProvider
             syncDocumentsTypes::class,
             syncTaxes::class,
             syncWarehouses::class,
+            syncTerminals::class,
             syncPaymentTypes::class,
             syncFamilies::class,
             syncArticles::class,

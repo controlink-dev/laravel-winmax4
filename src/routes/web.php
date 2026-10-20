@@ -10,6 +10,7 @@ use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4EntitiesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4FamiliesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4PaymentTypesController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4TaxesController;
+use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4TerminalsController;
 use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4WarehousesController;
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +63,10 @@ Route::middleware(['web'])->prefix('winmax4')->group(function () {
 
     Route::prefix('warehouses')->group(function () {
         Route::get('/get', [Winmax4WarehousesController::class, 'getWarehouses'])->name('winmax4.getWarehouses');
+    });
+
+    Route::prefix('terminals')->group(function () {
+        Route::get('/get', [Winmax4TerminalsController::class, 'getTerminals'])->name('winmax4.getTerminals');
     });
 
     Route::prefix('documents')->group(function () {

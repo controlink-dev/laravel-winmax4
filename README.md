@@ -1,6 +1,6 @@
 # Laravel Winmax4
 
-A Laravel package (compatible with Laravel 10, 11, 12 and 13) that wraps the Winmax4 API. It ships configuration for connecting to Winmax4, console commands and queued jobs that sync Winmax4 data (articles, entities, families, taxes, currencies, warehouses, payment types, document types and documents) into your own database, a set of Eloquent models mapped to that data, and HTTP controllers for interacting with the API. The package also supports two multi-tenancy strategies — license-scoped rows in a single database, and fully separated per-tenant databases — which are designed to be used together (see [Multi-tenancy](#multi-tenancy)).
+A Laravel package (compatible with Laravel 10, 11, 12 and 13) that wraps the Winmax4 API. It ships configuration for connecting to Winmax4, console commands and queued jobs that sync Winmax4 data (articles, entities, families, taxes, currencies, warehouses, terminals, payment types, document types and documents) into your own database, a set of Eloquent models mapped to that data, and HTTP controllers for interacting with the API. The package also supports two multi-tenancy strategies — license-scoped rows in a single database, and fully separated per-tenant databases — which are designed to be used together (see [Multi-tenancy](#multi-tenancy)).
 
 ## Installation
 
@@ -162,6 +162,9 @@ Package models live under `Controlink\LaravelWinmax4\app\Models`. All models use
 **Warehouses**
 - `Winmax4Warehouse` — table `winmax4_warehouses`.
 
+**Terminals**
+- `Winmax4Terminal` — table `winmax4_terminals`.
+
 **Payment Types**
 - `Winmax4PaymentType` — table `winmax4_payment_types`.
 
@@ -228,6 +231,9 @@ php artisan winmax4:sync-taxes {--license_id=}
 # Sync warehouses.
 php artisan winmax4:sync-warehouses {--license_id=}
 
+# Sync terminals.
+php artisan winmax4:sync-terminals {--license_id=}
+
 # Sync payment types.
 php artisan winmax4:sync-payment-types {--license_id=}
 
@@ -258,6 +264,7 @@ Passing `--license_id` while `use_license` is `false` makes the command error ou
 | `winmax4_currencies` |
 | `winmax4_entities` |
 | `winmax4_warehouses` |
+| `winmax4_terminals` |
 | `winmax4_payment_types` |
 | `winmax4_document_types` |
 | `winmax4_documents` |
@@ -271,7 +278,7 @@ Passing `--license_id` while `use_license` is `false` makes the command error ou
 
 ## Queues
 
-Only `winmax4:sync-articles`, `winmax4:sync-entities` and `winmax4:sync-families` dispatch queued jobs (`SyncArticlesJob`, `SyncEntitiesJob`, `SyncFamiliesJob`, batched via `Bus::batch(...)`) — the other sync commands (`sync-currencies`, `sync-taxes`, `sync-warehouses`, `sync-payment-types`, `sync-document-types`, `sync-documents`) write to the database synchronously and don't need a worker. The three job-dispatching commands send their batches to the queue configured by `config('winmax4.queue')` (default `winmax4`), so a worker must be listening on that queue for those jobs to be processed:
+Only `winmax4:sync-articles`, `winmax4:sync-entities` and `winmax4:sync-families` dispatch queued jobs (`SyncArticlesJob`, `SyncEntitiesJob`, `SyncFamiliesJob`, batched via `Bus::batch(...)`) — the other sync commands (`sync-currencies`, `sync-taxes`, `sync-warehouses`, `sync-terminals`, `sync-payment-types`, `sync-document-types`, `sync-documents`) write to the database synchronously and don't need a worker. The three job-dispatching commands send their batches to the queue configured by `config('winmax4.queue')` (default `winmax4`), so a worker must be listening on that queue for those jobs to be processed:
 
 ```bash
 php artisan queue:work --queue=winmax4

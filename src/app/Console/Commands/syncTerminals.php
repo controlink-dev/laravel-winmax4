@@ -1,0 +1,106 @@
+<?php
+
+namespace Controlink\LaravelWinmax4\app\Console\Commands;
+
+use Controlink\LaravelWinmax4\app\Http\Controllers\Winmax4Controller;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Setting;
+use Controlink\LaravelWinmax4\app\Models\Winmax4Terminal;
+use Controlink\LaravelWinmax4\app\Services\Winmax4TerminalService;
+use Illuminate\Console\Command;
+
+class syncTerminals extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'winmax4:sync-terminals
+                            {--license_id= : If you want to sync terminals for a specific license, specify the license id.}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Sync terminals from Winmax4 API';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
+    {
+        $license_id = null;
+        if(config('winmax4.use_license')){
+            if($this->option('license_id') != null){
+                // If the license_id option is set, use it
+                $license_id = $this->option('license_id');
+            }
+        }
+
+        if (!config('winmax4.use_license') && $this->option('license_id') != null) {
+            $this->error('You cannot specify a license id if you are not using the use_license configuration.');
+            return;
+        }
+
+        if ($license_id != null) {
+            $this->info('Syncing terminals for license id ' . $license_id . '...');
+            $winmax4Settings = Winmax4Setting::where(config('winmax4.license_column'), $license_id)->get();
+        } else {
+            $this->info('Syncing terminals for all licenses...');
+            $winmax4Settings = Winmax4Setting::get();
+        }
+
+        foreach ($winmax4Settings as $winmax4Setting) {
+            if(config('winmax4.use_license')){
+                if(!$winmax4Setting->tenant){
+                    continue;
+                }
+            }
+
+            $this->info('Syncing terminals for ' . $winmax4Setting->company_code . '...');
+            $winmax4Service = new Winmax4TerminalService(
+                false,
+                $winmax4Setting->url,
+                $winmax4Setting->company_code,
+                $winmax4Setting->username,
+                $winmax4Setting->password,
+                $winmax4Setting->n_terminal,
+                $winmax4Setting->license_id
+            );
+
+            $response = $winmax4Service->getTerminals();
+
+            if ($response === null || (is_object($response) && isset($response->error) && $response->error === true)) {
+                $this->warn("Skipping terminals sync for {$winmax4Setting->company_code}: no data returned from Winmax4 API.");
+                continue;
+            }
+
+            $terminals = $response->Data->Terminals ?? [];
+
+            foreach ($terminals as $terminal) {
+                $keys = ['code' => $terminal->Code];
+
+                if(config('winmax4.use_license')){
+                    $keys[config('winmax4.license_column')] = $winmax4Setting->license_id;
+                }
+
+                Winmax4Terminal::updateOrCreate($keys, [
+                    'designation' => $terminal->Designation,
+                    'is_active' => $terminal->IsActive,
+                    'service_zone_code' => $terminal->ServiceZoneCode ?? null,
+                    'price_type' => $terminal->PriceType ?? null,
+                    'ask_entity_info' => $terminal->AskEntityInfo ?? false,
+                    'pos_default_table_number' => $terminal->POSDefaultTableNumber ?? null,
+                    'pos_printer_is_local' => $terminal->POSPrinterIsLocal ?? false,
+                ]);
+            }
+
+            if(config('winmax4.use_license')){
+                (new Winmax4Controller())->updateLastSyncedAt(Winmax4Terminal::class, $winmax4Setting->license_id);
+            }else{
+                (new Winmax4Controller())->updateLastSyncedAt(Winmax4Terminal::class);
+            }
+        }
+    }
+}
