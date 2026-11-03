@@ -3,11 +3,15 @@
 namespace Controlink\LaravelWinmax4\app\Services;
 
 use Controlink\LaravelWinmax4\app\Models\Winmax4Entity;
+use Controlink\LaravelWinmax4\app\Models\Winmax4RequestLog;
 use Controlink\LaravelWinmax4\app\Models\Winmax4SyncErrors;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Promise\Create;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Response;
 
@@ -36,6 +40,10 @@ class Winmax4Service
                 );
             };
         });
+        // Pushed last so it sits next to the HTTP handler: logs the request exactly as sent and the raw response.
+        if (config('winmax4.log_requests')) {
+            $stack->push($this->logRequests($license_id));
+        }
 
         //Check if $url ends with a / if not add one
         if (!empty($url) && !str_ends_with($url, '/')) {
@@ -96,6 +104,96 @@ class Winmax4Service
         $token = json_decode($response->getBody()->getContents());
 
         return isset($token->Data->AccessToken->Value) ? $token : $tokenIsEmpty;
+    }
+
+    /**
+     * Guzzle middleware that stores every request to Winmax4 and its response (or connection error)
+     * in winmax4_request_logs. The password and the bearer token are masked; a failure to write
+     * the log is reported and never breaks the call to Winmax4.
+     */
+    protected function logRequests($license_id): callable
+    {
+        return function (callable $handler) use ($license_id) {
+            return function (RequestInterface $request, array $options) use ($handler, $license_id) {
+                $startedAt = microtime(true);
+
+                return $handler($request, $options)->then(
+                    function ($response) use ($request, $startedAt, $license_id) {
+                        $this->storeRequestLog($request, $startedAt, $license_id, $response);
+
+                        return $response;
+                    },
+                    function ($reason) use ($request, $startedAt, $license_id) {
+                        $this->storeRequestLog($request, $startedAt, $license_id, null, $reason);
+
+                        return Create::rejectionFor($reason);
+                    }
+                );
+            };
+        };
+    }
+
+    private function storeRequestLog(RequestInterface $request, float $startedAt, $license_id, ?ResponseInterface $response = null, $reason = null): void
+    {
+        try {
+            $headers = $request->getHeaders();
+            if (isset($headers['Authorization'])) {
+                $headers['Authorization'] = ['Bearer ***'];
+            }
+
+            $requestBody = $this->readBody($request);
+            $decoded = json_decode((string) $requestBody, true);
+            if (is_array($decoded) && array_key_exists('Password', $decoded)) {
+                $decoded['Password'] = '***';
+                $requestBody = json_encode($decoded);
+            }
+
+            $responseBody = $response ? $this->readBody($response) : null;
+            $decoded = json_decode((string) $responseBody, true);
+            foreach (['AccessToken', 'RefreshToken'] as $token) {
+                if (isset($decoded['Data'][$token]['Value'])) {
+                    $decoded['Data'][$token]['Value'] = '***';
+                    $responseBody = json_encode($decoded);
+                }
+            }
+
+            $attributes = [
+                'method' => $request->getMethod(),
+                'url' => (string) $request->getUri(),
+                'request_headers' => $headers,
+                'request_body' => $requestBody,
+                'status_code' => $response?->getStatusCode(),
+                'response_headers' => $response?->getHeaders(),
+                'response_body' => $responseBody,
+                'error' => $reason instanceof \Throwable ? get_class($reason) . ': ' . $reason->getMessage() : ($reason === null ? null : (string) $reason),
+                'duration_ms' => (int) round((microtime(true) - $startedAt) * 1000),
+            ];
+
+            if (config('winmax4.use_license')) {
+                $attributes[config('winmax4.license_column')] = session('licenseID') ?? ($license_id ?: null);
+            }
+
+            Winmax4RequestLog::create($attributes);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
+     * Reads the whole body and rewinds it, so the code that consumes the response afterwards still sees it all.
+     */
+    private function readBody(MessageInterface $message): ?string
+    {
+        $body = $message->getBody();
+
+        if (!$body->isSeekable()) {
+            return null; // shortcut: streamed bodies can't be re-read, Winmax4 never sends them
+        }
+
+        $contents = (string) $body;
+        $body->rewind();
+
+        return $contents === '' ? null : $contents;
     }
 
     /**

@@ -40,6 +40,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Request Logs
+    |--------------------------------------------------------------------------
+    |
+    | When true, every request to the Winmax4 API and its response (or
+    | connection error) is stored in winmax4_request_logs. Passwords and
+    | tokens are masked.
+    |
+    */
+    'log_requests' => env('WINMAX4_LOG_REQUESTS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Jobs Configuration
     |--------------------------------------------------------------------------
     |
